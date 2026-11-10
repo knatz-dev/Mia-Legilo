@@ -1,0 +1,103 @@
+{
+  "generator": "experiments/reader_lab/scripts/generate_corpus.py",
+  "license": "CC0-1.0",
+  "note": "Original synthetic books. No third-party book text is included.",
+  "books": [
+    {
+      "id": "EPUB-001",
+      "filename": "EPUB-001-simple.epub",
+      "title": "Simple Text",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "134004aee4f490556fa918a69e1806572ea6d91cd596e8d7b2ddd577bffba724",
+      "sizeBytes": 3521,
+      "epubVersion": "3.0",
+      "spineItemCount": 3,
+      "notable": "Short text-only EPUB 3. Three spine items, no images or tables."
+    },
+    {
+      "id": "EPUB-002",
+      "filename": "EPUB-002-novel.epub",
+      "title": "Medium Novel",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "043d39ae8dad2fd087ef3108f33a8375d74f2de4193b352ad57005aef6da589d",
+      "sizeBytes": 23013,
+      "epubVersion": "3.0",
+      "spineItemCount": 18,
+      "notable": "Medium novel shape: 18 spine items with several paragraphs each."
+    },
+    {
+      "id": "EPUB-003",
+      "filename": "EPUB-003-many-spines.epub",
+      "title": "Many Spine Items",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "a0fdecde8ea3b7b39bbcf512314e015572a93f9b63157c5e26c3fc8cf022c778",
+      "sizeBytes": 197485,
+      "epubVersion": "3.0",
+      "spineItemCount": 120,
+      "notable": "120 spine items and longer chapters. Used for load, memory and boundary frequency."
+    },
+    {
+      "id": "EPUB-004",
+      "filename": "EPUB-004-css.epub",
+      "title": "Complex CSS",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "acf48873dd14d7481a7ee074ddfaed7c3812844b62173dd7e924b555cf51693c",
+      "sizeBytes": 4767,
+      "epubVersion": "3.0",
+      "spineItemCount": 4,
+      "notable": "Publisher CSS includes a hidden paragraph, a drop cap, and text-align. The hidden sentence is HIDDEN-EPUB-004-SHOULD-NOT-APPEAR."
+    },
+    {
+      "id": "EPUB-005",
+      "filename": "EPUB-005-mixed.epub",
+      "title": "Images Tables Footnotes",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "1e8cb0e58b679e35e93cb278832f252ae6619934263458be7f6227def354e54c",
+      "sizeBytes": 5163,
+      "epubVersion": "3.0",
+      "spineItemCount": 5,
+      "notable": "Contains one PNG, an HTML table, and an EPUB 3 footnote."
+    },
+    {
+      "id": "EPUB-006",
+      "filename": "EPUB-006-long-chapters.epub",
+      "title": "Long Chapters",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "1f5578f9d20272c0ceedd8577cd62f50e250c200280ccb0b2c1ef52dc4d3d786",
+      "sizeBytes": 11307,
+      "epubVersion": "3.0",
+      "spineItemCount": 2,
+      "notable": "Two long spine items, to stress per-chapter layout cost."
+    },
+    {
+      "id": "EPUB-007",
+      "filename": "EPUB-007-short-chapters.epub",
+      "title": "Short Chapters",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "8b99ae68b165bb9ff9ed1f8cafb5901b9f05c1961cc36f461866df02c8dcf42a",
+      "sizeBytes": 21946,
+      "epubVersion": "3.0",
+      "spineItemCount": 36,
+      "notable": "36 very short spine items. Boundary crossing is frequent."
+    },
+    {
+      "id": "EPUB-008",
+      "filename": "EPUB-008-epub3-nav.epub",
+      "title": "EPUB 3 Semantics",
+      "source": "experiments/reader_lab/scripts/generate_corpus.py",
+      "license": "CC0-1.0",
+      "sha256": "0623d58e8941c691ee0db38f8c2b7339d5a4810d7272c64a5161f8a6c8ca72f1",
+      "sizeBytes": 6048,
+      "epubVersion": "3.0",
+      "spineItemCount": 6,
+      "notable": "EPUB 3 package with a nav document, landmarks, and epub:type on sections."
+    }
+  ]
+}

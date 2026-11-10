@@ -1,0 +1,22 @@
+Foliate-js EPUB subset vendored for the Mia Legilo Reader Lab.
+
+Upstream: https://github.com/readest/foliate-js
+Pinned commit: see PINNED_SHA
+License: MIT (Copyright (c) 2022 John Factotum). The full license is LICENSE
+in this directory.
+
+The Readest application (https://github.com/readest/readest) is AGPL-3.0.
+None of that application's source is included here. This directory contains
+only the foliate-js library files required to open a reflowable EPUB:
+
+- view.js, epub.js, epubcfi.js, paginator.js, progress.js, overlayer.js,
+  text-walker.js, section-chunks.js
+- vendor/zip.js (BSD-3-Clause, vendored by foliate-js)
+
+PDF.js, fixed-layout.js, and the Readest UI are intentionally not vendored.
+fixed-layout.js imports the npm package construct-style-sheets-polyfill,
+which is not bundled. Fixed-layout EPUBs are outside this lab corpus.
+
+The lab host page (host.html) is original Reader Lab code. It uses the
+public foliate-view custom element: open(), init(), goTo(), the flow
+attribute, and the load and relocate events.

@@ -110,6 +110,13 @@ coverage/
 # Symbols
 app.*.symbols
 
+# The Flutter engine ignore rules above also match app wrapper scripts.
+# The Reader Lab needs those scripts and its lockfiles.
+!experiments/**/pubspec.lock
+!experiments/**/android/gradlew
+!experiments/**/android/gradlew.bat
+!experiments/**/android/gradle/wrapper/gradle-wrapper.jar
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3

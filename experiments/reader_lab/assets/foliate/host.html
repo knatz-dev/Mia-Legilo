@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <title>Reader Lab Foliate host</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #ffffff; }
+    foliate-view { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+<script type="module">
+import './view.js';
+
+const view = document.createElement('foliate-view');
+document.body.append(view);
+
+let preferences = {
+  fontSizePx: 18,
+  lineHeight: 1.5,
+  paragraphSpacingEm: 0.8,
+  marginPx: 20,
+  fontFamily: 'serif',
+  textAlign: 'start',
+  background: '#ffffff',
+  foreground: '#111111',
+  reducedMotion: false,
+};
+
+function post(message) {
+  const json = JSON.stringify(message);
+  const bridge = window.flutter_inappwebview;
+  if (bridge && bridge.callHandler) {
+    bridge.callHandler('foliate', json);
+  }
+}
+
+function stylesheet() {
+  const align = preferences.textAlign === 'justify' ? 'justify' : preferences.textAlign;
+  return `
+    html, body {
+      background: ${preferences.background} !important;
+      color: ${preferences.foreground} !important;
+    }
+    body {
+      font-size: ${preferences.fontSizePx}px !important;
+      line-height: ${preferences.lineHeight} !important;
+      font-family: ${preferences.fontFamily} !important;
+      margin: ${preferences.marginPx}px !important;
+      text-align: ${align} !important;
+    }
+    p { margin-bottom: ${preferences.paragraphSpacingEm}em !important; }
+  `;
+}
+
+function applyToDocument(doc) {
+  if (!doc) return;
+  let style = doc.getElementById('reader-lab-style');
+  if (!style) {
+    style = doc.createElement('style');
+    style.id = 'reader-lab-style';
+    (doc.head || doc.documentElement).append(style);
+  }
+  style.textContent = stylesheet();
+}
+
+function applyAll() {
+  const contents = view.renderer && view.renderer.getContents
+    ? view.renderer.getContents()
+    : [];
+  for (const item of contents) applyToDocument(item.doc);
+}
+
+function serialise(detail) {
+  const toc = detail && detail.tocItem;
+  return {
+    cfi: detail && detail.cfi ? detail.cfi : null,
+    fraction: detail && typeof detail.fraction === 'number' ? detail.fraction : null,
+    chapterLabel: toc && toc.label ? toc.label : null,
+  };
+}
+
+view.addEventListener('load', (event) => {
+  applyToDocument(event.detail && event.detail.doc);
+  post({ type: 'load', index: event.detail ? event.detail.index : null });
+});
+
+view.addEventListener('relocate', (event) => {
+  post({ type: 'relocate', location: serialise(event.detail) });
+});
+
+window.readerLab = {
+  async open(url, cfi) {
+    await view.open(url);
+    if (!view.renderer) throw new Error('foliate renderer missing after open');
+    view.renderer.setAttribute('flow', 'scrolled');
+    if (view.renderer.hasAttribute('animated')) {
+      view.renderer.removeAttribute('animated');
+    }
+    if (view.renderer.hasAttribute('no-continuous-scroll')) {
+      view.renderer.removeAttribute('no-continuous-scroll');
+    }
+    await view.init(cfi ? { lastLocation: cfi } : {});
+    applyAll();
+    post({
+      type: 'opened',
+      sections: view.book && view.book.sections ? view.book.sections.length : null,
+      flow: view.renderer.getAttribute('flow'),
+      continuousScrollDisabled: view.renderer.hasAttribute('no-continuous-scroll'),
+    });
+  },
+  async goTo(cfi) {
+    await view.goTo(cfi);
+  },
+  setPreferences(next) {
+    preferences = Object.assign({}, preferences, next || {});
+    applyAll();
+    post({ type: 'preferences-applied' });
+  },
+  current() {
+    return serialise(view.lastLocation);
+  },
+};
+
+post({ type: 'ready' });
+</script>
+</body>
+</html>

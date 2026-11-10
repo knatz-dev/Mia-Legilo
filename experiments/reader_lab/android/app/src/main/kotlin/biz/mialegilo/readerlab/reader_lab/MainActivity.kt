@@ -1,0 +1,5 @@
+package biz.mialegilo.readerlab.reader_lab
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

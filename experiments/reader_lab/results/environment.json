@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-11-10T10:12:27Z",
+  "host": {
+    "os": "Ubuntu 24.04.5 LTS",
+    "kernel": "6.12.113+",
+    "role": "cloud agent VM, not an Android device"
+  },
+  "flutter": {
+    "version": "3.47.9",
+    "channel": "stable",
+    "frameworkRevision": "c197ca5199",
+    "engineRevision": "89c39edfdf",
+    "dart": "3.13.7"
+  },
+  "androidSdk": {
+    "compileSdkUsedByReaderLab": 36,
+    "compileSdkUsedByReadiumLab": 37,
+    "platformInstalled": ["android-35", "android-36", "android-37.0"],
+    "buildTools": "36.0.0"
+  },
+  "androidDevice": null,
+  "androidEmulator": null,
+  "renderingBackendOnDevice": null,
+  "builds": {
+    "readerLabDebugApk": "compiled with flutter build apk --debug; not installed",
+    "readiumLabDebugApk": "compiled with flutter build apk --debug; not installed"
+  },
+  "physicalDeviceBenchmarks": "not run",
+  "reason": "No Android device was attached. No emulator system image was installed. Debug APK compilation is not a runtime measurement."
+}
