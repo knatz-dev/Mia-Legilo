@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-fixed": "#1d1b18", "background": "#fbf9f3", "ink-charcoal": "#292724", "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3ee", "secondary-container": "#d6e4ca", "on-surface-variant": "#4a463f", "outline": "#7b766f", "inverse-on-surface": "#f2f1eb", "surface-container-high": "#eae8e2", "tertiary-fixed": "#ffdbcb", "secondary-fixed-dim": "#bccbb2", "surface-variant": "#e4e2dd", "surface": "#fbf9f3", "outline-variant": "#ccc5bc", "on-primary-container": "#928e89", "paper-elevated": "#E8E0D2", "border-ink": "#292724", "tertiary-fixed-dim": "#ffb691", "tertiary": "#260a00", "surface-container": "#f0eee8", "on-tertiary-container": "#c77c54", "primary": "#141310", "tertiary-container": "#461a00", "inverse-surface": "#30312d", "on-tertiary-fixed-variant": "#713714", "sage-accent": "#83917A", "surface-dim": "#dcdad4", "on-secondary-container": "#596652", "on-tertiary-fixed": "#341100", "on-secondary": "#ffffff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#494643", "primary-fixed-dim": "#cbc6c1", "primary-container": "#292724", "on-primary": "#ffffff", "secondary-fixed": "#d8e7cd", "paper-container": "#F2EBE0", "error-container": "#ffdad6", "secondary": "#55624e", "primary-fixed": "#e7e1dd", "inverse-primary": "#cbc6c1", "on-error": "#ffffff", "paper-surface": "#FAF8F2", "error": "#ba1a1a", "surface-container-highest": "#e4e2dd", "on-secondary-fixed": "#131f0e", "ochre-accent": "#C87D55", "surface-bright": "#fbf9f3", "highlight-sage": "#E1E6DE", "highlight-ochre": "#F2DDCF", "on-secondary-fixed-variant": "#3e4a37", "on-surface": "#1b1c19", "surface-tint": "#615e5a", "ink-muted": "#6E6962", "on-tertiary": "#ffffff", "on-background": "#1b1c19" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "margin": "1rem", "space-lg": "1.5rem", "gutter": "1rem", "gutter-tablet": "1.5rem", "space-xs": "0.25rem", "margin-tablet": "2rem", "space-md": "1rem", "space-xl": "2rem", "space-sm": "0.5rem", "margin-desktop": "3rem" }, fontFamily: { "headline-xl-mobile": ["Newsreader"], "headline-lg-mobile": ["Newsreader"], "body-lg": ["Newsreader"], "headline-lg": ["Newsreader"], "headline-md": ["Newsreader"], "body-sm": ["Newsreader"], "body-md": ["Newsreader"], "headline-sm": ["Newsreader"], "label-md": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "headline-xl": ["Newsreader"] }, fontSize: { "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }], "body-lg": ["19px", { "lineHeight": "30px", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-xl": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.02em", "fontWeight": "500" }] } } } };</script><style>@layer base { .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } } .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; line-height: 1; }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="min-h-screen bg-[rgba(41,39,36,0.45)] font-body-md text-body-md text-on-surface antialiased flex flex-col justify-end selection:bg-highlight-ochre selection:text-ink-charcoal"><main class="flex flex-col relative w-full justify-end min-h-screen bg-transparent"><div class="flex flex-col w-full relative min-h-full">
+<!-- Atmospheric Dimmed Library Background (Simulated behind scrim) -->
+<div aria-hidden="true" class="w-full px-space-md pt-4 opacity-40 select-none pointer-events-none filter blur-[0.6px]">
+<!-- Library Top Bar -->
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-ink-charcoal text-[26px]">menu_book</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-ink-charcoal tracking-tight">Mia Legilo</h1>
+</div>
+<div class="flex items-center space-x-2">
+<span class="w-9 h-9 rounded-full bg-paper-container flex items-center justify-center text-ink-charcoal shadow-sm">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<span class="w-9 h-9 rounded-full bg-paper-container flex items-center justify-center text-ink-charcoal shadow-sm">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</span>
+</div>
+</div>
+<!-- Search / Filter Pill Display -->
+<div class="bg-paper-container rounded-xl p-2.5 flex items-center space-x-2 mb-4">
+<span class="material-symbols-outlined text-ink-muted text-[18px]">filter_list</span>
+<span class="font-label-md text-label-md text-ink-muted">All Shelves • 38 Volumes</span>
+</div>
+<!-- Simulated Book Cards Mosaic -->
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-paper-container p-3 rounded-lg shadow-sm flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm text-ochre-accent uppercase tracking-wider">Ursula K. Le Guin</span>
+<span class="material-symbols-outlined text-[16px] text-ink-muted">bookmark</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal leading-tight">The Dispossessed</h2>
+<p class="font-label-sm text-label-sm text-ink-muted mt-0.5">Hainish Cycle • Vol. 5</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-sage-accent h-full w-[64%]"></div>
+</div>
+</div>
+</div>
+<div class="bg-paper-container p-3 rounded-lg shadow-sm flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm text-ochre-accent uppercase tracking-wider">Susanna Clarke</span>
+<span class="material-symbols-outlined text-[16px] text-ink-muted">bookmark</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal leading-tight">Piranesi</h2>
+<p class="font-label-sm text-label-sm text-ink-muted mt-0.5">The Halls • 82% read</p>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-2 overflow-hidden">
+<div class="bg-sage-accent h-full w-[82%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Ambient Scrim Layer Spacer -->
+<div class="flex-grow min-h-[36px]" onclick="handleDismiss()"></div>
+<!-- Bottom Sheet Container (Tactile SketchCN Notebook Aesthetic with Multi-Level Sorting) -->
+<section class="w-full bg-paper-surface rounded-t-[26px] border-t-[1.75px] border-x-[1.75px] border-[#292724] shadow-[0_-8px_24px_rgba(41,39,36,0.18)] flex flex-col max-h-[82vh] transition-transform duration-200 ease-out relative z-20 pb-safe" id="sort-bottom-sheet" style="box-shadow: 0 -4px 0px #292724, 0 -12px 30px rgba(41, 39, 36, 0.25); border-top-left-radius: 24px; border-top-right-radius: 26px;">
+<!-- Paper Grain Subtle Overlay Tint -->
+<div class="absolute inset-0 pointer-events-none rounded-t-[26px] opacity-25 mix-blend-multiply bg-[radial-gradient(#292724_0.75px,transparent_0.75px)] [background-size:12px_12px]"></div>
+<!-- Hand-Drawn Drag Handle Zone -->
+<div class="w-full flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing touch-none relative z-10">
+<div class="w-10 h-1.5 bg-ink-charcoal/70 rounded-full" style="clip-path: ellipse(48% 46% at 50% 50%);"></div>
+</div>
+<!-- Sheet Header -->
+<div class="px-space-md pt-1 pb-2 flex items-start justify-between relative z-10">
+<div class="flex items-start space-x-2.5">
+<div class="w-9 h-9 rounded-lg bg-paper-container border border-ink-charcoal flex items-center justify-center text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] mt-0.5 shrink-0">
+<span class="material-symbols-outlined text-[20px]">low_priority</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal font-semibold tracking-tight leading-snug">Sort Books</h2>
+<p class="font-label-sm text-label-sm text-ink-muted">Multi-level catalog ordering • 38 volumes</p>
+</div>
+</div>
+<!-- Hand-Drawn Style Dismiss Button (Min 48dp target) -->
+<button aria-label="Close sort sheet" class="w-12 h-12 flex items-center justify-center -mr-2 -mt-1 text-ink-charcoal active:scale-95 transition-transform" onclick="handleDismiss()" type="button">
+<span class="w-8 h-8 rounded-full bg-paper-container border border-ink-charcoal flex items-center justify-center shadow-[1.5px_1.5px_0px_#292724] active:shadow-none active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</span>
+</button>
+</div>
+<!-- Active Summary Badge -->
+<div class="px-space-md pb-2 relative z-10">
+<div class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-highlight-ochre/60 border border-ochre-accent/40 rounded-lg text-ink-charcoal text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px] text-ochre-accent">layers</span>
+<span class="font-medium">2 active tiers:</span>
+<span class="font-semibold text-ink-charcoal">Author (A→Z)</span>
+<span class="text-ochre-accent">➔</span>
+<span class="font-semibold text-ink-charcoal">Series Index (1→9)</span>
+</div>
+</div>
+<!-- Scrollable Sheet Content -->
+<div class="flex-1 overflow-y-auto px-space-md py-1 space-y-3.5 relative z-10 overscroll-contain">
+<!-- Multi-Level Rules Stack -->
+<div class="space-y-2.5">
+<!-- Tier 1: Primary Order -->
+<div class="bg-paper-container border-[1.5px] border-ink-charcoal rounded-xl p-3 shadow-[2px_2px_0px_#292724] relative">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center space-x-2">
+<span class="px-2 py-0.5 bg-ink-charcoal text-paper-surface rounded text-[11px] font-label-sm font-semibold tracking-wide uppercase">1 • Primary Order</span>
+<span class="text-label-sm text-ink-muted">Master grouping</span>
+</div>
+<!-- Reorder grab handle -->
+<span class="material-symbols-outlined text-[18px] text-ink-muted/80 cursor-grab" title="Drag to reorder">drag_indicator</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<!-- Criteria Selector -->
+<div class="min-h-[48px] px-3 py-2 bg-paper-surface border border-ink-charcoal rounded-lg flex items-center justify-between shadow-[1px_1px_0px_#292724] cursor-pointer active:translate-x-[0.5px] active:translate-y-[0.5px]">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-[19px] text-ochre-accent">person</span>
+<div>
+<div class="font-label-md text-label-md font-semibold text-ink-charcoal leading-none">Author</div>
+<div class="font-label-sm text-[10px] text-ink-muted leading-tight mt-0.5">Creator or translator surname</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-ink-charcoal">expand_more</span>
+</div>
+<!-- Dedicated Order Toggle (Ascending Active) -->
+<div class="h-[48px] p-1 bg-surface-container rounded-lg border border-ink-charcoal flex items-center gap-1 shadow-[inset_1px_1px_2px_rgba(41,39,36,0.1)]">
+<button class="flex-1 h-full px-2 rounded-md bg-paper-surface text-ink-charcoal border border-ink-charcoal/70 shadow-[1px_1px_0px_#292724] flex items-center justify-center space-x-1 font-label-sm text-label-sm font-semibold transition-all" type="button">
+<span class="material-symbols-outlined text-[16px] text-ochre-accent">arrow_upward</span>
+<span>A → Z</span>
+</button>
+<button class="flex-1 h-full px-2 rounded-md text-on-surface-variant hover:text-ink-charcoal flex items-center justify-center space-x-1 font-label-sm text-label-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[16px] opacity-60">arrow_downward</span>
+<span>Z → A</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tier 2: Secondary Order -->
+<div class="bg-paper-container border-[1.5px] border-ink-charcoal rounded-xl p-3 shadow-[2px_2px_0px_#292724] relative">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center space-x-2">
+<span class="px-2 py-0.5 bg-paper-elevated border border-ink-charcoal text-ink-charcoal rounded text-[11px] font-label-sm font-semibold tracking-wide uppercase">2 • Then by</span>
+<span class="text-label-sm text-ink-muted">Secondary ordering</span>
+</div>
+<div class="flex items-center space-x-1">
+<!-- Remove tier button (Min 48dp target container) -->
+<button aria-label="Remove tier" class="w-7 h-7 -my-1 rounded-full hover:bg-surface-container-high flex items-center justify-center text-ink-muted hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[17px]">close</span>
+</button>
+<!-- Reorder grab handle -->
+<span class="material-symbols-outlined text-[18px] text-ink-muted/80 cursor-grab" title="Drag to reorder">drag_indicator</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+<!-- Criteria Selector -->
+<div class="min-h-[48px] px-3 py-2 bg-paper-surface border border-ink-charcoal rounded-lg flex items-center justify-between shadow-[1px_1px_0px_#292724] cursor-pointer active:translate-x-[0.5px] active:translate-y-[0.5px]">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-[19px] text-ochre-accent">format_list_numbered</span>
+<div>
+<div class="font-label-md text-label-md font-semibold text-ink-charcoal leading-none">Series Index</div>
+<div class="font-label-sm text-[10px] text-ink-muted leading-tight mt-0.5">Volume numbering within cycle</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-[18px] text-ink-charcoal">expand_more</span>
+</div>
+<!-- Dedicated Order Toggle (1 -> 9 Active) -->
+<div class="h-[48px] p-1 bg-surface-container rounded-lg border border-ink-charcoal flex items-center gap-1 shadow-[inset_1px_1px_2px_rgba(41,39,36,0.1)]">
+<button class="flex-1 h-full px-2 rounded-md bg-paper-surface text-ink-charcoal border border-ink-charcoal/70 shadow-[1px_1px_0px_#292724] flex items-center justify-center space-x-1 font-label-sm text-label-sm font-semibold transition-all" type="button">
+<span class="material-symbols-outlined text-[16px] text-ochre-accent">arrow_upward</span>
+<span>1 → 9</span>
+</button>
+<button class="flex-1 h-full px-2 rounded-md text-on-surface-variant hover:text-ink-charcoal flex items-center justify-center space-x-1 font-label-sm text-label-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[16px] opacity-60">arrow_downward</span>
+<span>9 → 1</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Add Sort Tier Button (Dotted hand-drawn outline, 48dp min touch height) -->
+<button class="w-full min-h-[48px] px-4 py-2.5 rounded-xl border-[1.75px] border-dashed border-ink-charcoal/60 bg-paper-surface/60 hover:bg-paper-container text-ink-charcoal font-label-md text-label-md font-semibold flex items-center justify-center space-x-2 active:scale-[0.99] transition-all" type="button">
+<span class="material-symbols-outlined text-[19px] text-ochre-accent">add_circle_outline</span>
+<span>+ Add Sort Tier (e.g. Recently Added or Title)</span>
+</button>
+</div>
+<!-- Live Preview / Example Callout (Notebook style box) -->
+<div class="p-3 bg-highlight-sage/50 border border-sage-accent/60 rounded-xl relative overflow-hidden">
+<div class="flex items-start space-x-2.5">
+<div class="w-6 h-6 rounded-full bg-sage-accent/20 flex items-center justify-center text-secondary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">edit_note</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-ink-charcoal leading-snug">
+<strong class="font-semibold text-ink-charcoal">Preview:</strong> Books grouped by Author alphabetically, with series arranged in reading order (e.g., <em class="italic font-normal">Ursula K. Le Guin: Hainish Cycle Vol. 1 to Vol. 7</em>).
+        </p>
+</div>
+</div>
+</div>
+<!-- Available Criteria Quick Presets or Quick Swap Chips -->
+<div>
+<div class="flex items-center justify-between mb-1.5 px-0.5">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase tracking-wider font-semibold">Common Presets</span>
+<span class="font-label-sm text-[11px] text-ochre-accent">Tap to swap</span>
+</div>
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+<!-- Preset 1 (Active) -->
+<button class="shrink-0 min-h-[36px] px-3 py-1.5 rounded-lg bg-ink-charcoal text-paper-surface font-label-sm text-label-sm font-semibold flex items-center space-x-1.5 shadow-[1.5px_1.5px_0px_#292724]" type="button">
+<span class="material-symbols-outlined text-[15px] text-ochre-accent">check_circle</span>
+<span>Author + Series Index</span>
+</button>
+<!-- Preset 2 -->
+<button class="shrink-0 min-h-[36px] px-3 py-1.5 rounded-lg bg-paper-container border border-ink-charcoal text-ink-charcoal hover:bg-paper-elevated font-label-sm text-label-sm font-medium flex items-center space-x-1 shadow-[1px_1px_0px_#292724] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]" type="button">
+<span>Author + Last Read</span>
+</button>
+<!-- Preset 3 -->
+<button class="shrink-0 min-h-[36px] px-3 py-1.5 rounded-lg bg-paper-container border border-ink-charcoal text-ink-charcoal hover:bg-paper-elevated font-label-sm text-label-sm font-medium flex items-center space-x-1 shadow-[1px_1px_0px_#292724] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]" type="button">
+<span>Series + Series Index</span>
+</button>
+<!-- Preset 4 -->
+<button class="shrink-0 min-h-[36px] px-3 py-1.5 rounded-lg bg-paper-container border border-ink-charcoal text-ink-charcoal hover:bg-paper-elevated font-label-sm text-label-sm font-medium flex items-center space-x-1 shadow-[1px_1px_0px_#292724] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]" type="button">
+<span>Status + Last Read</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sheet Inked Separator Line -->
+<div class="w-full px-space-md pt-1 pb-0.5">
+<div class="w-full h-[1.5px] bg-ink-charcoal/20"></div>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="px-space-md py-3 flex items-center justify-between gap-3 relative z-10 bg-paper-surface">
+<!-- Reset to Default Button (Ivory paper card with ink border) -->
+<button class="min-h-[48px] px-4 py-2.5 rounded-xl bg-paper-container border-[1.5px] border-ink-charcoal text-ink-charcoal font-label-lg text-label-lg font-medium flex items-center space-x-1.5 shadow-[1.5px_1.5px_0px_#292724] active:shadow-none active:translate-x-[1.5px] active:translate-y-[1.5px] transition-all" onclick="resetSorting()" type="button">
+<span class="material-symbols-outlined text-[18px] text-ink-muted">restart_alt</span>
+<span>Reset</span>
+</button>
+<!-- Primary Multi-Level Sort CTA (Filled Muted Sage #83917A with crisp 2px offset drop shadow) -->
+<button class="flex-1 min-h-[48px] px-5 py-2.5 rounded-xl bg-sage-accent border-[1.5px] border-ink-charcoal text-ink-charcoal font-label-lg text-label-lg font-semibold flex items-center justify-center space-x-2 shadow-[2px_2px_0px_#292724] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all" id="apply-btn" onclick="applySorting()" type="button">
+<span class="material-symbols-outlined text-[20px]">done_all</span>
+<span>Apply Multi-Level Sort</span>
+</button>
+</div>
+</section>
+<!-- Interactive State Logic -->
+<script>
+    function resetSorting() {
+      const applyBtn = document.getElementById('apply-btn');
+      if (applyBtn) {
+        applyBtn.classList.add('scale-95');
+        setTimeout(() => applyBtn.classList.remove('scale-95'), 120);
+      }
+    }
+
+    function applySorting() {
+      const applyBtn = document.getElementById('apply-btn');
+      if (applyBtn) {
+        applyBtn.classList.add('translate-x-[2px]', 'translate-y-[2px]', 'shadow-none');
+        setTimeout(() => {
+          applyBtn.classList.remove('translate-x-[2px]', 'translate-y-[2px]', 'shadow-none');
+          handleDismiss();
+        }, 150);
+      }
+    }
+
+    function handleDismiss() {
+      const sheet = document.getElementById('sort-bottom-sheet');
+      if (sheet) {
+        sheet.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+          sheet.style.transform = 'translateY(0)';
+        }, 800);
+      }
+    }
+  </script>
+</div></main></body></html>

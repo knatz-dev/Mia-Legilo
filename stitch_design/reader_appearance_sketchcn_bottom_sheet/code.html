@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#260a00", "error-container": "#ffdad6", "on-primary-fixed-variant": "#494643", "on-tertiary-fixed": "#341100", "secondary-fixed-dim": "#bccbb2", "error": "#ba1a1a", "ochre-accent": "#C87D55", "surface-variant": "#e4e2dd", "on-secondary-container": "#596652", "surface-tint": "#615e5a", "border-ink": "#292724", "on-surface-variant": "#4a463f", "sage-accent": "#83917A", "surface-container": "#f0eee8", "secondary-container": "#d6e4ca", "on-secondary-fixed-variant": "#3e4a37", "outline-variant": "#ccc5bc", "surface-container-highest": "#e4e2dd", "on-primary-fixed": "#1d1b18", "surface-container-high": "#eae8e2", "on-background": "#1b1c19", "on-error-container": "#93000a", "on-secondary": "#ffffff", "paper-elevated": "#E8E0D2", "on-tertiary": "#ffffff", "inverse-on-surface": "#f2f1eb", "surface-dim": "#dcdad4", "ink-charcoal": "#292724", "on-tertiary-container": "#c77c54", "background": "#fbf9f3", "secondary": "#55624e", "highlight-sage": "#E1E6DE", "paper-surface": "#FAF8F2", "inverse-primary": "#cbc6c1", "on-surface": "#1b1c19", "surface-container-lowest": "#ffffff", "tertiary-fixed-dim": "#ffb691", "inverse-surface": "#30312d", "on-tertiary-fixed-variant": "#713714", "primary-fixed": "#e7e1dd", "tertiary-container": "#461a00", "on-primary-container": "#928e89", "ink-muted": "#6E6962", "on-primary": "#ffffff", "surface": "#fbf9f3", "paper-container": "#F2EBE0", "highlight-ochre": "#F2DDCF", "primary-fixed-dim": "#cbc6c1", "surface-container-low": "#f5f3ee", "surface-bright": "#fbf9f3", "secondary-fixed": "#d8e7cd", "primary": "#141310", "primary-container": "#292724", "on-error": "#ffffff", "tertiary-fixed": "#ffdbcb", "outline": "#7b766f", "on-secondary-fixed": "#131f0e" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "margin": "1rem", "space-sm": "0.5rem", "space-md": "1rem", "space-xl": "2rem", "margin-tablet": "2rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "gutter": "1rem", "gutter-tablet": "1.5rem", "margin-desktop": "3rem" }, "fontFamily": { "label-sm": ["Plus Jakarta Sans"], "headline-xl": ["Newsreader"], "headline-lg": ["Newsreader"], "body-md": ["Newsreader"], "body-lg": ["Newsreader"], "headline-xl-mobile": ["Newsreader"], "label-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Newsreader"], "headline-sm": ["Newsreader"], "body-sm": ["Newsreader"], "label-md": ["Plus Jakarta Sans"], "headline-md": ["Newsreader"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-xl": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "500" }], "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "body-lg": ["19px", { "lineHeight": "30px", "fontWeight": "400" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100vw;min-height:100vh;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen selection:bg-highlight-ochre"><main class="flex flex-col relative w-full min-h-screen bg-surface"><div class="flex flex-col w-full relative select-none">
+<!-- DIMMED IMMERSIVE READING SCREEN CONTEXT (The Dispossessed by Ursula K. Le Guin) -->
+<div aria-hidden="true" class="relative w-full px-margin pt-4 pb-12 overflow-hidden pointer-events-none">
+<div class="flex items-center justify-between text-ink-muted font-label-sm text-label-sm mb-6">
+<span>THE DISPOSSESSED</span>
+<span>CHAPTER 1 • P. 14</span>
+</div>
+<div class="space-y-4 font-body-lg text-body-lg text-ink-charcoal/80 leading-relaxed max-w-prose">
+<p class="first-letter:float-left first-letter:text-4xl first-letter:font-headline-xl first-letter:mr-2 first-letter:text-ink-charcoal">
+        There was a wall. It did not look important. It was built of un-cut rocks, roughly mortared. An adult could look right over it, and even a child could climb it. Where it crossed the roadway, instead of having a gate it simply dwindled to a foot-wide gap.
+      </p>
+<p>
+        The wall had been built to keep people out, or maybe to keep them in. To Anarres, the wall enclosed a small piece of land around the spaceport, shutting off the world from the ships of Urras. To Urras, the wall enclosed the entire planet Anarres, shutting it off from the rest of the cosmos.
+      </p>
+<p>
+        Like all walls it was ambiguous, two-faced. What was inside it and what was outside it depended upon which side of it you were on.
+      </p>
+</div>
+<!-- Scrim Overlay -->
+<div class="absolute inset-0 bg-ink-charcoal/45"></div>
+</div>
+<!-- TACTILE SKETCHCN BOTTOM SHEET -->
+<div class="relative w-full bg-paper-surface text-ink-charcoal rounded-t-[26px] shadow-[0_-6px_24px_rgba(41,39,36,0.18)] z-20 pb-safe transition-all duration-300" id="reader-appearance-sheet" style="box-shadow: 0 -4px 0 #292724, 0 -12px 30px rgba(41, 39, 36, 0.25);">
+<!-- Hand-drawn Drag Handle & Header Banner -->
+<div class="flex flex-col items-center pt-3 pb-2 px-margin">
+<!-- Authentic Sketched Pill Handle -->
+<div class="w-10 h-1.5 bg-ink-charcoal rounded-full mb-3 shadow-[1px_1px_0px_#83917A]"></div>
+<!-- Top Utility Header Row -->
+<div class="w-full flex items-center justify-between pb-3">
+<div class="flex items-center space-x-2.5">
+<span class="w-8 h-8 rounded-lg bg-paper-container flex items-center justify-center font-headline-sm text-headline-sm text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724]">
+            Aa
+          </span>
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md leading-none text-ink-charcoal">Reader Appearance</h2>
+<p class="font-label-sm text-label-sm text-ink-muted mt-0.5">Custom typography &amp; environment • Auto-saved</p>
+</div>
+</div>
+<div class="flex items-center space-x-1">
+<button class="h-10 px-2.5 flex items-center justify-center text-ochre-accent font-label-md text-label-md underline underline-offset-4 decoration-ochre-accent/60 active:scale-95 transition-transform" id="reset-btn" type="button">
+            Reset
+          </button>
+<button aria-label="Close appearance drawer" class="w-10 h-10 rounded-full bg-paper-container flex items-center justify-center text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all" id="dismiss-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Dotted Ink Ledger Separation -->
+<div class="w-full h-0.5 border-b border-dashed border-ink-charcoal/30 my-1"></div>
+</div>
+<!-- Scrollable Sheet Content -->
+<div class="px-margin space-y-5 pb-6 max-h-[618px] overflow-y-auto overscroll-contain">
+<!-- 1. THEME PREVIEWS -->
+<section class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-ink-charcoal uppercase tracking-wider">Reading Palette</span>
+<span class="font-label-sm text-label-sm text-sage-accent font-semibold" id="active-theme-label">Ivory (Active)</span>
+</div>
+<div class="grid grid-cols-3 gap-2.5">
+<!-- Light (Ivory) -->
+<button class="theme-card relative flex flex-col p-2.5 rounded-lg bg-paper-surface text-left shadow-[2px_2px_0px_#292724] transition-all bg-[#FAF8F2] ring-2 ring-ink-charcoal" data-theme="ivory" type="button">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-headline-sm text-ink-charcoal font-serif">Abc</span>
+<span class="w-4 h-4 rounded-full bg-ochre-accent text-paper-surface flex items-center justify-center text-[10px]">
+<span class="material-symbols-outlined text-[12px]">check</span>
+</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-ink-charcoal">Light Ivory</span>
+<span class="font-label-sm text-[10px] text-ink-muted">Paper vellum</span>
+</button>
+<!-- Sepia (Parchment) -->
+<button class="theme-card relative flex flex-col p-2.5 rounded-lg text-left shadow-[2px_2px_0px_#292724] transition-all bg-[#f4eedb]" data-theme="sepia" type="button">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-headline-sm text-[#4a3928] font-serif">Abc</span>
+<span class="w-4 h-4 rounded-full bg-transparent text-transparent flex items-center justify-center text-[10px] check-icon">
+<span class="material-symbols-outlined text-[12px]">check</span>
+</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-[#4a3928]">Sepia</span>
+<span class="font-label-sm text-[10px] text-[#78644e]">Warm honey</span>
+</button>
+<!-- Dark (Obsidian) -->
+<button class="theme-card relative flex flex-col p-2.5 rounded-lg text-left shadow-[2px_2px_0px_#292724] transition-all bg-[#242220]" data-theme="dark" type="button">
+<div class="flex items-center justify-between mb-1">
+<span class="font-headline-sm text-headline-sm text-[#e8e2d5] font-serif">Abc</span>
+<span class="w-4 h-4 rounded-full bg-transparent text-transparent flex items-center justify-center text-[10px] check-icon">
+<span class="material-symbols-outlined text-[12px]">check</span>
+</span>
+</div>
+<span class="font-label-sm text-label-sm font-semibold text-[#e8e2d5]">Obsidian</span>
+<span class="font-label-sm text-[10px] text-[#9b9487]">Night ink</span>
+</button>
+</div>
+</section>
+<!-- 2. LIVE TYPOGRAPHY PREVIEW CARD -->
+<section class="space-y-1.5">
+<div class="flex items-center justify-between text-label-sm font-label-sm text-ink-muted">
+<span>SPECIMEN RENDERING</span>
+<span class="text-ochre-accent font-medium" id="specimen-stats">Newsreader • 18pt / 1.75x</span>
+</div>
+<div class="relative p-3.5 bg-paper-container rounded-lg shadow-[2px_2px_0px_#292724] overflow-hidden">
+<div class="absolute top-0 right-0 transform translate-x-3 -translate-y-2 opacity-10 pointer-events-none select-none font-headline-xl text-5xl">
+            §1
+          </div>
+<p class="font-headline-sm text-[18px] leading-[1.75] text-ink-charcoal transition-all" id="live-specimen-text">
+            “There was a wall. It did not look important. It was built of un-cut rocks, roughly mortared...”
+          </p>
+<div class="mt-2.5 pt-2 border-t border-dashed border-ink-charcoal/20 flex items-center justify-between text-ink-muted font-label-sm text-[11px]">
+<span>Anarres Chapter 1</span>
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-sage-accent"></span>
+              Optical Kerning On
+            </span>
+</div>
+</div>
+</section>
+<!-- 3. FONT FAMILY SELECTOR -->
+<section class="space-y-2">
+<span class="font-label-md text-label-md text-ink-charcoal uppercase tracking-wider">Typeface</span>
+<div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-margin px-margin">
+<!-- Newsreader (Active) -->
+<button class="font-pill shrink-0 px-3 py-2 rounded-lg bg-secondary-container text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] font-headline-sm text-headline-sm flex items-center gap-1.5 active:scale-95 transition-all" data-font="Newsreader" type="button">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+            Newsreader
+          </button>
+<!-- Literata -->
+<button class="font-pill shrink-0 px-3 py-2 rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] font-headline-sm text-headline-sm flex items-center gap-1.5 active:scale-95 transition-all" data-font="Literata" type="button">
+            Literata
+          </button>
+<!-- Spectral -->
+<button class="font-pill shrink-0 px-3 py-2 rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] font-headline-sm text-headline-sm flex items-center gap-1.5 active:scale-95 transition-all" data-font="Spectral" type="button">
+            Spectral
+          </button>
+<!-- Atkinson Hyperlegible -->
+<button class="font-pill shrink-0 px-3 py-2 rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] font-label-lg text-label-lg flex items-center gap-1.5 active:scale-95 transition-all" data-font="Atkinson" type="button">
+            Atkinson Sans
+          </button>
+<!-- Baskerville -->
+<button class="font-pill shrink-0 px-3 py-2 rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] font-headline-sm text-headline-sm flex items-center gap-1.5 active:scale-95 transition-all" data-font="Baskerville" type="button">
+            Baskerville
+          </button>
+</div>
+</section>
+<!-- 4. FONT SIZE & LINE HEIGHT -->
+<section class="space-y-4 bg-paper-container p-3 rounded-lg shadow-[2px_2px_0px_#292724]">
+<!-- Size Stepper / Slider -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-ink-charcoal">Type Scale</span>
+<span class="font-label-sm text-label-sm font-semibold text-ochre-accent" id="font-size-indicator">18 pt</span>
+</div>
+<div class="flex items-center space-x-3">
+<!-- Decrease 48dp target -->
+<button aria-label="Decrease font size" class="w-12 h-12 flex items-center justify-center rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-sm font-serif" id="size-dec" type="button">
+              A-
+            </button>
+<!-- Custom Tactile Track -->
+<div class="relative flex-1 py-4 flex items-center">
+<div class="w-full h-1 bg-ink-charcoal/20 rounded-full relative">
+<!-- Progress Line -->
+<div class="absolute left-0 top-0 bottom-0 bg-ink-charcoal rounded-full" id="slider-progress" style="width: 45%;"></div>
+<!-- Diamond Slider Thumb (SketchCN signature) -->
+<div class="absolute top-1/2 -mt-2.5 -ml-2.5 w-5 h-5 bg-paper-surface shadow-[1.5px_1.5px_0px_#292724] rotate-45 flex items-center justify-center cursor-pointer" id="slider-thumb" style="left: 45%;">
+<div class="w-1.5 h-1.5 bg-ochre-accent rounded-full -rotate-45"></div>
+</div>
+</div>
+</div>
+<!-- Increase 48dp target -->
+<button aria-label="Increase font size" class="w-12 h-12 flex items-center justify-center rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none text-lg font-serif font-semibold" id="size-inc" type="button">
+              A+
+            </button>
+</div>
+</div>
+<!-- Line Spacing 3-segment pill -->
+<div class="space-y-1.5 pt-2 border-t border-dashed border-ink-charcoal/20">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-ink-charcoal">Leading / Spacing</span>
+<span class="font-label-sm text-label-sm text-ink-muted" id="line-height-indicator">1.75x (Relaxed)</span>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<button class="lh-btn h-11 px-2 flex flex-col items-center justify-center rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none" data-lh="1.4" data-lh-label="1.4x (Tight)" type="button">
+<span class="font-label-sm text-label-sm font-semibold">Tight</span>
+<span class="text-[10px] text-ink-muted">1.40</span>
+</button>
+<button class="lh-btn h-11 px-2 flex flex-col items-center justify-center rounded-lg bg-secondary-container text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] ring-1 ring-ink-charcoal" data-lh="1.75" data-lh-label="1.75x (Relaxed)" type="button">
+<span class="font-label-sm text-label-sm font-semibold">Relaxed</span>
+<span class="text-[10px] text-on-secondary-container font-medium">1.75</span>
+</button>
+<button class="lh-btn h-11 px-2 flex flex-col items-center justify-center rounded-lg bg-paper-surface text-ink-charcoal shadow-[1.5px_1.5px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none" data-lh="2.1" data-lh-label="2.1x (Spacious)" type="button">
+<span class="font-label-sm text-label-sm font-semibold">Spacious</span>
+<span class="text-[10px] text-ink-muted">2.10</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 5. MARGINS & PARAGRAPH STYLING -->
+<section class="space-y-2">
+<span class="font-label-md text-label-md text-ink-charcoal uppercase tracking-wider">Page Margins &amp; Rhythm</span>
+<div class="grid grid-cols-3 gap-2">
+<!-- Narrow -->
+<button class="margin-btn h-14 rounded-lg bg-paper-surface p-2 flex flex-col items-center justify-between shadow-[1.5px_1.5px_0px_#292724] active:scale-95" type="button">
+<div class="w-7 h-4 bg-paper-container rounded-sm flex items-center justify-center px-0.5">
+<div class="w-full h-0.5 bg-ink-charcoal/40"></div>
+</div>
+<span class="font-label-sm text-[11px] text-ink-charcoal">Narrow</span>
+</button>
+<!-- Balanced (Default Active) -->
+<button class="margin-btn h-14 rounded-lg bg-secondary-container p-2 flex flex-col items-center justify-between shadow-[1.5px_1.5px_0px_#292724] ring-1 ring-ink-charcoal" type="button">
+<div class="w-7 h-4 bg-paper-surface rounded-sm flex items-center justify-center px-1.5">
+<div class="w-full h-0.5 bg-ink-charcoal"></div>
+</div>
+<span class="font-label-sm text-[11px] font-semibold text-ink-charcoal">Balanced</span>
+</button>
+<!-- Wide -->
+<button class="margin-btn h-14 rounded-lg bg-paper-surface p-2 flex flex-col items-center justify-between shadow-[1.5px_1.5px_0px_#292724] active:scale-95" type="button">
+<div class="w-7 h-4 bg-paper-container rounded-sm flex items-center justify-center px-2.5">
+<div class="w-full h-0.5 bg-ink-charcoal/40"></div>
+</div>
+<span class="font-label-sm text-[11px] text-ink-charcoal">Generous</span>
+</button>
+</div>
+<!-- Paragraph Flow Style Toggle -->
+<div class="flex items-center justify-between p-2.5 bg-paper-surface rounded-lg shadow-[1.5px_1.5px_0px_#292724]">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-ink-charcoal">Paragraph Indentation</span>
+<span class="font-label-sm text-[11px] text-ink-muted">Fiction indent vs. web block style</span>
+</div>
+<button class="px-3 py-1.5 rounded-full bg-paper-container font-label-sm text-label-sm font-semibold text-ink-charcoal shadow-[1px_1px_0px_#292724] active:scale-95" id="indent-toggle" type="button">
+            Classic Indent
+          </button>
+</div>
+</section>
+<!-- 6. ALIGNMENT & READING FLOW -->
+<section class="space-y-2">
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Text Alignment -->
+<div class="p-2.5 bg-paper-container rounded-lg shadow-[1.5px_1.5px_0px_#292724] space-y-1.5">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Text Alignment</span>
+<div class="flex gap-1.5">
+<button class="flex-1 h-9 rounded bg-secondary-container flex items-center justify-center text-ink-charcoal shadow-[1px_1px_0px_#292724]" title="Left Align" type="button">
+<span class="material-symbols-outlined text-[18px]">format_align_left</span>
+</button>
+<button class="flex-1 h-9 rounded bg-paper-surface flex items-center justify-center text-ink-muted shadow-[1px_1px_0px_#292724] active:bg-paper-container" title="Justified" type="button">
+<span class="material-symbols-outlined text-[18px]">format_align_justify</span>
+</button>
+</div>
+</div>
+<!-- Page Flow Mode -->
+<div class="p-2.5 bg-paper-container rounded-lg shadow-[1.5px_1.5px_0px_#292724] space-y-1.5">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Paging Mode</span>
+<div class="flex gap-1.5">
+<button class="flex-1 h-9 rounded bg-secondary-container flex items-center justify-center text-ink-charcoal shadow-[1px_1px_0px_#292724]" title="Vertical Scroll" type="button">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+<button class="flex-1 h-9 rounded bg-paper-surface flex items-center justify-center text-ink-muted shadow-[1px_1px_0px_#292724] active:bg-paper-container" title="Paginated Turn" type="button">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. EDITORIAL METADATA & PERSISTENT ACTION -->
+<div class="pt-2">
+<div class="flex items-center justify-between text-ink-muted font-label-sm text-[11px] mb-3 px-1">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-sage-accent">sync</span>
+            Calibre Companion Synced
+          </span>
+<span>EPUB 3.2 Standards</span>
+</div>
+<button class="w-full h-12 rounded-lg bg-sage-accent text-paper-surface font-label-lg text-label-lg shadow-[2px_2px_0px_#292724] flex items-center justify-center space-x-2 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all" id="apply-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Apply to "The Dispossessed"</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple reactive controls for tactile delight & live specimen update
+  (function() {
+    let currentSize = 18;
+    let currentLh = 1.75;
+    let currentFont = 'Newsreader';
+    const specimen = document.getElementById('live-specimen-text');
+    const sizeInd = document.getElementById('font-size-indicator');
+    const statsInd = document.getElementById('specimen-stats');
+    const sliderThumb = document.getElementById('slider-thumb');
+    const sliderProg = document.getElementById('slider-progress');
+    const lhInd = document.getElementById('line-height-indicator');
+
+    function updateSpecimen() {
+      if (specimen) {
+        specimen.style.fontSize = currentSize + 'px';
+        specimen.style.lineHeight = currentLh;
+      }
+      if (sizeInd) sizeInd.innerText = currentSize + ' pt';
+      if (statsInd) statsInd.innerText = currentFont + ' • ' + currentSize + 'pt / ' + currentLh + 'x';
+      
+      // Update custom visual slider track (12pt = 0%, 28pt = 100%)
+      const pct = Math.min(100, Math.max(0, ((currentSize - 12) / (28 - 12)) * 100));
+      if (sliderThumb) sliderThumb.style.left = pct + '%';
+      if (sliderProg) sliderProg.style.width = pct + '%';
+    }
+
+    // Size increment / decrement steppers
+    const incBtn = document.getElementById('size-inc');
+    const decBtn = document.getElementById('size-dec');
+
+    if (incBtn) {
+      incBtn.addEventListener('click', function() {
+        if (currentSize < 28) {
+          currentSize += 1;
+          updateSpecimen();
+        }
+      });
+    }
+
+    if (decBtn) {
+      decBtn.addEventListener('click', function() {
+        if (currentSize > 12) {
+          currentSize -= 1;
+          updateSpecimen();
+        }
+      });
+    }
+
+    // Font selector pills
+    document.querySelectorAll('.font-pill').forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        document.querySelectorAll('.font-pill').forEach(function(p) {
+          p.classList.remove('bg-secondary-container', 'font-semibold');
+          p.classList.add('bg-paper-surface');
+        });
+        pill.classList.remove('bg-paper-surface');
+        pill.classList.add('bg-secondary-container', 'font-semibold');
+        currentFont = pill.getAttribute('data-font');
+        updateSpecimen();
+      });
+    });
+
+    // Line spacing selection
+    document.querySelectorAll('.lh-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.lh-btn').forEach(function(b) {
+          b.classList.remove('bg-secondary-container', 'ring-1', 'ring-ink-charcoal');
+          b.classList.add('bg-paper-surface');
+        });
+        btn.classList.remove('bg-paper-surface');
+        btn.classList.add('bg-secondary-container', 'ring-1', 'ring-ink-charcoal');
+        currentLh = parseFloat(btn.getAttribute('data-lh'));
+        if (lhInd) lhInd.innerText = btn.getAttribute('data-lh-label');
+        updateSpecimen();
+      });
+    });
+
+    // Theme selector cards
+    document.querySelectorAll('.theme-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.theme-card').forEach(function(c) {
+          c.classList.remove('ring-2', 'ring-ink-charcoal');
+          const check = c.querySelector('.check-icon');
+          if (check) {
+            check.classList.remove('bg-ochre-accent', 'text-paper-surface');
+            check.classList.add('bg-transparent', 'text-transparent');
+          }
+        });
+        card.classList.add('ring-2', 'ring-ink-charcoal');
+        const activeCheck = card.querySelector('.check-icon');
+        if (activeCheck) {
+          activeCheck.classList.remove('bg-transparent', 'text-transparent');
+          activeCheck.classList.add('bg-ochre-accent', 'text-paper-surface');
+        }
+        const lbl = document.getElementById('active-theme-label');
+        if (lbl) {
+          const t = card.getAttribute('data-theme');
+          lbl.innerText = t.charAt(0).toUpperCase() + t.slice(1) + ' (Active)';
+        }
+      });
+    });
+
+    // Dismiss / Done interaction
+    const dismissBtn = document.getElementById('dismiss-btn');
+    const applyBtn = document.getElementById('apply-btn');
+    const sheet = document.getElementById('reader-appearance-sheet');
+
+    function closeSheet() {
+      if (sheet) {
+        sheet.style.transform = 'translateY(100%)';
+        setTimeout(function() {
+          sheet.style.transform = 'translateY(0%)';
+        }, 800);
+      }
+    }
+
+    if (dismissBtn) dismissBtn.addEventListener('click', closeSheet);
+    if (applyBtn) {
+      applyBtn.addEventListener('click', function() {
+        const originalText = applyBtn.innerHTML;
+        applyBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">done_all</span><span>Applied Settings!</span>';
+        setTimeout(function() {
+          applyBtn.innerHTML = originalText;
+          closeSheet();
+        }, 400);
+      });
+    }
+
+    // Reset interaction
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        currentSize = 18;
+        currentLh = 1.75;
+        currentFont = 'Newsreader';
+        updateSpecimen();
+      });
+    }
+  })();
+</script></main></body></html>

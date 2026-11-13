@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mia Legilo — Interactive Controls & Button Showcase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FAF8F2',
+            'paper-subtle': '#F4EFE6',
+            'paper-card': '#FFFDF9',
+            'warm-beige': '#E8E0D2',
+            'beige-border': '#D8CFBF',
+            'charcoal': '#292724',
+            'charcoal-muted': '#5C5852',
+            'charcoal-light': '#8C867D',
+            'charcoal-disabled': '#B8B2A7',
+            'sage': '#83917A',
+            'sage-light': '#98A68E',
+            'sage-dark': '#6B7A62',
+            'sage-tint': '#EBF0E8',
+            'terracotta': '#C87D55',
+            'terracotta-tint': '#F9ECE5',
+          },
+          fontFamily: {
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            hand: ['Caveat', 'cursive'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Organic sketch borders inspired by SketchCN */
+    .ink-border-1 {
+      border: 1.75px solid #292724;
+      border-radius: 255px 18px 225px 15px / 15px 225px 18px 255px;
+    }
+    .ink-border-2 {
+      border: 1.75px solid #292724;
+      border-radius: 18px 240px 14px 230px / 230px 16px 245px 18px;
+    }
+    .ink-border-subtle {
+      border: 1.5px solid #292724;
+      border-radius: 12px 14px 11px 15px;
+    }
+    .ink-border-round {
+      border: 1.75px solid #292724;
+      border-radius: 50% 48% 52% 49% / 49% 52% 48% 51%;
+    }
+    .ink-border-pill {
+      border: 1.75px solid #292724;
+      border-radius: 999px 995px 998px 994px / 995px 998px 994px 999px;
+    }
+    .ink-border-disabled {
+      border: 1.5px dashed #B8B2A7;
+      border-radius: 255px 18px 225px 15px / 15px 225px 18px 255px;
+    }
+
+    /* Hand-drawn offset ink shadows */
+    .ink-shadow-sm {
+      box-shadow: 2px 2px 0px #292724;
+    }
+    .ink-shadow-md {
+      box-shadow: 3px 3px 0px #292724;
+    }
+    .ink-shadow-lg {
+      box-shadow: 4px 4px 0px #292724;
+    }
+    .ink-shadow-pressed {
+      box-shadow: 0.5px 0.5px 0px #292724;
+      transform: translate(2px, 2px);
+    }
+    .ink-shadow-sage {
+      box-shadow: 3px 3px 0px #292724;
+    }
+
+    /* Subtle paper texture simulation */
+    .paper-texture {
+      background-color: #FAF8F2;
+      background-image: 
+        radial-gradient(#292724 0.4px, transparent 0.4px),
+        radial-gradient(#292724 0.25px, #FAF8F2 0.25px);
+      background-size: 24px 24px, 48px 48px;
+      background-position: 0 0, 12px 12px;
+      background-opacity: 0.02;
+    }
+
+    /* Sketchy ruler / divider */
+    .sketch-divider {
+      height: 2px;
+      background: repeating-linear-gradient(90deg, #292724 0, #292724 8px, transparent 8px, transparent 10px);
+      opacity: 0.25;
+    }
+
+    /* Custom rotating hand ink loader */
+    @keyframes inkSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .ink-spin {
+      animation: inkSpin 1.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    }
+
+    /* Squiggle underline */
+    .squiggle-underline {
+      background-image: url("data:image/svg+xml,%3Csvg width='40' height='6' viewBox='0 0 40 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3C5 1 7 5 11 3C15 1 17 5 21 3C25 1 27 5 31 3C35 1 37 5 39 3' stroke='%23C87D55' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+      padding-bottom: 5px;
+    }
+
+    /* Touch target guarantee: Material 3 48dp */
+    .min-touch-48 {
+      min-height: 48px;
+      min-width: 48px;
+    }
+  </style>
+</head>
+<body class="paper-texture text-charcoal font-sans antialiased min-h-screen py-10 px-4 sm:px-6 md:px-12 selection:bg-sage selection:text-paper">
+
+  <!-- Outer container with notebook layout -->
+  <div class="max-w-6xl mx-auto space-y-12">
+
+    <!-- Header / Title Block with hand-drawn aesthetic -->
+    <header class="bg-paper-card ink-border-1 ink-shadow-md p-6 sm:p-8 relative">
+      <!-- Notebook binding holes illusion on left for large screens -->
+      <div class="hidden md:flex absolute -left-3.5 top-8 flex-col space-y-6">
+        <div class="w-3.5 h-3.5 rounded-full bg-paper border border-charcoal ink-shadow-sm"></div>
+        <div class="w-3.5 h-3.5 rounded-full bg-paper border border-charcoal ink-shadow-sm"></div>
+        <div class="w-3.5 h-3.5 rounded-full bg-paper border border-charcoal ink-shadow-sm"></div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-charcoal/15">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-sage text-charcoal font-serif font-bold text-lg ink-border-round ink-shadow-sm">M</span>
+            <span class="font-mono text-xs uppercase tracking-wider text-charcoal-muted font-semibold">Material 3 • Android Native UI Kit</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-terracotta/15 text-terracotta text-xs font-mono font-medium border border-terracotta/40">SketchCN Style</span>
+          </div>
+          <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-charcoal">
+            Buttons & Interactive Controls
+          </h1>
+          <p class="font-sans text-sm sm:text-base text-charcoal-muted mt-2 max-w-2xl">
+            A tactile component showcase for <span class="font-semibold text-charcoal">Mia Legilo</span>. Crafted with organic hand-inked outlines, subtle corner wobbles, M3 48dp minimum touch targets, and tactile pressed states for a refined literary notebook atmosphere.
+          </p>
+        </div>
+
+        <!-- Quick Spec Tag -->
+        <div class="bg-warm-beige/60 ink-border-subtle p-3.5 rounded-lg text-xs font-mono space-y-1.5 self-start md:self-auto min-w-[210px]">
+          <div class="flex justify-between text-charcoal-muted">
+            <span>Primary Tone:</span>
+            <span class="font-semibold text-charcoal">Muted Sage (#83917A)</span>
+          </div>
+          <div class="flex justify-between text-charcoal-muted">
+            <span>Secondary Tone:</span>
+            <span class="font-semibold text-charcoal">Ivory (#FAF8F2)</span>
+          </div>
+          <div class="flex justify-between text-charcoal-muted">
+            <span>Ink Stroke:</span>
+            <span class="font-semibold text-charcoal">1.75px Charcoal (#292724)</span>
+          </div>
+          <div class="flex justify-between text-charcoal-muted">
+            <span>Min Touch Target:</span>
+            <span class="font-semibold text-sage-dark">48 × 48 dp (AA / AAA)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Index Tabs (Showcase Navigation) -->
+      <div class="pt-4 flex flex-wrap gap-2 text-xs font-mono">
+        <a href="#button-hierarchy" class="px-3 py-1.5 rounded-full bg-paper ink-border-subtle hover:bg-warm-beige transition-colors flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-sage"></span>
+          01. Button Hierarchy
+        </a>
+        <a href="#interactive-states" class="px-3 py-1.5 rounded-full bg-paper ink-border-subtle hover:bg-warm-beige transition-colors flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-terracotta"></span>
+          02. Button States (Normal, Pressed, Loading, Disabled)
+        </a>
+        <a href="#selection-controls" class="px-3 py-1.5 rounded-full bg-paper ink-border-subtle hover:bg-warm-beige transition-colors flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-charcoal"></span>
+          03. Checkboxes, Radios & Toggles
+        </a>
+        <a href="#segmented-controls" class="px-3 py-1.5 rounded-full bg-paper ink-border-subtle hover:bg-warm-beige transition-colors flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-sage-dark"></span>
+          04. Segmented & Reader Toolbars
+        </a>
+      </div>
+    </header>
+
+    <!-- SECTION 01: BUTTON HIERARCHY -->
+    <section id="button-hierarchy" class="space-y-6">
+      <div class="flex items-baseline justify-between border-b border-charcoal/20 pb-2">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs text-terracotta font-bold">01 /</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold">Button Hierarchy & Flavors</h2>
+        </div>
+        <span class="font-hand text-lg text-charcoal-muted">Tactile bookish actions</span>
+      </div>
+
+      <!-- Component Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Card 1: Primary Action Button -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-sm p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono uppercase font-bold text-sage-dark">Primary Action</span>
+              <span class="text-[11px] font-mono text-charcoal-muted">Filled Sage</span>
+            </div>
+            <h3 class="font-serif font-semibold text-lg">Main Flow Initiators</h3>
+            <p class="text-xs text-charcoal-muted mt-1">High-emphasis call to actions: resuming reading, synchronizing library, confirming download.</p>
+          </div>
+
+          <div class="py-4 space-y-3 bg-paper/60 rounded-lg p-3 ink-border-subtle">
+            <!-- Normal Sage Button -->
+            <button class="w-full min-touch-48 px-5 py-3 rounded-[14px_18px_13px_17px] bg-sage text-charcoal font-semibold text-sm ink-border-1 ink-shadow-sm flex items-center justify-center gap-2 hover:bg-sage-light transition-all active:translate-x-0.5 active:translate-y-0.5">
+              <span class="material-symbols-outlined text-[19px]">auto_stories</span>
+              <span>Resume Reading</span>
+              <span class="font-mono text-xs opacity-75 font-normal ml-1">· Ch. 14</span>
+            </button>
+
+            <!-- Compact primary button with badge -->
+            <button class="w-full min-touch-48 px-4 py-2.5 rounded-[16px_14px_17px_13px] bg-sage text-charcoal font-semibold text-sm ink-border-1 ink-shadow-sm flex items-center justify-between hover:bg-sage-light transition-all">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">sync</span>
+                <span>Sync with CWNG</span>
+              </div>
+              <span class="px-2 py-0.5 bg-paper font-mono text-[11px] font-bold rounded-full ink-border-subtle">Online</span>
+            </button>
+          </div>
+
+          <div class="text-[11px] font-mono text-charcoal-muted pt-2 border-t border-charcoal/10 flex justify-between">
+            <span>Fill: #83917A</span>
+            <span>Ink text: #292724</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Secondary Action Button -->
+        <div class="bg-paper-card ink-border-2 ink-shadow-sm p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono uppercase font-bold text-charcoal">Secondary Action</span>
+              <span class="text-[11px] font-mono text-charcoal-muted">Ivory Surface</span>
+            </div>
+            <h3 class="font-serif font-semibold text-lg">Supportive & Exploratory</h3>
+            <p class="text-xs text-charcoal-muted mt-1">Medium emphasis: shelf assignment, appearance customization, filtering and detail browsing.</p>
+          </div>
+
+          <div class="py-4 space-y-3 bg-paper/60 rounded-lg p-3 ink-border-subtle">
+            <!-- Normal Ivory Button -->
+            <button class="w-full min-touch-48 px-5 py-3 rounded-[15px_13px_17px_14px] bg-paper text-charcoal font-semibold text-sm ink-border-1 ink-shadow-sm flex items-center justify-center gap-2 hover:bg-warm-beige transition-all active:translate-x-0.5 active:translate-y-0.5">
+              <span class="material-symbols-outlined text-[19px]">tune</span>
+              <span>Reader Appearance</span>
+            </button>
+
+            <!-- Secondary with Shelves -->
+            <button class="w-full min-touch-48 px-5 py-2.5 rounded-[13px_17px_14px_16px] bg-paper text-charcoal font-semibold text-sm ink-border-1 ink-shadow-sm flex items-center justify-between hover:bg-warm-beige transition-all">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">shelves</span>
+                <span>Manage Shelves</span>
+              </div>
+              <span class="text-xs font-mono text-charcoal-muted">3 active</span>
+            </button>
+          </div>
+
+          <div class="text-[11px] font-mono text-charcoal-muted pt-2 border-t border-charcoal/10 flex justify-between">
+            <span>Fill: #FAF8F2</span>
+            <span>Border: 1.75px #292724</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Outlined Button -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-sm p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono uppercase font-bold text-terracotta">Outlined / Tactile</span>
+              <span class="text-[11px] font-mono text-charcoal-muted">Minimal Ground</span>
+            </div>
+            <h3 class="font-serif font-semibold text-lg">Bordered Actions</h3>
+            <p class="text-xs text-charcoal-muted mt-1">Clean outlined buttons for catalog actions: format conversions, tag editing, metadata inspection.</p>
+          </div>
+
+          <div class="py-4 space-y-3 bg-paper/60 rounded-lg p-3 ink-border-subtle">
+            <button class="w-full min-touch-48 px-5 py-3 rounded-[16px_14px_15px_18px] bg-transparent text-charcoal font-medium text-sm ink-border-1 hover:bg-warm-beige/50 transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[19px]">download_for_offline</span>
+              <span>Cache EPUB (1.8 MB)</span>
+            </button>
+
+            <button class="w-full min-touch-48 px-5 py-2.5 rounded-[14px_18px_13px_16px] bg-transparent text-charcoal font-medium text-sm ink-border-1 hover:bg-warm-beige/50 transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">bookmark_border</span>
+              <span>Add Chapter Bookmark</span>
+            </button>
+          </div>
+
+          <div class="text-[11px] font-mono text-charcoal-muted pt-2 border-t border-charcoal/10 flex justify-between">
+            <span>Stroke: 1.75px Inked</span>
+            <span>Hover: Paper tint</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Text Buttons & Literary Links -->
+        <div class="bg-paper-card ink-border-2 ink-shadow-sm p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono uppercase font-bold text-charcoal-muted">Text Button</span>
+              <span class="text-[11px] font-mono text-charcoal-muted">Zero Elevation</span>
+            </div>
+            <h3 class="font-serif font-semibold text-lg">Literary In-Line Actions</h3>
+            <p class="text-xs text-charcoal-muted mt-1">Subtle text buttons for dialog cancelations, "Read more" links, and non-disruptive TOC jumps.</p>
+          </div>
+
+          <div class="py-4 space-y-3 bg-paper/60 rounded-lg p-3 ink-border-subtle flex flex-col items-center">
+            <button class="min-touch-48 px-4 py-2 text-charcoal font-serif font-semibold text-base hover:text-sage-dark transition-colors inline-flex items-center gap-1.5 group">
+              <span class="squiggle-underline">Expand Chapter Excerpt</span>
+              <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+            </button>
+
+            <div class="flex items-center justify-between w-full px-2">
+              <button class="min-touch-48 px-3 py-2 text-charcoal-muted hover:text-charcoal font-sans text-xs font-semibold uppercase tracking-wider">
+                Cancel
+              </button>
+              <button class="min-touch-48 px-3 py-2 text-terracotta hover:text-terracotta/80 font-sans text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">delete_outline</span>
+                Clear Annotation
+              </button>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-charcoal-muted pt-2 border-t border-charcoal/10 flex justify-between">
+            <span>Font: Newsreader / Plus Jakarta</span>
+            <span>Subtle hover cues</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Icon Buttons & Floating Targets -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-sm p-6 flex flex-col justify-between space-y-4 md:col-span-2">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-mono uppercase font-bold text-charcoal">Icon Buttons</span>
+              <span class="text-[11px] font-mono text-charcoal-muted">48dp Touch Targets</span>
+            </div>
+            <h3 class="font-serif font-semibold text-lg">Header, Reader & Floating Actions</h3>
+            <p class="text-xs text-charcoal-muted mt-1">Circular and square hand-drawn frames for high-frequency reader toolbar shortcuts.</p>
+          </div>
+
+          <div class="py-4 bg-paper/60 rounded-lg p-4 ink-border-subtle">
+            <div class="flex flex-wrap items-center justify-around gap-4">
+              <!-- Round Ivory -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button aria-label="Table of contents" class="min-touch-48 w-12 h-12 rounded-full bg-paper text-charcoal ink-border-round ink-shadow-sm flex items-center justify-center hover:bg-warm-beige active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                  <span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+                </button>
+                <span class="text-[11px] font-mono text-charcoal-muted">Standard</span>
+              </div>
+
+              <!-- Round Sage Selected -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button aria-label="Bookmarked" class="min-touch-48 w-12 h-12 rounded-full bg-sage text-charcoal ink-border-round ink-shadow-sm flex items-center justify-center hover:bg-sage-light active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                  <span class="material-symbols-outlined text-[20px] font-bold">bookmark</span>
+                </button>
+                <span class="text-[11px] font-mono text-sage-dark font-semibold">Active/Saved</span>
+              </div>
+
+              <!-- Terracotta Accent -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button aria-label="Highlight passage" class="min-touch-48 w-12 h-12 rounded-full bg-terracotta text-paper ink-border-round ink-shadow-sm flex items-center justify-center hover:bg-terracotta/90 active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                  <span class="material-symbols-outlined text-[20px]">brush</span>
+                </button>
+                <span class="text-[11px] font-mono text-terracotta font-semibold">Accent</span>
+              </div>
+
+              <!-- Square Rounded Notebook Target -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button aria-label="Search within text" class="min-touch-48 w-12 h-12 rounded-[13px_15px_12px_16px] bg-paper text-charcoal ink-border-subtle ink-shadow-sm flex items-center justify-center hover:bg-warm-beige active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                  <span class="material-symbols-outlined text-[20px]">search</span>
+                </button>
+                <span class="text-[11px] font-mono text-charcoal-muted">Squircle</span>
+              </div>
+
+              <!-- Extended Floating Action Button (FAB) -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button class="min-touch-48 px-5 py-3 rounded-[24px_22px_25px_21px] bg-charcoal text-paper font-sans font-semibold text-xs tracking-wider uppercase ink-shadow-md flex items-center gap-2 hover:bg-charcoal-muted active:translate-x-0.5 active:translate-y-0.5 transition-all">
+                  <span class="material-symbols-outlined text-[18px]">add</span>
+                  <span>Import Book</span>
+                </button>
+                <span class="text-[11px] font-mono text-charcoal-muted">Extended FAB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] font-mono text-charcoal-muted pt-2 border-t border-charcoal/10 flex justify-between">
+            <span>Dimensions: 48 × 48 dp min touch area</span>
+            <span>Outline: Irregular ink contour</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 02: INTERACTIVE STATES -->
+    <section id="interactive-states" class="space-y-6">
+      <div class="flex items-baseline justify-between border-b border-charcoal/20 pb-2">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs text-sage font-bold">02 /</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold">State Matrix (Interactive Dynamics)</h2>
+        </div>
+        <span class="font-hand text-lg text-charcoal-muted">Tactile physical feedback</span>
+      </div>
+
+      <!-- State Demonstration Table Card -->
+      <div class="bg-paper-card ink-border-1 ink-shadow-md p-6 sm:p-8 space-y-6">
+        <p class="text-sm text-charcoal-muted max-w-3xl">
+          In a physical book or notebook, pressure indents the paper. In Mia Legilo, the <strong>Pressed State</strong> eliminates the offset drop-shadow and translates the button down-right by 2px to mimic a physical stamp. The <strong>Disabled State</strong> replaces crisp strokes with dashed charcoal-disabled lines.
+        </p>
+
+        <!-- Interactive State Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b-2 border-charcoal/20 font-mono text-xs text-charcoal-muted uppercase">
+                <th class="py-3 px-4 font-semibold">Action Type</th>
+                <th class="py-3 px-4 font-semibold">1. Default / Rest</th>
+                <th class="py-3 px-4 font-semibold">2. Pressed (Active Stamp)</th>
+                <th class="py-3 px-4 font-semibold">3. Loading (Syncing)</th>
+                <th class="py-3 px-4 font-semibold">4. Disabled (Inactive)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-charcoal/10 text-sm">
+              
+              <!-- Row 1: Primary Action (Sage) -->
+              <tr>
+                <td class="py-5 px-4 font-mono font-medium text-xs">
+                  <div class="font-bold text-charcoal">Primary</div>
+                  <div class="text-charcoal-muted">Muted Sage</div>
+                </td>
+                
+                <!-- Default -->
+                <td class="py-5 px-4">
+                  <button class="min-touch-48 px-4 py-2.5 rounded-[14px_16px_13px_17px] bg-sage text-charcoal font-semibold text-xs ink-border-1 ink-shadow-sm flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">download</span>
+                    <span>Download EPUB</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Elevation: 2px offset</span>
+                </td>
+
+                <!-- Pressed -->
+                <td class="py-5 px-4">
+                  <div class="inline-block">
+                    <button class="min-touch-48 px-4 py-2.5 rounded-[14px_16px_13px_17px] bg-sage-dark text-charcoal font-semibold text-xs ink-border-1 ink-shadow-pressed flex items-center gap-1.5">
+                      <span class="material-symbols-outlined text-[17px]">download</span>
+                      <span>Downloading…</span>
+                    </button>
+                  </div>
+                  <span class="block text-[10px] font-mono text-sage-dark mt-1.5 font-medium">+2px offset translate</span>
+                </td>
+
+                <!-- Loading -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[14px_16px_13px_17px] bg-sage/80 text-charcoal font-semibold text-xs ink-border-1 ink-shadow-sm flex items-center gap-2 cursor-wait">
+                    <!-- Custom hand-drawn ink spinner -->
+                    <svg class="w-4 h-4 ink-spin text-charcoal" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 10" stroke-linecap="round"/>
+                    </svg>
+                    <span>Unpacking OPF…</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Hand-sketched spinner</span>
+                </td>
+
+                <!-- Disabled -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[14px_16px_13px_17px] bg-paper-subtle text-charcoal-disabled font-semibold text-xs ink-border-disabled cursor-not-allowed flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] text-charcoal-disabled">cloud_off</span>
+                    <span>Server Offline</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-disabled mt-1.5">Dashed border, no shadow</span>
+                </td>
+              </tr>
+
+              <!-- Row 2: Secondary Action (Ivory Paper) -->
+              <tr>
+                <td class="py-5 px-4 font-mono font-medium text-xs">
+                  <div class="font-bold text-charcoal">Secondary</div>
+                  <div class="text-charcoal-muted">Ivory Surface</div>
+                </td>
+
+                <!-- Default -->
+                <td class="py-5 px-4">
+                  <button class="min-touch-48 px-4 py-2.5 rounded-[15px_13px_16px_14px] bg-paper text-charcoal font-semibold text-xs ink-border-1 ink-shadow-sm flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">edit_note</span>
+                    <span>Add Note</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Ivory #FAF8F2 ground</span>
+                </td>
+
+                <!-- Pressed -->
+                <td class="py-5 px-4">
+                  <button class="min-touch-48 px-4 py-2.5 rounded-[15px_13px_16px_14px] bg-warm-beige text-charcoal font-semibold text-xs ink-border-1 ink-shadow-pressed flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">edit_note</span>
+                    <span>Opening Pad…</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal mt-1.5 font-medium">Warm beige depression</span>
+                </td>
+
+                <!-- Loading -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[15px_13px_16px_14px] bg-paper text-charcoal font-semibold text-xs ink-border-1 ink-shadow-sm flex items-center gap-2 cursor-wait">
+                    <svg class="w-4 h-4 ink-spin text-charcoal" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 10" stroke-linecap="round"/>
+                    </svg>
+                    <span>Indexing…</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Local index rebuild</span>
+                </td>
+
+                <!-- Disabled -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[15px_13px_16px_14px] bg-paper-subtle/60 text-charcoal-disabled font-semibold text-xs ink-border-disabled cursor-not-allowed flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] text-charcoal-disabled">lock</span>
+                    <span>Read Only</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-disabled mt-1.5">Disabled state</span>
+                </td>
+              </tr>
+
+              <!-- Row 3: Outlined Action -->
+              <tr>
+                <td class="py-5 px-4 font-mono font-medium text-xs">
+                  <div class="font-bold text-charcoal">Outlined</div>
+                  <div class="text-charcoal-muted">Minimal Outline</div>
+                </td>
+
+                <!-- Default -->
+                <td class="py-5 px-4">
+                  <button class="min-touch-48 px-4 py-2.5 rounded-[16px_14px_17px_13px] bg-transparent text-charcoal font-medium text-xs ink-border-1 hover:bg-warm-beige/40 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">share</span>
+                    <span>Share Quote</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Transparent back</span>
+                </td>
+
+                <!-- Pressed -->
+                <td class="py-5 px-4">
+                  <button class="min-touch-48 px-4 py-2.5 rounded-[16px_14px_17px_13px] bg-warm-beige/80 text-charcoal font-semibold text-xs ink-border-1 translate-x-0.5 translate-y-0.5 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px]">share</span>
+                    <span>Sharing…</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal mt-1.5 font-medium">Inked border + ground fill</span>
+                </td>
+
+                <!-- Loading -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[16px_14px_17px_13px] bg-transparent text-charcoal font-medium text-xs ink-border-1 flex items-center gap-2 cursor-wait">
+                    <svg class="w-4 h-4 ink-spin text-charcoal" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" stroke-dasharray="14 10" stroke-linecap="round"/>
+                    </svg>
+                    <span>Generating…</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-muted mt-1.5">Exporting card PNG</span>
+                </td>
+
+                <!-- Disabled -->
+                <td class="py-5 px-4">
+                  <button disabled class="min-touch-48 px-4 py-2.5 rounded-[16px_14px_17px_13px] bg-transparent text-charcoal-disabled font-medium text-xs ink-border-disabled cursor-not-allowed flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[17px] text-charcoal-disabled">block</span>
+                    <span>Unavailable</span>
+                  </button>
+                  <span class="block text-[10px] font-mono text-charcoal-disabled mt-1.5">Muted dashed stroke</span>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: SELECTION CONTROLS (CHECKBOXES, RADIOS & TOGGLES) -->
+    <section id="selection-controls" class="space-y-6">
+      <div class="flex items-baseline justify-between border-b border-charcoal/20 pb-2">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs text-terracotta font-bold">03 /</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold">Selection Controls & Form Toggles</h2>
+        </div>
+        <span class="font-hand text-lg text-charcoal-muted">Hand-checked ink indicators</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Checkboxes -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-sm p-6 space-y-4">
+          <div class="border-b border-charcoal/10 pb-3 flex justify-between items-center">
+            <div>
+              <span class="text-xs font-mono font-bold uppercase text-sage-dark">03.1 Checkboxes</span>
+              <h3 class="font-serif font-bold text-lg">Multi-Filter Selection</h3>
+            </div>
+            <span class="material-symbols-outlined text-charcoal-muted">check_box</span>
+          </div>
+          <p class="text-xs text-charcoal-muted">Imperfect squircle boundaries with organic hand-drawn checkmark vectors.</p>
+
+          <div class="space-y-3 pt-2">
+            <!-- Checked State (Selected) -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-paper cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-[6px_7px_5px_8px] bg-sage ink-border-1 ink-shadow-sm mt-0.5">
+                <svg class="w-4 h-4 text-charcoal" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 8.5L6.5 12L13 4" stroke="#292724" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Available Offline Only</div>
+                <div class="text-charcoal-muted text-[11px]">38 books cached locally</div>
+              </div>
+            </label>
+
+            <!-- Indeterminate State -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-paper cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-[7px_5px_8px_6px] bg-warm-beige ink-border-1 ink-shadow-sm mt-0.5">
+                <div class="w-2.5 h-0.5 bg-charcoal rounded-full"></div>
+              </div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Hainish Cycle Series</div>
+                <div class="text-charcoal-muted text-[11px]">Partial (4 of 7 books read)</div>
+              </div>
+            </label>
+
+            <!-- Unchecked State -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-paper cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-[6px_8px_5px_7px] bg-paper ink-border-1 ink-shadow-sm mt-0.5"></div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Show Cover Illustrations</div>
+                <div class="text-charcoal-muted text-[11px]">High-res Calibre art</div>
+              </div>
+            </label>
+
+            <!-- Disabled Checkbox -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg cursor-not-allowed opacity-60 min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-[6px_7px_5px_8px] bg-paper-subtle ink-border-disabled mt-0.5"></div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal-disabled">Auto-backup to Nextcloud</div>
+                <div class="text-charcoal-disabled text-[11px]">Requires Calibre sync v2</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Radio Buttons -->
+        <div class="bg-paper-card ink-border-2 ink-shadow-sm p-6 space-y-4">
+          <div class="border-b border-charcoal/10 pb-3 flex justify-between items-center">
+            <div>
+              <span class="text-xs font-mono font-bold uppercase text-charcoal">03.2 Radio Choices</span>
+              <h3 class="font-serif font-bold text-lg">Single Selection</h3>
+            </div>
+            <span class="material-symbols-outlined text-charcoal-muted">radio_button_checked</span>
+          </div>
+          <p class="text-xs text-charcoal-muted">Hand-inked concentric circles with solid charcoal ink dot cores.</p>
+
+          <div class="space-y-3 pt-2">
+            <!-- Radio Selected -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg bg-sage-tint/40 ink-border-subtle cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-full bg-paper ink-border-round ink-shadow-sm mt-0.5">
+                <div class="w-3 h-3 rounded-full bg-charcoal"></div>
+              </div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Continuous Vertical Scroll</div>
+                <div class="text-charcoal-muted text-[11px]">Smooth uninterrupted reading</div>
+              </div>
+            </label>
+
+            <!-- Radio Unselected 1 -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-paper cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-full bg-paper ink-border-round ink-shadow-sm mt-0.5"></div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Paged Book Spreads</div>
+                <div class="text-charcoal-muted text-[11px]">Simulates turn transitions</div>
+              </div>
+            </label>
+
+            <!-- Radio Unselected 2 -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-paper cursor-pointer transition-colors min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-full bg-paper ink-border-round ink-shadow-sm mt-0.5"></div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal">Infinite Dynamic Flow</div>
+                <div class="text-charcoal-muted text-[11px]">Adaptive column typography</div>
+              </div>
+            </label>
+
+            <!-- Radio Disabled -->
+            <label class="flex items-start gap-3 p-2.5 rounded-lg cursor-not-allowed opacity-60 min-touch-48">
+              <div class="relative flex items-center justify-center w-6 h-6 rounded-full bg-paper-subtle ink-border-disabled mt-0.5"></div>
+              <div class="text-xs">
+                <div class="font-semibold text-charcoal-disabled">Two-Column Landscape</div>
+                <div class="text-charcoal-disabled text-[11px]">Tablet mode only</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Toggles / Switches -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-sm p-6 space-y-4">
+          <div class="border-b border-charcoal/10 pb-3 flex justify-between items-center">
+            <div>
+              <span class="text-xs font-mono font-bold uppercase text-terracotta">03.3 Inked Toggles</span>
+              <h3 class="font-serif font-bold text-lg">Binary Feature Switches</h3>
+            </div>
+            <span class="material-symbols-outlined text-charcoal-muted">toggle_on</span>
+          </div>
+          <p class="text-xs text-charcoal-muted">Capsule tracks with tactile ink sliders mimicking physical slide levers.</p>
+
+          <div class="space-y-4 pt-2">
+            <!-- Toggle ON (Active Sage) -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-paper min-touch-48">
+              <div class="text-xs pr-2">
+                <div class="font-semibold text-charcoal">Keep Screen Awake</div>
+                <div class="text-charcoal-muted text-[11px]">Prevent ambient sleep timer</div>
+              </div>
+              <button aria-label="Toggle keep screen awake" class="w-13 h-7 w-[52px] h-[28px] rounded-full bg-sage ink-border-pill ink-shadow-sm relative p-0.5 transition-colors focus:outline-none flex items-center justify-end">
+                <span class="w-5 h-5 rounded-full bg-paper ink-border-round ink-shadow-sm inline-block mr-0.5"></span>
+              </button>
+            </div>
+
+            <!-- Toggle ON (Terracotta Accent) -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-paper min-touch-48">
+              <div class="text-xs pr-2">
+                <div class="font-semibold text-charcoal">Margin Notes Overlay</div>
+                <div class="text-charcoal-muted text-[11px]">Handwritten annotations</div>
+              </div>
+              <button aria-label="Toggle margin notes overlay" class="w-[52px] h-[28px] rounded-full bg-terracotta ink-border-pill ink-shadow-sm relative p-0.5 transition-colors focus:outline-none flex items-center justify-end">
+                <span class="w-5 h-5 rounded-full bg-paper ink-border-round ink-shadow-sm inline-block mr-0.5"></span>
+              </button>
+            </div>
+
+            <!-- Toggle OFF (Inactive Paper) -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-paper min-touch-48">
+              <div class="text-xs pr-2">
+                <div class="font-semibold text-charcoal">OLED Pure Black Mode</div>
+                <div class="text-charcoal-muted text-[11px]">Maximum power savings</div>
+              </div>
+              <button aria-label="Toggle pure black mode" class="w-[52px] h-[28px] rounded-full bg-paper ink-border-pill ink-shadow-sm relative p-0.5 transition-colors focus:outline-none flex items-center justify-start">
+                <span class="w-5 h-5 rounded-full bg-warm-beige ink-border-round ink-shadow-sm inline-block ml-0.5"></span>
+              </button>
+            </div>
+
+            <!-- Toggle Disabled -->
+            <div class="flex items-center justify-between p-2.5 rounded-lg cursor-not-allowed opacity-60 min-touch-48">
+              <div class="text-xs pr-2">
+                <div class="font-semibold text-charcoal-disabled">Hardware E-Ink Waveform</div>
+                <div class="text-charcoal-disabled text-[11px]">A2 high-refresh driver</div>
+              </div>
+              <div class="w-[52px] h-[28px] rounded-full bg-paper-subtle ink-border-disabled relative p-0.5 flex items-center justify-start">
+                <span class="w-5 h-5 rounded-full bg-charcoal-disabled/30 inline-block ml-0.5"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 04: SEGMENTED CONTROLS & FILTER CHIPS -->
+    <section id="segmented-controls" class="space-y-6">
+      <div class="flex items-baseline justify-between border-b border-charcoal/20 pb-2">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-xs text-charcoal font-bold">04 /</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold">Segmented Controls, Steppers & Filter Chips</h2>
+        </div>
+        <span class="font-hand text-lg text-charcoal-muted">Reader toolbar & catalog filters</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Card: Segmented Switchers -->
+        <div class="bg-paper-card ink-border-1 ink-shadow-md p-6 space-y-6">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-mono font-bold uppercase text-sage-dark">04.1 Segmented Controls</span>
+              <span class="text-xs font-mono text-charcoal-muted">Reader Theme & Typography</span>
+            </div>
+            <h3 class="font-serif font-bold text-lg">Segmented Switching Archetypes</h3>
+            <p class="text-xs text-charcoal-muted">Designed for mutually exclusive options like Reading Themes, Font Families, and Page Margins.</p>
+          </div>
+
+          <!-- Segment 1: Reader Page Tones -->
+          <div class="space-y-2">
+            <label class="text-xs font-mono font-semibold text-charcoal uppercase tracking-wider block">Page Ground Theme</label>
+            <div class="bg-paper p-1.5 ink-border-1 ink-shadow-sm rounded-[14px_16px_13px_15px] grid grid-cols-4 gap-1.5">
+              <!-- Item 1: Selected (Ivory) -->
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-sage text-charcoal font-semibold text-xs ink-border-subtle ink-shadow-sm flex flex-col items-center justify-center gap-0.5">
+                <span class="material-symbols-outlined text-[16px]">check</span>
+                <span>Ivory</span>
+              </button>
+              <!-- Item 2: Sepia -->
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige text-charcoal font-medium text-xs transition-colors flex flex-col items-center justify-center gap-0.5">
+                <span class="w-3 h-3 rounded-full bg-[#EFE3C3] border border-charcoal/40"></span>
+                <span>Sepia</span>
+              </button>
+              <!-- Item 3: Charcoal -->
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige text-charcoal font-medium text-xs transition-colors flex flex-col items-center justify-center gap-0.5">
+                <span class="w-3 h-3 rounded-full bg-[#292724] border border-charcoal/40"></span>
+                <span>Dark</span>
+              </button>
+              <!-- Item 4: E-Ink -->
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige text-charcoal font-medium text-xs transition-colors flex flex-col items-center justify-center gap-0.5">
+                <span class="w-3 h-3 rounded-full bg-white border border-charcoal"></span>
+                <span>E-Ink</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Segment 2: Font Selection (Newsreader vs Sans) -->
+          <div class="space-y-2">
+            <label class="text-xs font-mono font-semibold text-charcoal uppercase tracking-wider block">Reading Typeface</label>
+            <div class="bg-paper p-1.5 ink-border-1 ink-shadow-sm rounded-[14px_16px_13px_15px] grid grid-cols-3 gap-1.5">
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-sage text-charcoal font-serif font-bold text-xs ink-border-subtle ink-shadow-sm flex items-center justify-center gap-1.5">
+                <span>Newsreader</span>
+                <span class="font-mono text-[10px] bg-paper/80 px-1 rounded">Serif</span>
+              </button>
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige text-charcoal font-serif text-xs transition-colors flex items-center justify-center gap-1.5">
+                <span>Literata</span>
+              </button>
+              <button class="min-touch-48 py-2 px-3 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige text-charcoal font-sans font-medium text-xs transition-colors flex items-center justify-center gap-1.5">
+                <span>Plus Jakarta</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stepper Control (Font Size Increment / Decrement) -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-mono font-semibold text-charcoal uppercase tracking-wider">Type Size & Leading</label>
+              <span class="font-mono text-xs text-charcoal-muted">Active: 18 pt / 1.6</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex-1 bg-paper ink-border-1 ink-shadow-sm rounded-[14px_16px_13px_15px] p-1 flex items-center justify-between">
+                <button aria-label="Decrease font size" class="min-touch-48 w-11 h-11 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige active:bg-sage text-charcoal font-bold text-lg flex items-center justify-center ink-border-subtle transition-all">
+                  -
+                </button>
+                <div class="text-center px-4">
+                  <div class="font-serif font-bold text-base">18 pt</div>
+                  <div class="font-mono text-[10px] text-charcoal-muted">Default Le Guin</div>
+                </div>
+                <button aria-label="Increase font size" class="min-touch-48 w-11 h-11 rounded-[10px_12px_9px_11px] bg-paper-card hover:bg-warm-beige active:bg-sage text-charcoal font-bold text-lg flex items-center justify-center ink-border-subtle transition-all">
+                  +
+                </button>
+              </div>
+
+              <!-- Reset Stepper -->
+              <button aria-label="Reset to default typography" class="min-touch-48 px-3.5 py-2.5 rounded-[12px_14px_11px_15px] bg-paper hover:bg-warm-beige text-charcoal text-xs font-mono ink-border-1 ink-shadow-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Filter Chips, Tags & Status Pills -->
+        <div class="bg-paper-card ink-border-2 ink-shadow-md p-6 space-y-6">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-mono font-bold uppercase text-terracotta">04.2 Filter Chips & Tags</span>
+              <span class="text-xs font-mono text-charcoal-muted">Catalog & Shelves</span>
+            </div>
+            <h3 class="font-serif font-bold text-lg">Interactive Filter Chips</h3>
+            <p class="text-xs text-charcoal-muted">Tappable tags with remove actions, offline cache stamps, and book status markers.</p>
+          </div>
+
+          <!-- Active Filter Chips Group -->
+          <div class="space-y-2">
+            <label class="text-xs font-mono font-semibold text-charcoal uppercase tracking-wider block">Active Filter Stack</label>
+            <div class="flex flex-wrap gap-2.5 pt-1">
+              <!-- Active Sage Chip with Close -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sage text-charcoal font-medium text-xs ink-border-pill ink-shadow-sm min-touch-48">
+                <span class="material-symbols-outlined text-[16px]">menu_book</span>
+                <span>Currently Reading (8)</span>
+                <button aria-label="Remove filter" class="w-5 h-5 rounded-full hover:bg-charcoal/15 flex items-center justify-center ml-0.5">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+
+              <!-- Active Beige Chip with Close -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warm-beige text-charcoal font-medium text-xs ink-border-pill ink-shadow-sm min-touch-48">
+                <span class="material-symbols-outlined text-[16px]">cloud_done</span>
+                <span>Offline Cached (38)</span>
+                <button aria-label="Remove filter" class="w-5 h-5 rounded-full hover:bg-charcoal/15 flex items-center justify-center ml-0.5">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+
+              <!-- Unselected Filter Pill -->
+              <button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-paper hover:bg-warm-beige text-charcoal font-medium text-xs ink-border-pill ink-shadow-sm transition-colors min-touch-48">
+                <span class="material-symbols-outlined text-[16px]">star_outline</span>
+                <span>Hugo Winners</span>
+              </button>
+
+              <!-- Terracotta Series Tag -->
+              <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-terracotta-tint text-terracotta font-serif font-semibold text-xs border border-terracotta/40 ink-shadow-sm min-touch-48">
+                <span class="material-symbols-outlined text-[15px]">auto_stories</span>
+                <span>Hainish Cycle #4</span>
+              </div>
+
+              <!-- Technical EPUB tag -->
+              <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-paper text-charcoal-muted font-mono text-[11px] ink-border-subtle min-touch-48">
+                <span>EPUB 3.2</span>
+                <span class="text-charcoal">· 1.8 MB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar Simulation -->
+          <div class="pt-4 border-t border-charcoal/15 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-serif font-bold text-base">Filter Summary</span>
+              <span class="font-mono text-xs text-sage-dark font-semibold">14 books match</span>
+            </div>
+            <div class="flex gap-3">
+              <button class="flex-1 min-touch-48 px-4 py-2.5 rounded-[14px_16px_13px_17px] bg-sage text-charcoal font-bold text-xs uppercase tracking-wider ink-border-1 ink-shadow-sm hover:bg-sage-light flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">done_all</span>
+                <span>Apply Filter (14)</span>
+              </button>
+              <button class="min-touch-48 px-4 py-2.5 rounded-[15px_13px_16px_14px] bg-paper text-charcoal-muted hover:text-charcoal font-semibold text-xs uppercase tracking-wider ink-border-1 ink-shadow-sm flex items-center justify-center">
+                <span>Clear All</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 05: INTERACTIVE DEMO CANVAS -->
+    <section class="bg-paper-card ink-border-1 ink-shadow-lg p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-charcoal/20 pb-4">
+        <div>
+          <span class="font-mono text-xs text-sage font-bold uppercase">05 / Live Integration</span>
+          <h2 class="font-serif text-2xl font-bold">Reader Action Bar in Context</h2>
+          <p class="text-xs text-charcoal-muted mt-1">Shows how these buttons assemble inside an active reading session for <em>The Left Hand of Darkness</em>.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-sage animate-pulse"></span>
+          <span class="font-mono text-xs text-charcoal-muted font-medium">Page 134 / 304 (42%)</span>
+        </div>
+      </div>
+
+      <!-- Mock Reader Overlay Footer -->
+      <div class="bg-paper p-5 rounded-[16px_20px_15px_22px] ink-border-1 ink-shadow-md space-y-5 max-w-3xl mx-auto">
+        
+        <!-- Scrubber Slider -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between font-mono text-xs text-charcoal">
+            <span class="font-semibold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-sage inline-block"></span>
+              Ch. 14: The Orgota Ice
+            </span>
+            <span class="text-charcoal-muted">~2h 10m left in book</span>
+          </div>
+          <!-- Tactile Scrubber Bar -->
+          <div class="relative w-full h-3 bg-warm-beige rounded-full ink-border-subtle flex items-center px-1">
+            <div class="h-1.5 bg-sage rounded-full w-[42%]"></div>
+            <!-- Slider Thumb -->
+            <div class="absolute left-[42%] -translate-x-1/2 w-6 h-6 rounded-full bg-paper text-charcoal font-mono text-[10px] font-bold ink-border-round ink-shadow-sm flex items-center justify-center">
+              42
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Reader Action Bar -->
+        <div class="flex items-center justify-between gap-2 pt-2 border-t border-charcoal/10">
+          <button class="min-touch-48 flex-1 py-2 px-3 rounded-[12px_14px_11px_13px] bg-paper hover:bg-warm-beige text-charcoal font-medium text-xs ink-border-subtle flex items-center justify-center gap-1.5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">menu_book</span>
+            <span>Contents</span>
+          </button>
+          
+          <button class="min-touch-48 flex-1 py-2 px-3 rounded-[13px_11px_14px_12px] bg-sage text-charcoal font-semibold text-xs ink-border-1 ink-shadow-sm flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">tune</span>
+            <span>Appearance</span>
+          </button>
+
+          <button class="min-touch-48 flex-1 py-2 px-3 rounded-[11px_14px_12px_13px] bg-paper hover:bg-warm-beige text-charcoal font-medium text-xs ink-border-subtle flex items-center justify-center gap-1.5 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">headphones</span>
+            <span>Listen</span>
+          </button>
+
+          <!-- Quick Bookmark Trigger -->
+          <button aria-label="Quick bookmark" class="min-touch-48 w-12 h-12 rounded-full bg-terracotta text-paper ink-border-round ink-shadow-sm flex items-center justify-center hover:bg-terracotta/90 active:translate-x-0.5 active:translate-y-0.5 transition-all">
+            <span class="material-symbols-outlined text-[20px]">bookmark_add</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Notes & Design Token Manifest -->
+    <footer class="text-center font-mono text-xs text-charcoal-muted space-y-2 py-6 border-t border-charcoal/15">
+      <div class="flex flex-wrap justify-center items-center gap-4 text-charcoal">
+        <span>Warm Ivory: <strong class="font-mono">#FAF8F2</strong></span>
+        <span>•</span>
+        <span>Charcoal Ink: <strong class="font-mono">#292724</strong></span>
+        <span>•</span>
+        <span>Muted Sage: <strong class="font-mono">#83917A</strong></span>
+        <span>•</span>
+        <span>Warm Beige: <strong class="font-mono">#E8E0D2</strong></span>
+        <span>•</span>
+        <span>Terracotta: <strong class="font-mono">#C87D55</strong></span>
+      </div>
+      <p class="font-sans text-xs">Mia Legilo Component Showcase • Hand-Drawn Android Material 3 UI Kit • All controls guarantee 48dp minimum touch bounds.</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

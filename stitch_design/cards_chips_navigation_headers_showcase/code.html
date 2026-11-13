@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "on-tertiary-container": "#c77c54",
+          "on-primary": "#ffffff",
+          "surface-bright": "#fbf9f3",
+          "secondary": "#55624e",
+          "error": "#ba1a1a",
+          "on-primary-container": "#928e89",
+          "primary-fixed-dim": "#cbc6c1",
+          "on-tertiary-fixed-variant": "#713714",
+          "primary-fixed": "#e7e1dd",
+          "tertiary-fixed": "#ffdbcb",
+          "surface-container-high": "#eae8e2",
+          "paper-surface": "#FAF8F2",
+          "primary-container": "#292724",
+          "on-error": "#ffffff",
+          "outline-variant": "#ccc5bc",
+          "on-secondary-fixed": "#131f0e",
+          "tertiary-fixed-dim": "#ffb691",
+          "on-surface": "#1b1c19",
+          "outline": "#7b766f",
+          "surface-variant": "#e4e2dd",
+          "highlight-sage": "#E1E6DE",
+          "primary": "#141310",
+          "tertiary-container": "#461a00",
+          "on-primary-fixed-variant": "#494643",
+          "on-secondary-container": "#596652",
+          "surface": "#fbf9f3",
+          "error-container": "#ffdad6",
+          "on-primary-fixed": "#1d1b18",
+          "secondary-fixed-dim": "#bccbb2",
+          "on-secondary-fixed-variant": "#3e4a37",
+          "surface-tint": "#615e5a",
+          "ochre-accent": "#C87D55",
+          "sage-accent": "#83917A",
+          "on-error-container": "#93000a",
+          "inverse-on-surface": "#f2f1eb",
+          "paper-elevated": "#E8E0D2",
+          "highlight-ochre": "#F2DDCF",
+          "paper-container": "#F2EBE0",
+          "surface-container-low": "#f5f3ee",
+          "secondary-fixed": "#d8e7cd",
+          "secondary-container": "#d6e4ca",
+          "background": "#fbf9f3",
+          "ink-charcoal": "#292724",
+          "on-background": "#1b1c19",
+          "on-secondary": "#ffffff",
+          "tertiary": "#260a00",
+          "ink-muted": "#6E6962",
+          "surface-container": "#f0eee8",
+          "on-tertiary-fixed": "#341100",
+          "surface-dim": "#dcdad4",
+          "surface-container-lowest": "#ffffff",
+          "border-ink": "#292724",
+          "on-surface-variant": "#4a463f",
+          "inverse-surface": "#30312d",
+          "on-tertiary": "#ffffff",
+          "inverse-primary": "#cbc6c1",
+          "surface-container-highest": "#e4e2dd"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-md": "1rem",
+          "space-xl": "2rem",
+          "margin-tablet": "2rem",
+          "space-lg": "1.5rem",
+          "gutter": "1rem",
+          "margin-desktop": "3rem",
+          "space-sm": "0.5rem",
+          "space-xs": "0.25rem",
+          "margin": "1rem",
+          "gutter-tablet": "1.5rem"
+        },
+        "fontFamily": {
+          "label-md": ["Plus Jakarta Sans"],
+          "headline-lg": ["Newsreader"],
+          "headline-xl": ["Newsreader"],
+          "body-sm": ["Newsreader"],
+          "headline-md": ["Newsreader"],
+          "label-lg": ["Plus Jakarta Sans"],
+          "headline-lg-mobile": ["Newsreader"],
+          "headline-xl-mobile": ["Newsreader"],
+          "body-md": ["Newsreader"],
+          "body-lg": ["Newsreader"],
+          "headline-sm": ["Newsreader"],
+          "label-sm": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+          "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+          "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "500"}],
+          "headline-xl": ["38px", {"lineHeight": "46px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+          "body-sm": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+          "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+          "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+          "headline-xl-mobile": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+          "body-md": ["16px", {"lineHeight": "26px", "fontWeight": "400"}],
+          "body-lg": ["19px", {"lineHeight": "30px", "fontWeight": "400"}],
+          "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+          "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500"}]
+        }
+      }
+    }
+  };</script></head><body class="bg-background font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-paper-container z-50 flex flex-col pt-space-md pb-space-lg"><div class="px-space-md mb-space-lg flex items-center justify-between"><div class="flex items-center gap-space-sm"><span class="w-3 h-3 rounded-full bg-ochre-accent"></span><span class="font-headline-sm text-headline-sm text-ink-charcoal">SketchCN Lab</span></div><span class="font-label-sm text-label-sm bg-highlight-sage text-secondary px-2 py-0.5 rounded">v1.2</span></div><div class="px-space-md mb-space-sm"><span class="font-label-sm text-label-sm text-ink-muted uppercase tracking-wider">Components</span></div><nav class="flex-1 px-space-sm space-y-1" data-active-classes="bg-primary-container text-on-primary font-label-md shadow-[2px_2px_0px_#292724] rounded-lg"><a aria-current="page" class="flex items-center px-space-sm py-2 transition-colors bg-primary-container text-on-primary font-label-md shadow-[2px_2px_0px_#292724] rounded-lg" data-path="component-catalog" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">view_quilt</span>Component Catalog</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="cards-showcase" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">auto_stories</span>Cards &amp; Covers</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="navigation-drawer" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">dock_to_right</span>Navigation Shelves</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="filter-chips" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">label</span>Filter Chips</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="section-headers" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">format_size</span>Section Headers</a><a class="flex items-center px-space-sm py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md" data-path="spec-tokens" href="#"><span class="material-symbols-outlined mr-space-sm text-[20px]">tune</span>Tokens &amp; Sliders</a></nav><div class="px-space-md pt-space-sm border-t border-dashed border-outline-variant"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-sage-accent flex items-center justify-center"><span class="material-symbols-outlined text-paper-surface text-[18px]">menu_book</span></div><div><div class="font-label-sm text-label-sm text-ink-charcoal">EPUB Native Spec</div><div class="font-body-sm text-body-sm text-ink-muted text-xs">Charcoal &amp; Ivory</div></div></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-paper-surface/85 backdrop-blur-md shadow-[0_1px_8px_rgba(41,39,36,0.04)] z-40 flex items-center justify-between px-margin-desktop"><div class="flex items-center gap-space-md"><span class="font-label-md text-label-md text-ink-muted">Interactive Preview Environment</span><span class="font-label-sm text-label-sm bg-highlight-ochre text-ochre-accent px-2 py-0.5 rounded">Touch Target 48dp</span></div><div class="flex items-center gap-space-md"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 bg-background px-margin-desktop"><div class="flex flex-col w-full pb-space-xl">
+<!-- Subtle Paper Stamped Watermark & Header Context -->
+<header class="relative mb-space-xl pt-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-space-md mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted bg-paper-container px-2.5 py-1 rounded shadow-[1.5px_1.5px_0px_#292724]">
+          Android Spec v3.4 • Material 3 Tactile
+        </span>
+<span class="inline-flex items-center gap-1.5 font-label-sm text-label-sm text-secondary bg-secondary-container px-2.5 py-1 rounded shadow-[1.5px_1.5px_0px_#292724]">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+          SketchCN Verified
+        </span>
+</div>
+<!-- Quick Telemetry Badges -->
+<div class="flex flex-wrap items-center gap-2">
+<span class="font-label-sm text-label-sm bg-paper-surface px-2.5 py-1 text-ink-charcoal rounded shadow-[1.5px_1.5px_0px_#292724]">
+          Touch Target ≥ 48dp
+        </span>
+<span class="font-label-sm text-label-sm bg-paper-surface px-2.5 py-1 text-ink-charcoal rounded shadow-[1.5px_1.5px_0px_#292724]">
+          Hard Stamped Offset (2.5px)
+        </span>
+<span class="font-label-sm text-label-sm bg-highlight-ochre text-ochre-accent px-2.5 py-1 rounded shadow-[1.5px_1.5px_0px_#292724]">
+          Organic Ink Contours
+        </span>
+</div>
+</div>
+<div class="relative bg-paper-container p-space-lg md:p-space-xl rounded-xl shadow-[3px_3px_0px_#292724] overflow-hidden">
+<!-- Decorative Marginalia Corner Note -->
+<div class="absolute right-4 top-4 hidden md:block text-right pointer-events-none select-none">
+<span class="font-label-sm text-label-sm text-ink-muted block tracking-tighter">FIG. 04 — SPEC SHEET</span>
+<span class="font-headline-sm text-headline-sm text-ochre-accent italic opacity-75">Mia Legilo EPUB</span>
+</div>
+<div class="max-w-3xl">
+<p class="font-label-md text-label-md uppercase tracking-wider text-ochre-accent mb-1.5">
+          Design System &amp; Android Primitives
+        </p>
+<h1 class="font-headline-xl text-headline-xl text-ink-charcoal mb-space-sm leading-tight">
+          Android Cards, Chips, Navigation &amp; Section Headers
+        </h1>
+<p class="font-body-lg text-body-lg text-ink-muted leading-relaxed">
+          Tactile, production-ready Android components engineered with SketchCN hand-inked borders and literary notebook warmth. Designed for reading sanctuary focus, tactile feedback loops, and strict Android 48dp touch ergonomics.
+        </p>
+</div>
+<!-- Spec Metrics Strip -->
+<div class="mt-space-lg grid grid-cols-2 sm:grid-cols-4 gap-space-md pt-space-md">
+<div class="p-3 bg-paper-surface rounded-lg shadow-[2px_2px_0px_#292724]">
+<span class="block font-label-sm text-label-sm text-ink-muted">Contour Thickness</span>
+<span class="font-headline-sm text-headline-sm text-ink-charcoal">1.5 – 1.75 dp</span>
+</div>
+<div class="p-3 bg-paper-surface rounded-lg shadow-[2px_2px_0px_#292724]">
+<span class="block font-label-sm text-label-sm text-ink-muted">Elevation Mechanism</span>
+<span class="font-headline-sm text-headline-sm text-ink-charcoal">Hard Ink Stamp</span>
+</div>
+<div class="p-3 bg-paper-surface rounded-lg shadow-[2px_2px_0px_#292724]">
+<span class="block font-label-sm text-label-sm text-ink-muted">Active Paper Tint</span>
+<span class="font-headline-sm text-headline-sm text-secondary">Muted Sage #83917A</span>
+</div>
+<div class="p-3 bg-paper-surface rounded-lg shadow-[2px_2px_0px_#292724]">
+<span class="block font-label-sm text-label-sm text-ink-muted">Typography Matrix</span>
+<span class="font-headline-sm text-headline-sm text-ochre-accent">Newsreader + PJS</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- SECTION 01: BOOK INFORMATION CARDS (GRID, LIST, ANNOTATION) -->
+<!-- ========================================================================= -->
+<section class="mb-space-xl">
+<div class="flex items-baseline justify-between mb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-[1.5px] bg-ink-charcoal"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted">01 / SURFACES</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-ink-charcoal mt-1">
+          Book Information Cards
+        </h2>
+</div>
+<span class="font-label-sm text-label-sm text-ink-muted">3 Variant Layouts</span>
+</div>
+<!-- Cards Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Variant A: Standard Grid Book Card (Left Column, 4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Grid Component (Portrait)</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-2 py-0.5 rounded">Default State</span>
+</div>
+<article class="relative bg-paper-container rounded-xl p-space-md shadow-[2.5px_2.5px_0px_#292724] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3.5px_3.5px_0px_#292724] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[0.5px_0.5px_0px_#292724]">
+<!-- Top Tag & Overflow Action with 48dp trigger -->
+<div class="flex items-center justify-between mb-space-sm">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm bg-highlight-sage text-secondary px-2 py-0.5 rounded shadow-[1px_1px_0px_#292724]">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Currently Reading
+            </span>
+<button aria-label="Book actions" class="min-w-[48px] min-h-[48px] -mr-2 -my-2 flex items-center justify-center text-ink-charcoal hover:text-ochre-accent transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Cover Presentation with simulated sewn spine -->
+<div class="relative w-full h-56 bg-paper-elevated rounded-lg shadow-[2px_2px_0px_#292724] overflow-hidden mb-space-md flex">
+<!-- Bound Book Spine Accent -->
+<div class="w-3.5 h-full bg-primary-container shrink-0 flex flex-col justify-between items-center py-2 opacity-80">
+<span class="w-1 h-1 rounded-full bg-paper-surface opacity-40"></span>
+<span class="w-1 h-6 bg-paper-surface opacity-25 rounded-full"></span>
+<span class="w-1 h-1 rounded-full bg-paper-surface opacity-40"></span>
+</div>
+<!-- Cover Art / Placeholder -->
+<div class="relative flex-1 p-space-md flex flex-col justify-between bg-surface-container-high">
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm text-ochre-accent tracking-widest uppercase">Hainish Cycle • Vol 05</span>
+<p class="font-headline-md text-headline-md text-ink-charcoal leading-snug">The Dispossessed</p>
+<p class="font-body-sm text-body-sm text-ink-muted italic">An Ambiguous Utopia</p>
+</div>
+<div class="flex items-end justify-between">
+<span class="font-label-sm text-label-sm text-ink-muted">Ursula K. Le Guin</span>
+<span class="font-label-sm text-label-sm text-ink-charcoal font-bold">1974</span>
+</div>
+</div>
+</div>
+<!-- Card Content & Reading Progress Meter -->
+<div class="space-y-space-sm">
+<div class="flex items-baseline justify-between">
+<span class="font-label-md text-label-md text-ink-charcoal">Reading Progress</span>
+<span class="font-label-md text-label-md text-ochre-accent">68%</span>
+</div>
+<!-- Inked Tactile Progress Bar -->
+<div class="w-full h-3 bg-paper-surface rounded-full shadow-[1.5px_1.5px_0px_#292724] p-[1.5px] overflow-hidden">
+<div class="h-full bg-sage-accent rounded-full" style="width: 68%;"></div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-body-sm text-body-sm text-ink-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-ink-muted">schedule</span>
+                ~3h 15m remaining
+              </span>
+<span class="font-label-sm text-label-sm text-ink-charcoal bg-surface-container px-2 py-0.5 rounded">
+                p. 234 / 341
+              </span>
+</div>
+<!-- Action Button with Android 48dp Minimum Height -->
+<div class="pt-space-xs">
+<button class="w-full min-h-[48px] bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#83917A] flex items-center justify-center gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#83917A] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+                Continue Reading Chapter 8
+              </button>
+</div>
+</div>
+</article>
+</div>
+<!-- Variant B: Compact List Row Card (Middle Column, 8 cols stacked) -->
+<div class="lg:col-span-8 flex flex-col gap-space-md">
+<!-- List Row Card 1 -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Horizontal Shelf Row (Standard Android List)</span>
+<span class="font-label-sm text-label-sm text-ink-muted">Press Response Tested</span>
+</div>
+<article class="bg-paper-container rounded-xl p-space-md shadow-[2.5px_2.5px_0px_#292724] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-md hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<!-- Book Cover Thumbnail -->
+<div class="w-14 h-20 bg-paper-surface rounded-lg shadow-[2px_2px_0px_#292724] flex shrink-0 overflow-hidden">
+<div class="w-2 h-full bg-ochre-accent shrink-0"></div>
+<div class="flex-1 p-1.5 flex flex-col justify-between bg-surface-container-high">
+<span class="font-label-sm text-[8px] leading-tight text-ink-muted block truncate">NOVELLA</span>
+<span class="font-headline-sm text-xs text-ink-charcoal leading-none block font-serif line-clamp-2">Piranesi</span>
+<span class="w-4 h-[1px] bg-ink-charcoal opacity-30"></span>
+</div>
+</div>
+<!-- Metadata & Details -->
+<div class="min-w-0 flex-1">
+<div class="flex flex-wrap items-center gap-2 mb-1">
+<span class="font-label-sm text-label-sm bg-highlight-ochre text-ochre-accent px-2 py-0.5 rounded shadow-[1px_1px_0px_#292724]">
+                    Downloaded • 2.4 MB
+                  </span>
+<span class="font-label-sm text-label-sm text-ink-muted">Last opened 2h ago</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-ink-charcoal truncate">Piranesi</h3>
+<p class="font-body-sm text-body-sm text-ink-muted">Susanna Clarke • Bloomsbury Publishing</p>
+<!-- Mini Progress -->
+<div class="flex items-center gap-3 mt-2 max-w-xs">
+<div class="flex-1 h-2 bg-paper-surface rounded-full shadow-[1px_1px_0px_#292724] overflow-hidden p-[1px]">
+<div class="h-full bg-secondary rounded-full" style="width: 42%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-ink-charcoal">42%</span>
+</div>
+</div>
+</div>
+<!-- List Actions (Min 48x48dp Targets) -->
+<div class="flex items-center gap-1 sm:self-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-dashed border-outline-variant">
+<button aria-label="Quick bookmark" class="w-12 h-12 flex items-center justify-center rounded-lg text-ink-charcoal hover:bg-paper-surface hover:shadow-[1.5px_1.5px_0px_#292724] active:translate-y-0.5 transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]">bookmark_add</span>
+</button>
+<button aria-label="Reading options" class="w-12 h-12 flex items-center justify-center rounded-lg text-ink-charcoal hover:bg-paper-surface hover:shadow-[1.5px_1.5px_0px_#292724] active:translate-y-0.5 transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]">more_vert</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Variant C: Detailed Metadata & Sync Annotation Card -->
+<article class="bg-paper-surface rounded-xl p-space-lg shadow-[2.5px_2.5px_0px_#292724] relative overflow-hidden">
+<!-- Ribbon Marker in Corner -->
+<div class="absolute -top-1 right-8 w-6 h-10 bg-ochre-accent shadow-[1.5px_1.5px_0px_#292724] flex items-end justify-center pb-1">
+<span class="w-2 h-2 bg-paper-surface rounded-full mb-1"></span>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm mb-space-sm">
+<span class="font-label-sm text-label-sm bg-highlight-sage text-secondary px-2.5 py-1 rounded shadow-[1px_1px_0px_#292724] flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px]">sync_saved_locally</span>
+              Calibre-Web Synced
+            </span>
+<span class="font-label-sm text-label-sm text-ink-muted">Opds catalog: /lib/scifi-classics</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md">
+<!-- Left Info (8 cols) -->
+<div class="md:col-span-8 space-y-space-sm">
+<h3 class="font-headline-lg text-headline-lg text-ink-charcoal">
+                The Left Hand of Darkness
+              </h3>
+<p class="font-body-md text-body-md text-ink-muted">
+                "Light is the left hand of darkness and darkness the right hand of light. Two are one, life and death, lying together like lovers in kemmer..."
+              </p>
+<!-- Inset Marginalia Note Block -->
+<div class="bg-paper-container p-space-sm rounded-lg shadow-[1.5px_1.5px_0px_#292724]">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-ochre-accent font-semibold uppercase">Reader Marginalia Flag</span>
+<span class="font-label-sm text-label-sm text-ink-muted">Page 112 • Chapter 7</span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-charcoal italic">
+                  Note: Note Genly Ai’s perception shift regarding Estraven during the ice traversal.
+                </p>
+</div>
+</div>
+<!-- Right Telemetry & Action (4 cols) -->
+<div class="md:col-span-4 flex flex-col justify-between bg-paper-container p-space-sm rounded-lg shadow-[1.5px_1.5px_0px_#292724] space-y-3">
+<div class="space-y-1.5">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase block">Reader Telemetry</span>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-ink-muted">WPM Avg:</span>
+<span class="font-label-md text-label-md text-ink-charcoal">248 wpm</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-ink-muted">Total Time:</span>
+<span class="font-label-md text-label-md text-ink-charcoal">6h 12m</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-ink-muted">Font Family:</span>
+<span class="font-label-md text-label-md text-ink-charcoal">Newsreader</span>
+</div>
+</div>
+<button class="w-full min-h-[48px] bg-paper-surface text-ink-charcoal font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#292724] flex items-center justify-center gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#292724] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" type="button">
+<span class="material-symbols-outlined text-[18px] text-ochre-accent">bookmarks</span>
+                Inspect Annotations
+              </button>
+</div>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- SECTION 02: FILTER CHIPS, SEARCH OMNIBOX & FILTER BARS -->
+<!-- ========================================================================= -->
+<section class="mb-space-xl">
+<div class="flex items-baseline justify-between mb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-[1.5px] bg-ink-charcoal"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted">02 / CONTROLS</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-ink-charcoal mt-1">
+          Tactile Filter Chips &amp; Omnibox
+        </h2>
+</div>
+<span class="font-label-sm text-label-sm text-ink-muted">Material 3 Target Compliant</span>
+</div>
+<div class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724] space-y-space-lg">
+<!-- 48dp Tactile Search Omnibox -->
+<div>
+<label class="block font-label-sm text-label-sm text-ink-muted uppercase mb-2" for="catalog-omnibox">
+          Tactile Omnibox Input Field (48dp Minimum Touch Area)
+        </label>
+<div class="relative flex items-center bg-paper-surface rounded-xl shadow-[2.5px_2.5px_0px_#292724] focus-within:shadow-[3.5px_3.5px_0px_#C87D55] transition-all">
+<div class="w-12 h-12 flex items-center justify-center text-ink-charcoal shrink-0">
+<span class="material-symbols-outlined text-[22px]">search</span>
+</div>
+<input class="w-full h-12 bg-transparent text-ink-charcoal placeholder-ink-muted font-body-md text-body-md focus:outline-none pr-24" id="catalog-omnibox" placeholder="Search title, author, passage, or handwritten tag..." type="text" value="Le Guin Hainish"/>
+<div class="absolute right-1 flex items-center">
+<!-- Clear Button with 48dp trigger -->
+<button aria-label="Clear search input" class="w-11 h-11 flex items-center justify-center text-ink-muted hover:text-ink-charcoal transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">cancel</span>
+</button>
+<!-- Voice Dictation / Ink OCR Button with 48dp trigger -->
+<button aria-label="Voice dictation search" class="w-11 h-11 flex items-center justify-center text-ochre-accent hover:bg-highlight-ochre rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Reading Status Chips Set (Interactive states displayed side-by-side) -->
+<div>
+<span class="block font-label-sm text-label-sm text-ink-muted uppercase mb-space-xs">
+          Status Chips Matrix (Selected, Outline, Dotted states)
+        </span>
+<div class="flex flex-wrap items-center gap-space-sm">
+<!-- Chip: Selected Sage Fill -->
+<div class="relative inline-flex items-center min-h-[48px] py-1">
+<button class="h-9 px-3.5 bg-sage-accent text-paper-surface font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#292724] flex items-center gap-1.5 transition-transform active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Currently Reading</span>
+<span class="bg-paper-surface/20 text-paper-surface px-1.5 py-0.2 rounded text-[10px]">3</span>
+</button>
+</div>
+<!-- Chip: Warm Beige Active -->
+<div class="relative inline-flex items-center min-h-[48px] py-1">
+<button class="h-9 px-3.5 bg-paper-surface text-ink-charcoal font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#292724] flex items-center gap-1.5 hover:bg-paper-elevated transition-all active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">task_alt</span>
+<span>Completed</span>
+<span class="bg-paper-container text-ink-muted px-1.5 py-0.2 rounded text-[10px]">48</span>
+</button>
+</div>
+<!-- Chip: Ivory Outline Want to read -->
+<div class="relative inline-flex items-center min-h-[48px] py-1">
+<button class="h-9 px-3.5 bg-paper-surface text-ink-charcoal font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#292724] flex items-center gap-1.5 hover:bg-paper-elevated transition-all active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-[16px] text-ochre-accent">bookmark</span>
+<span>Want to Read</span>
+<span class="bg-paper-container text-ink-muted px-1.5 py-0.2 rounded text-[10px]">112</span>
+</button>
+</div>
+<!-- Chip: Dotted Shelved / DNF -->
+<div class="relative inline-flex items-center min-h-[48px] py-1">
+<button class="h-9 px-3.5 bg-paper-container text-ink-muted font-label-md text-label-md rounded-lg shadow-[1.5px_1.5px_0px_#292724] flex items-center gap-1.5 hover:text-ink-charcoal transition-all" type="button">
+<span class="material-symbols-outlined text-[16px]">folder_off</span>
+<span>DNF / Shelved</span>
+</button>
+</div>
+<!-- Chip: Primary Ink Inverted Filter -->
+<div class="relative inline-flex items-center min-h-[48px] py-1">
+<button class="h-9 px-3.5 bg-primary-container text-on-primary font-label-md text-label-md rounded-lg shadow-[2px_2px_0px_#83917A] flex items-center gap-1.5 transition-transform active:translate-x-0.5 active:translate-y-0.5" type="button">
+<span class="material-symbols-outlined text-[16px] text-ochre-accent">filter_list</span>
+<span>Catalog: All Books</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Active Filters Strip with Dismiss Handles & Squiggle Underline -->
+<div class="pt-space-sm border-t border-dashed border-outline-variant">
+<div class="flex flex-wrap items-center justify-between gap-space-sm mb-2">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Active Search Constraints</span>
+<!-- Squiggle Underline Action Button -->
+<button class="group min-h-[48px] px-2 flex items-center font-label-md text-label-md text-ochre-accent hover:text-ink-charcoal transition-colors" type="button">
+<span class="relative">
+              Clear All Constraints (3)
+              <svg class="absolute -bottom-1 left-0 w-full h-1.5 text-ochre-accent group-hover:text-ink-charcoal" preserveaspectratio="none" viewbox="0 0 100 6">
+<path d="M0,3 Q25,0 50,3 T100,3" fill="none" stroke="currentColor" stroke-width="1.75"></path>
+</svg>
+</span>
+</button>
+</div>
+<div class="flex flex-wrap items-center gap-2">
+<!-- Removable Active Chip 1 -->
+<span class="inline-flex items-center pl-3 pr-1 py-1 bg-paper-surface rounded-lg shadow-[1.5px_1.5px_0px_#292724] font-label-sm text-label-sm text-ink-charcoal">
+<span>Genre: <strong class="font-semibold">Sci-Fi</strong></span>
+<button aria-label="Remove Genre Sci-Fi filter" class="w-8 h-8 ml-1 flex items-center justify-center rounded hover:bg-paper-container text-ink-muted hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<!-- Removable Active Chip 2 -->
+<span class="inline-flex items-center pl-3 pr-1 py-1 bg-paper-surface rounded-lg shadow-[1.5px_1.5px_0px_#292724] font-label-sm text-label-sm text-ink-charcoal">
+<span>Author: <strong class="font-semibold">Le Guin</strong></span>
+<button aria-label="Remove Author Le Guin filter" class="w-8 h-8 ml-1 flex items-center justify-center rounded hover:bg-paper-container text-ink-muted hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+<!-- Removable Active Chip 3 -->
+<span class="inline-flex items-center pl-3 pr-1 py-1 bg-highlight-sage rounded-lg shadow-[1.5px_1.5px_0px_#292724] font-label-sm text-label-sm text-secondary">
+<span>Filter: <strong class="font-semibold">Offline Only</strong></span>
+<button aria-label="Remove Offline filter" class="w-8 h-8 ml-1 flex items-center justify-center rounded hover:bg-secondary-container text-secondary hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- SECTION 03: SECTION HEADERS & GROUPING DIVIDERS -->
+<!-- ========================================================================= -->
+<section class="mb-space-xl">
+<div class="flex items-baseline justify-between mb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-[1.5px] bg-ink-charcoal"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted">03 / TYPOGRAPHY &amp; DIVIDERS</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-ink-charcoal mt-1">
+          Section Headers &amp; Grouping Dividers
+        </h2>
+</div>
+<span class="font-label-sm text-label-sm text-ink-muted">Hand-drawn Deckle Rules</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- Header Example A: Deckle Ink Rule with Count -->
+<div class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724] space-y-space-md">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Pattern A — Serif Header with Wavy Inked Rule</span>
+<div class="pt-2">
+<div class="flex items-end justify-between mb-2">
+<div>
+<span class="font-label-sm text-label-sm text-ochre-accent tracking-wider uppercase font-semibold">Active Shelf</span>
+<h3 class="font-headline-lg text-headline-lg text-ink-charcoal">Currently Reading</h3>
+</div>
+<span class="font-label-md text-label-md bg-paper-surface px-2.5 py-1 rounded shadow-[1.5px_1.5px_0px_#292724] text-ink-charcoal">
+              3 volumes
+            </span>
+</div>
+<!-- Hand-drawn Deckle SVG Rule -->
+<div class="w-full py-1 text-ink-charcoal">
+<svg class="w-full h-3" fill="none" preserveaspectratio="none" viewbox="0 0 600 8">
+<path d="M0,4 C150,1 300,7 450,3 C525,1 575,6 600,4" stroke="currentColor" stroke-linecap="round" stroke-width="1.75"></path>
+</svg>
+</div>
+<p class="font-body-sm text-body-sm text-ink-muted mt-1">
+            Track active reading sessions synced via OPDS catalog and local internal storage.
+          </p>
+</div>
+<!-- Pattern B: Grouped Header with Right Aligned Action -->
+<div class="pt-space-sm border-t border-dashed border-outline-variant">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h4 class="font-headline-sm text-headline-sm text-ink-charcoal">Downloaded Books</h4>
+<span class="w-5 h-5 rounded-full bg-paper-surface shadow-[1px_1px_0px_#292724] text-[11px] font-bold flex items-center justify-center text-ink-charcoal">
+                18
+              </span>
+</div>
+<button class="group min-h-[48px] px-2 flex items-center gap-1 font-label-md text-label-md text-secondary hover:text-ink-charcoal transition-colors" type="button">
+<span class="relative">
+                Manage Storage
+                <span class="block w-full h-[1.5px] bg-secondary group-hover:bg-ink-charcoal"></span>
+</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Header Example B: Collapsible Chapter / Archive Section -->
+<div class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724] flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Pattern B — Collapsible Section Headers</span>
+<!-- Collapsible Header: Expanded State -->
+<div class="mt-space-md bg-paper-surface rounded-lg p-space-sm shadow-[2px_2px_0px_#292724]">
+<button class="w-full min-h-[48px] flex items-center justify-between text-left group" type="button">
+<div class="flex items-center gap-space-sm">
+<span class="w-7 h-7 rounded bg-highlight-sage text-secondary flex items-center justify-center shadow-[1px_1px_0px_#292724]">
+<span class="material-symbols-outlined text-[18px]">expand_less</span>
+</span>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-ink-charcoal">Hainish Cycle Chronology</h4>
+<span class="font-label-sm text-label-sm text-ink-muted">7 books • 1,842 total pages</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm bg-paper-container px-2 py-1 rounded text-ink-muted">Expanded</span>
+</button>
+<div class="px-space-sm pt-2 pb-1 space-y-1 text-ink-muted font-body-sm text-body-sm border-t border-outline-variant/60 mt-2">
+<div class="flex justify-between py-1 text-ink-charcoal">
+<span>1. Rocannon's World</span>
+<span class="font-label-sm text-label-sm text-secondary">Finished</span>
+</div>
+<div class="flex justify-between py-1 text-ink-charcoal">
+<span>2. Planet of Exile</span>
+<span class="font-label-sm text-label-sm text-secondary">Finished</span>
+</div>
+<div class="flex justify-between py-1 font-semibold text-ochre-accent">
+<span>3. City of Illusions</span>
+<span class="font-label-sm text-label-sm bg-highlight-ochre px-1.5 rounded">Up Next</span>
+</div>
+</div>
+</div>
+<!-- Collapsible Header: Collapsed State -->
+<div class="mt-space-sm bg-paper-surface rounded-lg p-space-sm shadow-[2px_2px_0px_#292724]">
+<button class="w-full min-h-[48px] flex items-center justify-between text-left group" type="button">
+<div class="flex items-center gap-space-sm">
+<span class="w-7 h-7 rounded bg-paper-container text-ink-charcoal flex items-center justify-center shadow-[1px_1px_0px_#292724]">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</span>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-ink-charcoal">Earthsea Archive</h4>
+<span class="font-label-sm text-label-sm text-ink-muted">6 books • Complete Collection</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm bg-paper-container px-2 py-1 rounded text-ink-muted">Collapsed</span>
+</button>
+</div>
+</div>
+<div class="mt-space-md pt-2 border-t border-dashed border-outline-variant flex items-center justify-between text-ink-muted font-label-sm text-label-sm">
+<span>Accordion State Tokens</span>
+<span>Material 3 Motion 200ms ease</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- SECTION 04: ANDROID NAVIGATION BARS & NAVIGATION RAIL -->
+<!-- ========================================================================= -->
+<section class="mb-space-xl">
+<div class="flex items-baseline justify-between mb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-[1.5px] bg-ink-charcoal"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted">04 / NAVIGATION PRIMITIVES</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-ink-charcoal mt-1">
+          Android Bottom Navigation &amp; Tablet Rail
+        </h2>
+</div>
+<span class="font-label-sm text-label-sm text-ink-muted">Hand-drawn Active Markers</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Phone Bottom Navigation Bar Preview (~390px simulated container) -->
+<div class="lg:col-span-6 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Phone Bottom Bar Preview (390dp Container)</span>
+<span class="font-label-sm text-label-sm text-ochre-accent font-semibold">Active: Library</span>
+</div>
+<div class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724] flex flex-col items-center">
+<!-- Mobile Screen Simulated Frame -->
+<div class="w-full max-w-[390px] bg-paper-surface rounded-2xl shadow-[3px_3px_0px_#292724] overflow-hidden">
+<!-- Simulated Content Area with Paper Grain -->
+<div class="p-space-md h-36 bg-paper-surface flex flex-col justify-center items-center text-center border-b border-dashed border-outline-variant">
+<span class="font-headline-sm text-headline-sm text-ink-charcoal">Active Reader Viewport</span>
+<p class="font-body-sm text-body-sm text-ink-muted">Continuous single scroll or dual spread</p>
+</div>
+<!-- Tactile Android Bottom Navigation Bar -->
+<nav class="h-20 bg-paper-container px-2 flex items-center justify-around shadow-[0px_-2px_0px_#292724] relative">
+<!-- Tab 1: Library (Active) -->
+<button class="relative flex-1 min-h-[48px] h-full flex flex-col items-center justify-center gap-1 group" type="button">
+<!-- Tactile Active Indicator Pill -->
+<div class="relative px-4 py-1 bg-highlight-sage rounded-full shadow-[1.5px_1.5px_0px_#292724] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-secondary" style="font-variation-settings: 'FILL' 1;">local_library</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Library</span>
+<!-- Inked Underline Accent -->
+<span class="w-6 h-[2px] bg-secondary rounded-full"></span>
+</button>
+<!-- Tab 2: Shelves -->
+<button class="relative flex-1 min-h-[48px] h-full flex flex-col items-center justify-center gap-1 text-ink-muted hover:text-ink-charcoal group" type="button">
+<div class="px-4 py-1 rounded-full flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[20px]">shelves</span>
+</div>
+<span class="font-label-sm text-label-sm">Shelves</span>
+<span class="w-6 h-[2px] bg-transparent"></span>
+</button>
+<!-- Tab 3: Search with badge -->
+<button class="relative flex-1 min-h-[48px] h-full flex flex-col items-center justify-center gap-1 text-ink-muted hover:text-ink-charcoal group" type="button">
+<div class="relative px-4 py-1 rounded-full flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+<!-- Notification ink dot -->
+<span class="absolute top-0.5 right-3 w-2.5 h-2.5 bg-ochre-accent rounded-full shadow-[1px_1px_0px_#292724]"></span>
+</div>
+<span class="font-label-sm text-label-sm">Search</span>
+<span class="w-6 h-[2px] bg-transparent"></span>
+</button>
+<!-- Tab 4: Settings -->
+<button class="relative flex-1 min-h-[48px] h-full flex flex-col items-center justify-center gap-1 text-ink-muted hover:text-ink-charcoal group" type="button">
+<div class="px-4 py-1 rounded-full flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</div>
+<span class="font-label-sm text-label-sm">Settings</span>
+<span class="w-6 h-[2px] bg-transparent"></span>
+</button>
+</nav>
+<!-- Android System Gesture Pill -->
+<div class="h-5 bg-paper-container flex items-center justify-center pb-1">
+<span class="w-32 h-1 bg-ink-charcoal rounded-full opacity-60"></span>
+</div>
+</div>
+<!-- Bottom Navigation Annotation -->
+<div class="w-full max-w-[390px] mt-space-sm flex justify-between text-ink-muted font-label-sm text-label-sm">
+<span>Height: 80dp (M3 spec)</span>
+<span>Indicator: 56×32dp Pill</span>
+</div>
+</div>
+</div>
+<!-- Tablet Navigation Rail Preview (~80dp wide bar) -->
+<div class="lg:col-span-6 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-ink-muted uppercase">Tablet Navigation Rail (80dp Dock)</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-2 py-0.5 rounded">Foldable &amp; Tablet Ready</span>
+</div>
+<div class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724]">
+<div class="flex flex-col sm:flex-row gap-space-lg items-center">
+<!-- Inked Tablet Navigation Rail Component -->
+<aside class="w-20 bg-paper-surface py-space-md rounded-xl shadow-[2.5px_2.5px_0px_#292724] flex flex-col items-center justify-between h-[420px] shrink-0">
+<!-- Top: Monogram Stamp & FAB -->
+<div class="flex flex-col items-center gap-space-md w-full">
+<!-- App Monogram Logo -->
+<div class="w-10 h-10 rounded-lg bg-paper-container shadow-[1.5px_1.5px_0px_#292724] flex items-center justify-center">
+<span class="font-headline-sm text-headline-sm text-ochre-accent italic font-serif">ML</span>
+</div>
+<!-- Floating Action Button (Import EPUB) -->
+<button aria-label="Import EPUB" class="w-12 h-12 bg-ochre-accent text-paper-surface rounded-xl shadow-[2px_2px_0px_#292724] flex items-center justify-center hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#292724] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]">add</span>
+</button>
+</div>
+<!-- Center: Nav Destinations -->
+<div class="flex flex-col items-center gap-space-sm w-full">
+<!-- Nav Item 1: Active -->
+<button class="w-full min-h-[48px] py-1 flex flex-col items-center justify-center gap-0.5 group" type="button">
+<div class="w-12 h-8 bg-highlight-sage text-secondary rounded-full shadow-[1.5px_1.5px_0px_#292724] flex items-center justify-center">
+<span class="material-symbols-outlined text-[19px]" style="font-variation-settings: 'FILL' 1;">book_4</span>
+</div>
+<span class="font-label-sm text-[10px] text-secondary font-bold">Books</span>
+</button>
+<!-- Nav Item 2 -->
+<button class="w-full min-h-[48px] py-1 flex flex-col items-center justify-center gap-0.5 text-ink-muted hover:text-ink-charcoal group" type="button">
+<div class="w-12 h-8 rounded-full flex items-center justify-center hover:bg-paper-container transition-colors">
+<span class="material-symbols-outlined text-[19px]">bookmarks</span>
+</div>
+<span class="font-label-sm text-[10px]">Notes</span>
+</button>
+<!-- Nav Item 3 -->
+<button class="w-full min-h-[48px] py-1 flex flex-col items-center justify-center gap-0.5 text-ink-muted hover:text-ink-charcoal group" type="button">
+<div class="w-12 h-8 rounded-full flex items-center justify-center hover:bg-paper-container transition-colors">
+<span class="material-symbols-outlined text-[19px]">bar_chart</span>
+</div>
+<span class="font-label-sm text-[10px]">Stats</span>
+</button>
+</div>
+<!-- Bottom: Settings & Profile Avatar -->
+<div class="flex flex-col items-center gap-space-sm">
+<button aria-label="Rail settings" class="w-11 h-11 flex items-center justify-center text-ink-muted hover:text-ink-charcoal rounded-lg" type="button">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-paper-container shadow-[1px_1px_0px_#292724] flex items-center justify-center font-label-sm text-ink-charcoal font-semibold">
+                  E
+                </div>
+</div>
+</aside>
+<!-- Specification Explainer Card -->
+<div class="flex-1 space-y-space-sm">
+<h4 class="font-headline-sm text-headline-sm text-ink-charcoal">
+                Ergonomic Rail Specifications
+              </h4>
+<p class="font-body-sm text-body-sm text-ink-muted">
+                Engineered for dual-screen foldables (e.g., Pixel Fold, Galaxy Fold) and 10"+ Android tablets. Centers thumb access along the left spine while reader pages render on the right spread.
+              </p>
+<div class="space-y-2 pt-2">
+<div class="flex items-center gap-2 text-ink-charcoal font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span>Minimum 48×48dp bounding box touch safety zones</span>
+</div>
+<div class="flex items-center gap-2 text-ink-charcoal font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span>Asymmetric physical stamping with #292724 hard contours</span>
+</div>
+<div class="flex items-center gap-2 text-ink-charcoal font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span>E-ink friendly contrast ratio (&gt; 7:1 across all surfaces)</span>
+</div>
+</div>
+<!-- Live Interaction Notice -->
+<div class="p-space-sm bg-paper-surface rounded-lg shadow-[1.5px_1.5px_0px_#292724] mt-space-sm">
+<span class="font-label-sm text-label-sm text-ochre-accent font-semibold block mb-0.5">Physical Tactile Spring</span>
+<span class="font-body-sm text-body-sm text-ink-muted">
+                  Interactive state shifts collapse the shadow offset by 2px to simulate mechanical press into physical vellum stock.
+                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- FOOTER SPECIFICATION TOKEN SUMMARY TABLE -->
+<!-- ========================================================================= -->
+<footer class="bg-paper-container p-space-lg rounded-xl shadow-[3px_3px_0px_#292724]">
+<div class="flex flex-wrap items-center justify-between gap-space-md mb-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-ochre-accent text-[20px]">architecture</span>
+<span class="font-headline-sm text-headline-sm text-ink-charcoal">Design Token &amp; State Reference</span>
+</div>
+<span class="font-label-sm text-label-sm text-ink-muted">Mia Legilo Component Catalog • SketchCN Specification</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm text-ink-charcoal">
+<thead>
+<tr class="border-b border-ink-charcoal text-ink-muted font-label-sm text-label-sm uppercase">
+<th class="py-2 pr-4">Component</th>
+<th class="py-2 pr-4">Base Substrate</th>
+<th class="py-2 pr-4">Border &amp; Shadow Token</th>
+<th class="py-2 pr-4">Typography Pairing</th>
+<th class="py-2">Android Target</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/60">
+<tr>
+<td class="py-2.5 pr-4 font-semibold">Book Grid Card</td>
+<td class="py-2.5 pr-4 text-ink-muted">#F2EBE0 (Container)</td>
+<td class="py-2.5 pr-4">2.5px 2.5px 0px #292724</td>
+<td class="py-2.5 pr-4">Newsreader Md / PJS</td>
+<td class="py-2.5 text-secondary font-semibold">≥ 48×48dp</td>
+</tr>
+<tr>
+<td class="py-2.5 pr-4 font-semibold">Status / Filter Chip</td>
+<td class="py-2.5 pr-4 text-ink-muted">#83917A (Active) / #FAF8F2</td>
+<td class="py-2.5 pr-4">1.5px 1.5px 0px #292724</td>
+<td class="py-2.5 pr-4">Plus Jakarta Sans 12/16</td>
+<td class="py-2.5 text-secondary font-semibold">48dp envelope</td>
+</tr>
+<tr>
+<td class="py-2.5 pr-4 font-semibold">Section Header Rule</td>
+<td class="py-2.5 pr-4 text-ink-muted">#FAF8F2 (Paper Surface)</td>
+<td class="py-2.5 pr-4">1.75px Deckle SVG Contour</td>
+<td class="py-2.5 pr-4">Newsreader Lg 28/36</td>
+<td class="py-2.5 text-ink-muted">Non-interactive</td>
+</tr>
+<tr>
+<td class="py-2.5 pr-4 font-semibold">Bottom Navigation</td>
+<td class="py-2.5 pr-4 text-ink-muted">#F2EBE0 / #E1E6DE (Pill)</td>
+<td class="py-2.5 pr-4">Top 2px Solid Inked Rule</td>
+<td class="py-2.5 pr-4">Plus Jakarta Sans 11/14</td>
+<td class="py-2.5 text-secondary font-semibold">80dp Bar / 48dp Tabs</td>
+</tr>
+</tbody>
+</table>
+</div>
+</footer>
+</div></main></div></body></html>

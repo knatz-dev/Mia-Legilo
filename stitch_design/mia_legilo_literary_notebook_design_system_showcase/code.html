@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mia Legilo — Literary Notebook Design System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FAF8F2',
+            'paper-card': '#FFFDF9',
+            'paper-dim': '#F2ECE1',
+            beige: '#E8E0D2',
+            'beige-dark': '#D8CFC0',
+            charcoal: '#292724',
+            'charcoal-muted': '#5C5851',
+            'charcoal-light': '#8A857B',
+            sage: '#83917A',
+            'sage-dark': '#5D6B55',
+            'sage-light': '#E9ECE6',
+            ochre: '#C87D55',
+            'ochre-light': '#F8EFEA',
+            border: '#292724',
+          },
+          fontFamily: {
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'sketch-sm': '1.5px 1.5px 0px #292724',
+            'sketch': '2.5px 2.5px 0px #292724',
+            'sketch-lg': '4px 4px 0px #292724',
+            'sketch-pressed': '0.5px 0.5px 0px #292724',
+            'sketch-sage': '2.5px 2.5px 0px #5D6B55',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Organic Hand-Drawn SketchCN-inspired borders */
+    .sketch-border {
+      border: 1.5px solid #292724;
+      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+    }
+    .sketch-border-subtle {
+      border: 1.5px solid #292724;
+      border-radius: 18px 4px 16px 5px/4px 17px 5px 18px;
+    }
+    .sketch-border-pill {
+      border: 1.5px solid #292724;
+      border-radius: 255px 25px 225px 25px/25px 225px 25px 255px;
+    }
+    .sketch-border-box {
+      border: 1.5px solid #292724;
+      border-radius: 4px 8px 3px 6px/7px 3px 6px 4px;
+    }
+    .sketch-border-tag {
+      border: 1.5px solid #292724;
+      border-radius: 8px 3px 7px 4px/3px 7px 4px 8px;
+    }
+    .sketch-divider {
+      border: none;
+      height: 2px;
+      background-image: radial-gradient(circle, #292724 50%, transparent 50%);
+      background-size: 8px 2px;
+      background-repeat: repeat-x;
+    }
+    .sketch-handline {
+      border-bottom: 1.5px solid #292724;
+      border-radius: 100% 50% 100% 0%/0% 100% 0% 100%;
+    }
+    /* Subtle paper texture */
+    .bg-notebook-grid {
+      background-color: #FAF8F2;
+      background-image: 
+        radial-gradient(#292724 0.65px, transparent 0.65px);
+      background-size: 18px 18px;
+      background-position: 0 0;
+    }
+  </style>
+</head>
+<body class="bg-paper text-charcoal font-sans antialiased min-h-screen p-4 sm:p-6 md:p-10 selection:bg-sage-light selection:text-charcoal">
+
+  <div class="max-w-4xl mx-auto space-y-12">
+
+    <!-- Header & Brand Intro -->
+    <header class="bg-paper-card sketch-border p-6 sm:p-8 shadow-sketch-lg relative overflow-hidden">
+      <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+        <svg width="220" height="220" viewBox="0 0 100 100" fill="currentColor">
+          <path d="M10 80 Q 50 70, 90 80 L 85 20 Q 50 28, 15 20 Z" />
+        </svg>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b border-charcoal/20">
+        <div class="flex items-center gap-3">
+          <!-- Hand-sketched Logo -->
+          <div class="w-12 h-12 bg-sage sketch-border flex items-center justify-center shadow-sketch-sm text-paper font-serif text-2xl font-bold">
+            M
+          </div>
+          <div>
+            <h1 class="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-charcoal flex items-center gap-2">
+              Mia Legilo
+              <span class="text-xs font-sans font-semibold tracking-wider uppercase px-2 py-0.5 bg-beige sketch-border-pill text-charcoal">v2.0 SketchCN Style</span>
+            </h1>
+            <p class="text-charcoal-muted text-sm sm:text-base font-serif italic">Design System — Hand-Drawn Literary Notebook & Tactile EPUB Reader</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-mono bg-paper px-3 py-1.5 sketch-border-subtle shadow-sketch-sm">
+          <span class="w-2.5 h-2.5 rounded-full bg-sage inline-block border border-charcoal"></span>
+          <span>Material 3 • 48dp Targets • Accessible</span>
+        </div>
+      </div>
+
+      <p class="text-charcoal-muted text-sm leading-relaxed max-w-2xl font-sans">
+        Inspired by <span class="font-semibold text-charcoal">SketchCN</span>'s organic ink outlines, subtly wobbled borders, and tactile paper warmth. Mia Legilo merges the quiet intimacy of physical margin notes with structured Android Material 3 accessibility. No synthetic gradients, no gloss — just ink, paper, and thoughtful reading craft.
+      </p>
+    </header>
+
+    <!-- 1. Color Palette Tokens -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-serif text-2xl font-bold flex items-center gap-2">
+          <span class="font-mono text-sm font-normal text-charcoal-light">01.</span>
+          Color Palette & Paper Surfaces
+        </h2>
+        <span class="text-xs font-mono text-charcoal-light">Natural Pigments • WCAG AA</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
+        <!-- Paper Ivory -->
+        <div class="bg-paper-card p-3.5 sketch-border-subtle shadow-sketch flex flex-col justify-between h-36">
+          <div class="h-16 rounded bg-[#FAF8F2] border border-charcoal/30 flex items-center justify-center">
+            <span class="text-xs font-mono text-charcoal-muted">#FAF8F2</span>
+          </div>
+          <div>
+            <span class="font-bold text-xs uppercase tracking-wide block">Warm Ivory</span>
+            <span class="text-[11px] text-charcoal-light">Main Page Background</span>
+          </div>
+        </div>
+
+        <!-- Charcoal Ink -->
+        <div class="bg-paper-card p-3.5 sketch-border-subtle shadow-sketch flex flex-col justify-between h-36">
+          <div class="h-16 rounded bg-[#292724] border border-charcoal flex items-center justify-center">
+            <span class="text-xs font-mono text-paper font-medium">#292724</span>
+          </div>
+          <div>
+            <span class="font-bold text-xs uppercase tracking-wide block">Charcoal Ink</span>
+            <span class="text-[11px] text-charcoal-light">Primary Text & Outlines</span>
+          </div>
+        </div>
+
+        <!-- Muted Sage -->
+        <div class="bg-paper-card p-3.5 sketch-border-subtle shadow-sketch flex flex-col justify-between h-36">
+          <div class="h-16 rounded bg-[#83917A] border border-charcoal flex items-center justify-center">
+            <span class="text-xs font-mono text-paper font-medium">#83917A</span>
+          </div>
+          <div>
+            <span class="font-bold text-xs uppercase tracking-wide block">Muted Sage</span>
+            <span class="text-[11px] text-charcoal-light">Active Accent & Shelf</span>
+          </div>
+        </div>
+
+        <!-- Warm Beige -->
+        <div class="bg-paper-card p-3.5 sketch-border-subtle shadow-sketch flex flex-col justify-between h-36">
+          <div class="h-16 rounded bg-[#E8E0D2] border border-charcoal flex items-center justify-center">
+            <span class="text-xs font-mono text-charcoal font-medium">#E8E0D2</span>
+          </div>
+          <div>
+            <span class="font-bold text-xs uppercase tracking-wide block">Warm Beige</span>
+            <span class="text-[11px] text-charcoal-light">Secondary Container</span>
+          </div>
+        </div>
+
+        <!-- Terracotta Ochre -->
+        <div class="bg-paper-card p-3.5 sketch-border-subtle shadow-sketch flex flex-col justify-between h-36 col-span-2 sm:col-span-1">
+          <div class="h-16 rounded bg-[#C87D55] border border-charcoal flex items-center justify-center">
+            <span class="text-xs font-mono text-paper font-medium">#C87D55</span>
+          </div>
+          <div>
+            <span class="font-bold text-xs uppercase tracking-wide block">Terracotta</span>
+            <span class="text-[11px] text-charcoal-light">Bookmarks & Highlights</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Typography Specimens -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-serif text-2xl font-bold flex items-center gap-2">
+          <span class="font-mono text-sm font-normal text-charcoal-light">02.</span>
+          Typography Scale & Literary Rhythm
+        </h2>
+        <span class="text-xs font-mono text-charcoal-light">Newsreader Serif × Plus Jakarta Sans</span>
+      </div>
+
+      <div class="bg-paper-card p-6 sm:p-8 sketch-border shadow-sketch space-y-6">
+        <div class="border-b border-charcoal/20 pb-4">
+          <span class="text-[11px] font-mono text-charcoal-light uppercase tracking-wider block mb-1">Display / Book Titles (Newsreader 700)</span>
+          <p class="font-serif text-3xl sm:text-4xl text-charcoal font-bold leading-tight">
+            The Left Hand of Darkness
+          </p>
+          <p class="font-serif text-xl sm:text-2xl text-charcoal-muted font-normal italic mt-1">
+            "Light is the left hand of darkness and darkness the right hand of light."
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-charcoal/20 pb-6">
+          <div>
+            <span class="text-[11px] font-mono text-charcoal-light uppercase tracking-wider block mb-1">Chapter Heading (Newsreader 600 • 20pt)</span>
+            <h3 class="font-serif text-xl font-semibold text-charcoal mb-2">Chapter XIV: The Orgota Ice</h3>
+            <p class="font-serif text-charcoal text-base leading-relaxed indent-4">
+              The snow began before nightfall, drifting across the volcanic plains like gray ash. We kept our hoods cinched close, hearing only the rhythm of our own breathing against the arctic silence of the glacier.
+            </p>
+          </div>
+          <div>
+            <span class="text-[11px] font-mono text-charcoal-light uppercase tracking-wider block mb-1">UI Controls & Metadata (Plus Jakarta Sans • 14pt)</span>
+            <div class="space-y-2 mt-2">
+              <div class="flex justify-between items-center text-sm py-1 border-b border-charcoal/10">
+                <span class="font-medium text-charcoal">Calibre-Web Server</span>
+                <span class="text-charcoal-muted font-mono text-xs">cwng.local:8083</span>
+              </div>
+              <div class="flex justify-between items-center text-sm py-1 border-b border-charcoal/10">
+                <span class="font-medium text-charcoal">Reading Pace</span>
+                <span class="text-charcoal-muted font-mono text-xs">245 words/min • 3d left</span>
+              </div>
+              <div class="flex justify-between items-center text-sm py-1">
+                <span class="font-medium text-charcoal">File Format & Storage</span>
+                <span class="text-charcoal-muted font-mono text-xs">EPUB 3.2 • 1.8 MB (Offline)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Margin Note Specimen -->
+        <div class="bg-paper p-4 sketch-border-subtle flex items-start gap-3">
+          <span class="material-symbols-outlined text-ochre mt-0.5 text-xl">edit_note</span>
+          <div>
+            <span class="font-serif text-sm font-bold text-charcoal">Tactile Notebook Margin Note (Handwriting Specimen)</span>
+            <p class="font-serif italic text-charcoal-muted text-sm mt-0.5">
+              “Estraven stood by the sledges, checking the lashing on the primus stove. A reminder that in Kemmer, all are equal.”
+            </p>
+            <span class="text-[10px] font-mono text-charcoal-light uppercase tracking-wider mt-1 block">Bookmark at Page 134 • 42%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Interactive Component Showcase -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="font-serif text-2xl font-bold flex items-center gap-2">
+          <span class="font-mono text-sm font-normal text-charcoal-light">03.</span>
+          Component Library (SketchCN Ink Style)
+        </h2>
+        <span class="text-xs font-mono text-charcoal-light">48dp Min Touch Targets • Accessible States</span>
+      </div>
+
+      <!-- Buttons Grid -->
+      <div class="bg-paper-card p-6 sm:p-8 sketch-border shadow-sketch space-y-6">
+        <h3 class="font-serif text-lg font-bold text-charcoal flex items-center gap-2 border-b border-charcoal/20 pb-2">
+          <span>Buttons & Actions</span>
+          <span class="text-xs font-sans font-normal text-charcoal-light">(Min-height 48px, offset ink shadows)</span>
+        </h3>
+
+        <div class="flex flex-wrap gap-4 items-center">
+          <!-- Primary Filled Button -->
+          <button class="min-h-[48px] px-6 py-2.5 bg-charcoal text-paper font-sans font-semibold text-sm sketch-border-pill shadow-sketch hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-sketch-sm active:translate-x-[2.5px] active:translate-y-[2.5px] active:shadow-sketch-pressed transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">menu_book</span>
+            <span>Resume Reading</span>
+          </button>
+
+          <!-- Sage Accent Button -->
+          <button class="min-h-[48px] px-6 py-2.5 bg-sage text-paper font-sans font-semibold text-sm sketch-border-pill shadow-sketch hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-sketch-sm active:translate-x-[2.5px] active:translate-y-[2.5px] active:shadow-sketch-pressed transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">cloud_sync</span>
+            <span>Sync with CWNG</span>
+          </button>
+
+          <!-- Secondary Beige Button -->
+          <button class="min-h-[48px] px-5 py-2.5 bg-beige text-charcoal font-sans font-medium text-sm sketch-border-subtle shadow-sketch hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2.5px] active:translate-y-[2.5px] transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">download</span>
+            <span>Download EPUB</span>
+          </button>
+
+          <!-- Outlined / Ghost Button -->
+          <button class="min-h-[48px] px-5 py-2.5 bg-paper text-charcoal font-sans font-medium text-sm sketch-border-subtle shadow-sketch hover:bg-paper-dim active:translate-x-[2.5px] active:translate-y-[2.5px] transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">tune</span>
+            <span>Filter Library</span>
+          </button>
+
+          <!-- Bookmark Icon Button (48dp circle) -->
+          <button class="w-12 h-12 bg-ochre-light text-ochre sketch-border-pill shadow-sketch flex items-center justify-center hover:bg-ochre hover:text-paper transition-all">
+            <span class="material-symbols-outlined text-xl">bookmark</span>
+          </button>
+
+          <!-- More Options Icon Button -->
+          <button class="w-12 h-12 bg-paper text-charcoal sketch-border-pill shadow-sketch flex items-center justify-center hover:bg-paper-dim transition-all">
+            <span class="material-symbols-outlined text-xl">more_vert</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Controls: Inputs, Checkbox, Radio, Switch -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Inputs & Search -->
+        <div class="bg-paper-card p-6 sketch-border shadow-sketch space-y-4">
+          <h3 class="font-serif text-lg font-bold text-charcoal border-b border-charcoal/20 pb-2">
+            Text Inputs & Search Fields
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Search Omnibox -->
+            <div>
+              <label class="block text-xs font-mono uppercase tracking-wider text-charcoal-muted mb-1">Library Omnibox (48dp)</label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3.5 top-3 text-charcoal-muted text-xl">search</span>
+                <input type="text" placeholder="Search title, author, or passage..." value="Ursula K. Le Guin" class="w-full h-12 pl-11 pr-4 bg-paper sketch-border-subtle text-charcoal placeholder-charcoal-light font-sans text-sm focus:outline-none focus:ring-2 focus:ring-sage shadow-sketch-sm">
+              </div>
+            </div>
+
+            <!-- Server URL Input -->
+            <div>
+              <label class="block text-xs font-mono uppercase tracking-wider text-charcoal-muted mb-1">Calibre-Web Server Endpoint</label>
+              <input type="text" value="https://library.mialegilo.internal/opds" class="w-full h-12 px-4 bg-paper sketch-border-subtle text-charcoal font-mono text-xs focus:outline-none focus:ring-2 focus:ring-sage shadow-sketch-sm">
+            </div>
+
+            <!-- Number Stepper -->
+            <div>
+              <label class="block text-xs font-mono uppercase tracking-wider text-charcoal-muted mb-1">Reading Type Size</label>
+              <div class="flex items-center gap-3">
+                <button class="w-12 h-12 bg-beige sketch-border-box shadow-sketch-sm flex items-center justify-center font-bold text-lg hover:bg-beige-dark">-</button>
+                <div class="flex-1 h-12 bg-paper sketch-border-box flex items-center justify-center font-mono font-bold text-sm">
+                  18 pt • Newsreader
+                </div>
+                <button class="w-12 h-12 bg-beige sketch-border-box shadow-sketch-sm flex items-center justify-center font-bold text-lg hover:bg-beige-dark">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toggles, Checkboxes & Radio -->
+        <div class="bg-paper-card p-6 sketch-border shadow-sketch space-y-4">
+          <h3 class="font-serif text-lg font-bold text-charcoal border-b border-charcoal/20 pb-2">
+            Selection & Toggles
+          </h3>
+
+          <div class="space-y-4">
+            <!-- Hand-drawn Switch (Checked) -->
+            <label class="flex items-center justify-between min-h-[48px] cursor-pointer group">
+              <span class="text-sm font-medium text-charcoal flex items-center gap-2">
+                <span class="material-symbols-outlined text-sage text-xl">auto_stories</span>
+                Continuous Vertical Reading
+              </span>
+              <div class="w-14 h-8 bg-sage sketch-border-pill p-1 flex items-center justify-end shadow-sketch-sm transition-all">
+                <div class="w-6 h-6 bg-paper sketch-border-pill shadow-sketch-pressed flex items-center justify-center">
+                  <span class="w-2 h-2 rounded-full bg-sage-dark"></span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Hand-drawn Switch (Unchecked) -->
+            <label class="flex items-center justify-between min-h-[48px] cursor-pointer group">
+              <span class="text-sm font-medium text-charcoal-muted flex items-center gap-2">
+                <span class="material-symbols-outlined text-xl">contrast</span>
+                OLED Pure Black Mode
+              </span>
+              <div class="w-14 h-8 bg-beige sketch-border-pill p-1 flex items-center justify-start shadow-sketch-sm transition-all">
+                <div class="w-6 h-6 bg-paper sketch-border-pill shadow-sketch-pressed"></div>
+              </div>
+            </label>
+
+            <div class="pt-2 border-t border-charcoal/10 flex flex-wrap gap-6 items-center">
+              <!-- Checkbox (Checked) -->
+              <label class="flex items-center gap-3 cursor-pointer min-h-[48px]">
+                <div class="w-6 h-6 bg-sage sketch-border-box shadow-sketch-sm flex items-center justify-center text-paper">
+                  <span class="material-symbols-outlined text-base font-bold">check</span>
+                </div>
+                <span class="text-sm font-medium text-charcoal">Downloaded Offline</span>
+              </label>
+
+              <!-- Checkbox (Unchecked) -->
+              <label class="flex items-center gap-3 cursor-pointer min-h-[48px]">
+                <div class="w-6 h-6 bg-paper sketch-border-box shadow-sketch-sm flex items-center justify-center"></div>
+                <span class="text-sm font-medium text-charcoal-muted">Show Series Badges</span>
+              </label>
+            </div>
+
+            <!-- Radio Group -->
+            <div class="flex items-center gap-6 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer min-h-[48px]">
+                <div class="w-6 h-6 bg-paper sketch-border-pill shadow-sketch-sm flex items-center justify-center">
+                  <div class="w-3 h-3 bg-charcoal rounded-full"></div>
+                </div>
+                <span class="text-sm font-medium text-charcoal">Serif (Literary)</span>
+              </label>
+
+              <label class="flex items-center gap-2 cursor-pointer min-h-[48px]">
+                <div class="w-6 h-6 bg-paper sketch-border-pill shadow-sketch-sm flex items-center justify-center"></div>
+                <span class="text-sm font-medium text-charcoal-muted">Sans-Serif</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chips, Tags & Badges -->
+      <div class="bg-paper-card p-6 sm:p-8 sketch-border shadow-sketch space-y-4">
+        <h3 class="font-serif text-lg font-bold text-charcoal border-b border-charcoal/20 pb-2">
+          Chips, Filters & Reading Tags
+        </h3>
+
+        <div class="flex flex-wrap gap-3 items-center">
+          <!-- Active Filter Chip -->
+          <div class="min-h-[40px] px-3.5 py-1.5 bg-sage text-paper sketch-border-pill shadow-sketch-sm flex items-center gap-2 text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm">filter_alt</span>
+            <span>Currently Reading (8)</span>
+            <span class="material-symbols-outlined text-sm cursor-pointer hover:opacity-80">close</span>
+          </div>
+
+          <!-- Secondary Active Chip -->
+          <div class="min-h-[40px] px-3.5 py-1.5 bg-beige text-charcoal sketch-border-pill shadow-sketch-sm flex items-center gap-2 text-xs font-medium">
+            <span class="material-symbols-outlined text-sm">cloud_done</span>
+            <span>Offline Cached (38)</span>
+            <span class="material-symbols-outlined text-sm cursor-pointer hover:opacity-80">close</span>
+          </div>
+
+          <!-- Inactive Chip -->
+          <div class="min-h-[40px] px-3.5 py-1.5 bg-paper text-charcoal-muted sketch-border-subtle shadow-sketch-sm flex items-center gap-1.5 text-xs font-medium hover:bg-paper-dim cursor-pointer">
+            <span class="material-symbols-outlined text-sm">schedule</span>
+            <span>Unread (24)</span>
+          </div>
+
+          <!-- Series Tag -->
+          <span class="min-h-[36px] px-3 py-1 bg-ochre-light text-ochre sketch-border-tag text-xs font-serif font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">auto_stories</span>
+            Hainish Cycle #4
+          </span>
+
+          <!-- Format Tag -->
+          <span class="min-h-[36px] px-2.5 py-1 bg-paper-dim text-charcoal font-mono text-[11px] sketch-border-box flex items-center">
+            EPUB • 1.8 MB
+          </span>
+        </div>
+      </div>
+
+      <!-- Tactile Card Patterns: Book Tile & Sheet Preview -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Tactile Book Item Card -->
+        <div class="bg-paper-card p-5 sketch-border shadow-sketch space-y-4">
+          <div class="flex items-center justify-between border-b border-charcoal/20 pb-2">
+            <span class="text-xs font-mono uppercase tracking-wider text-charcoal-muted">Book Card Component</span>
+            <span class="text-xs font-mono text-sage font-bold flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-sage inline-block"></span>
+              42% Read
+            </span>
+          </div>
+
+          <div class="flex gap-4">
+            <!-- Sketched Book Cover Placeholder -->
+            <div class="w-24 h-34 bg-[#E0D7C6] sketch-border flex-shrink-0 flex flex-col justify-between p-2 shadow-sketch text-center">
+              <span class="text-[9px] font-mono uppercase tracking-widest text-charcoal-light">Ursula K.</span>
+              <div class="font-serif font-bold text-xs leading-tight text-charcoal my-auto">
+                The Left Hand of Darkness
+              </div>
+              <span class="text-[8px] font-mono text-charcoal-muted bg-paper-card py-0.5 sketch-border-subtle">Hainish #4</span>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-serif text-lg font-bold text-charcoal leading-snug">The Left Hand of Darkness</h4>
+                <p class="text-xs text-charcoal-muted font-sans">Ursula K. Le Guin • 1969</p>
+                <div class="mt-2 flex items-center gap-2 text-xs text-charcoal-light font-sans">
+                  <span class="material-symbols-outlined text-sm text-ochre">timer</span>
+                  <span>~2h 10m left in book</span>
+                </div>
+              </div>
+
+              <!-- Progress bar with sketch border -->
+              <div class="mt-3">
+                <div class="w-full h-3 bg-paper sketch-border-box overflow-hidden p-0.5">
+                  <div class="h-full bg-sage rounded-xs" style="width: 42%;"></div>
+                </div>
+                <div class="flex justify-between text-[10px] font-mono text-charcoal-light mt-1">
+                  <span>Chapter 14 (p. 134)</span>
+                  <span>42% Complete</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center justify-between border-t border-charcoal/10">
+            <div class="flex items-center gap-1 text-xs font-mono text-charcoal-muted">
+              <span class="material-symbols-outlined text-sm text-sage">check_circle</span>
+              <span>Available Offline</span>
+            </div>
+            <button class="px-4 py-1.5 bg-charcoal text-paper font-sans text-xs font-semibold sketch-border-pill shadow-sketch-sm hover:translate-x-[1px]">
+              Continue
+            </button>
+          </div>
+        </div>
+
+        <!-- SketchCN-inspired Bottom Sheet / Dialog Specimen -->
+        <div class="bg-paper-card p-5 sketch-border shadow-sketch space-y-4">
+          <div class="flex items-center justify-between border-b border-charcoal/20 pb-2">
+            <span class="text-xs font-mono uppercase tracking-wider text-charcoal-muted">SketchCN Sheet Component</span>
+            <span class="w-8 h-1.5 bg-charcoal/30 rounded-full"></span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-serif text-lg font-bold text-charcoal">Reader Appearance</h4>
+              <button class="w-8 h-8 rounded-full bg-paper sketch-border-pill flex items-center justify-center text-charcoal hover:bg-beige">
+                <span class="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <!-- Page Tone Selector -->
+            <div>
+              <span class="text-xs font-sans font-medium text-charcoal-muted block mb-1.5">Page Tone Selection</span>
+              <div class="grid grid-cols-4 gap-2">
+                <div class="p-2 bg-paper sketch-border-subtle text-center shadow-sketch-sm cursor-pointer ring-2 ring-sage">
+                  <span class="block text-xs font-bold text-charcoal">Ivory</span>
+                  <span class="text-[9px] text-charcoal-light">Warm</span>
+                </div>
+                <div class="p-2 bg-beige sketch-border-subtle text-center cursor-pointer hover:bg-beige-dark">
+                  <span class="block text-xs font-bold text-charcoal">Sepia</span>
+                  <span class="text-[9px] text-charcoal-light">Dusk</span>
+                </div>
+                <div class="p-2 bg-[#292724] sketch-border-subtle text-center text-paper cursor-pointer">
+                  <span class="block text-xs font-bold">Charcoal</span>
+                  <span class="text-[9px] text-paper-dim">Night</span>
+                </div>
+                <div class="p-2 bg-[#FFFFFF] border-2 border-dashed border-charcoal text-center cursor-pointer">
+                  <span class="block text-xs font-bold text-charcoal">E-Ink</span>
+                  <span class="text-[9px] text-charcoal-light">Mono</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hand-drawn Divider -->
+            <div class="sketch-divider my-2"></div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs font-mono text-charcoal-light">Reset to Defaults</span>
+              <button class="px-4 py-2 bg-sage text-paper font-sans text-xs font-semibold sketch-border-pill shadow-sketch-sm">
+                Apply to Reader
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="text-center py-6 border-t border-charcoal/20 space-y-2">
+      <p class="font-serif italic text-charcoal-muted text-sm">
+        Mia Legilo Design System • Conceived for open-source literary reading & Calibre-Web integration.
+      </p>
+      <div class="flex items-center justify-center gap-3 text-xs font-mono text-charcoal-light">
+        <span>Hand-Drawn Ink Lines</span>
+        <span>•</span>
+        <span>Warm Ivory #FAF8F2</span>
+        <span>•</span>
+        <span>Charcoal Ink #292724</span>
+        <span>•</span>
+        <span>Sage #83917A</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

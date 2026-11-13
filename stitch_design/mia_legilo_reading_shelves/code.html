@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-fixed": "#1d1b18", "ochre-accent": "#C87D55", "on-error": "#ffffff", "on-secondary": "#ffffff", "primary": "#141310", "background": "#fbf9f3", "on-background": "#1b1c19", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#341100", "secondary-fixed-dim": "#bccbb2", "highlight-sage": "#E1E6DE", "surface-bright": "#fbf9f3", "tertiary-container": "#461a00", "secondary-fixed": "#d8e7cd", "highlight-ochre": "#F2DDCF", "sage-accent": "#83917A", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#494643", "primary-fixed-dim": "#cbc6c1", "on-surface-variant": "#4a463f", "inverse-surface": "#30312d", "paper-elevated": "#E8E0D2", "primary-fixed": "#e7e1dd", "surface-container-low": "#f5f3ee", "outline": "#7b766f", "error": "#ba1a1a", "on-error-container": "#93000a", "surface-tint": "#615e5a", "on-secondary-container": "#596652", "surface-container-highest": "#e4e2dd", "outline-variant": "#ccc5bc", "ink-muted": "#6E6962", "paper-container": "#F2EBE0", "border-ink": "#292724", "error-container": "#ffdad6", "surface-variant": "#e4e2dd", "surface-dim": "#dcdad4", "paper-surface": "#FAF8F2", "surface-container": "#f0eee8", "on-tertiary-container": "#c77c54", "tertiary-fixed-dim": "#ffb691", "surface": "#fbf9f3", "on-secondary-fixed-variant": "#3e4a37", "secondary": "#55624e", "ink-charcoal": "#292724", "tertiary-fixed": "#ffdbcb", "on-secondary-fixed": "#131f0e", "on-primary-container": "#928e89", "on-tertiary-fixed-variant": "#713714", "secondary-container": "#d6e4ca", "inverse-on-surface": "#f2f1eb", "surface-container-high": "#eae8e2", "on-surface": "#1b1c19", "tertiary": "#260a00", "on-primary": "#ffffff", "primary-container": "#292724", "inverse-primary": "#cbc6c1" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "2rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "gutter": "1rem", "margin-tablet": "2rem", "margin-desktop": "3rem", "space-sm": "0.5rem", "margin": "1rem", "gutter-tablet": "1.5rem", "space-md": "1rem" }, "fontFamily": { "label-sm": ["Plus Jakarta Sans"], "headline-lg": ["Newsreader"], "headline-sm": ["Newsreader"], "headline-md": ["Newsreader"], "headline-xl": ["Newsreader"], "headline-lg-mobile": ["Newsreader"], "body-sm": ["Newsreader"], "body-md": ["Newsreader"], "headline-xl-mobile": ["Newsreader"], "label-md": ["Plus Jakarta Sans"], "body-lg": ["Newsreader"], "label-lg": ["Plus Jakarta Sans"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "500" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-xl": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }], "body-sm": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-lg": ["19px", { "lineHeight": "30px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#fbf9f3;color:#1b1c19;overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-md text-headline-md italic font-medium tracking-tight text-ink-charcoal">Mia Legilo</span><span class="w-1.5 h-1.5 rounded-full bg-sage-accent mt-1"></span></div><span class="font-label-sm text-label-sm uppercase tracking-wider text-ink-muted -mt-0.5">Reading Shelves</span></div><div class="flex items-center gap-space-sm"><button aria-label="Reading Activity" class="w-11 h-11 flex items-center justify-center text-ink-charcoal hover:text-ochre-accent transition-colors"><span class="material-symbols-outlined text-[22px]">local_cafe</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-20 bg-surface"><div class="flex flex-col w-full px-margin pb-10 space-y-space-lg select-none">
+<!-- Top Context / Shelves Header -->
+<div class="flex flex-col space-y-space-xs pt-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-ink-charcoal text-[26px]">shelves</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-ink-charcoal tracking-tight font-serif">
+          Reading Shelves
+        </h1>
+</div>
+<!-- Tactile '+ New Custom Shelf' Pill Button (48dp min-touch) -->
+<button aria-label="Create new custom shelf" class="group relative inline-flex items-center justify-center min-h-[48px] px-3.5 py-1.5 bg-paper-surface text-ink-charcoal shadow-[2px_2px_0px_#292724] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-[0.5px_0.5px_0px_#292724] transition-all" style="border-radius: 14px 18px 12px 16px / 16px 12px 18px 14px; box-shadow: 2px 2px 0px #292724; border: 1.5px solid #292724;" type="button">
+<span class="material-symbols-outlined text-[18px] mr-1 text-ochre-accent group-hover:rotate-90 transition-transform">edit_square</span>
+<span class="font-label-md text-label-md text-ink-charcoal">New Shelf</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-ink-muted italic">
+      Personal reading journal &amp; status partitions • 6 Shelves • 38 Volumes
+    </p>
+</div>
+<!-- Reading Goal / Notebook Insert Card -->
+<div class="relative w-full bg-paper-container p-space-md shadow-[2px_2.5px_0px_#292724] transition-all" style="border: 1.5px solid #292724; border-radius: 16px 14px 18px 13px / 14px 18px 13px 17px;">
+<!-- Visual stitch simulation left binding -->
+<div class="absolute left-2.5 top-3 bottom-3 flex flex-col justify-between pointer-events-none opacity-40">
+<span class="w-1.5 h-0.5 bg-ink-charcoal rounded-full"></span>
+<span class="w-1.5 h-0.5 bg-ink-charcoal rounded-full"></span>
+<span class="w-1.5 h-0.5 bg-ink-charcoal rounded-full"></span>
+<span class="w-1.5 h-0.5 bg-ink-charcoal rounded-full"></span>
+</div>
+<div class="pl-4">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-ochre-accent text-[20px]">workspace_premium</span>
+<span class="font-label-lg text-label-lg text-ink-charcoal font-semibold">Year of Reading 2025</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 bg-highlight-sage text-ink-charcoal font-semibold" style="border: 1.5px solid #292724; border-radius: 6px 4px 5px 3px;">
+          On track
+        </span>
+</div>
+<div class="flex justify-between items-baseline mb-2">
+<p class="font-body-md text-body-md text-ink-charcoal">
+<span class="font-headline-sm text-headline-sm font-semibold text-ochre-accent">11</span> of 25 books finished
+        </p>
+<span class="font-label-sm text-label-sm text-ink-muted">44% Goal</span>
+</div>
+<!-- Hand-drawn Progress Bar with Inked Hatch Pattern -->
+<div class="relative w-full h-4 bg-paper-surface overflow-hidden" style="border: 1.5px solid #292724; border-radius: 8px;">
+<!-- Inked striped hatched bar -->
+<div class="h-full bg-sage-accent relative" style="width: 44%; background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(41,39,36,0.3) 4px, rgba(41,39,36,0.3) 6px);"></div>
+<div class="absolute right-[56%] top-0 bottom-0 w-[1.5px] bg-ink-charcoal"></div>
+</div>
+<div class="flex items-center justify-between mt-1 text-ink-muted font-label-sm text-label-sm">
+<span>Target: 2 vol/mo</span>
+<span>+2 ahead of pace</span>
+</div>
+</div>
+</div>
+<!-- Shelves List Section -->
+<div class="space-y-space-md">
+<!-- Shelf 1: Currently Reading (Active Shelf) -->
+<article aria-label="Currently Reading Shelf" class="group relative w-full bg-paper-surface p-space-md shadow-[2.5px_3px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1.5px_1.5px_0px_#292724] transition-all cursor-pointer" role="region" style="border: 1.8px solid #292724; border-radius: 16px 13px 17px 14px / 14px 17px 13px 16px;" tabindex="0">
+<!-- Top meta line -->
+<div class="flex items-start justify-between mb-2">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-full flex items-center justify-center bg-highlight-ochre text-ink-charcoal" style="border: 1.5px solid #292724; box-shadow: 1.5px 1.5px 0px #292724;">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal tracking-tight">Currently Reading</h2>
+<p class="font-label-sm text-label-sm text-ink-muted -mt-0.5">3 sessions in progress</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 bg-sage-accent text-on-secondary font-medium tracking-wide" style="border: 1.5px solid #292724; border-radius: 9px 5px 8px 4px; box-shadow: 1.5px 1.5px 0px #292724;">
+          3 volumes
+        </span>
+</div>
+<!-- Description -->
+<p class="font-body-sm text-body-sm text-ink-charcoal line-clamp-2 mb-3">
+        Active reading sessions with synchronized bookmarks, annotated marginalia &amp; tactile chapter logs.
+      </p>
+<!-- Book Visuals + Progress Strip -->
+<div class="flex items-center justify-between pt-1">
+<!-- Stack of 3 Overlapping Covers -->
+<div class="relative flex items-center h-20 w-36 pl-1">
+<!-- Book 3 (Back) -->
+<div class="absolute left-0 bottom-0 w-12 h-16 bg-surface-container-high rounded-[2px] shadow-[1.5px_1.5px_0px_#292724] rotate-[-6deg] overflow-hidden" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Vintage linen book cover of Ficciones by Jorge Luis Borges, embossed minimalist maze labyrinth in dark ochre on ivory cloth with sewn spine edge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbAcBo4flgo16pXILD7rtoxBH_zPlyqo-3TNLt6tmfL2gLslCQNWR_MJKBppHgrLaAJMPidY6RFTT6gL_HjHC_-qapSvKZ8ZV4RjZ7K3y29WysWrd689XlqKtu2kB7j6p7WyCaTRgQ7LQLrKkGXPZCFhXt5IuT2vRTXXFCcwEGcxsAFZdehATKPgZOKnzLGYTp9hWarprjoHIjSe9pP64v0V6iQ0KftORv8U42X9A"/>
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-ink-charcoal/20"></div>
+</div>
+<!-- Book 2 (Middle) -->
+<div class="absolute left-6 bottom-0.5 w-12 h-16 bg-surface-container-high rounded-[2px] shadow-[1.5px_1.5px_0px_#292724] rotate-[3deg] overflow-hidden z-10" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Cover of Piranesi by Susanna Clarke, antique classical statue silhouettes among tidal waters, muted sage green paper cover with gold leaf typography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhUOkoe7xuWNzGLydiaaoCWqDzkgTLGDK9AezSwppIkUsTjWPanNgLztEYSbJdk8SZGaQUxSgSG7edzy76xXg6u-qQSPwJ_Por6EDCM7B1pKlMu4gVq96l1V-OFSmUKsP8ysY2aDUvyIXS833qe8asTGqZmVe3vkpnpI7-vq8qyzIMgBCiJE5oh-HtwOzfrl7uuJfZYg3qiP6SBY4kidiNIhkQNszxk9cdvIIhy04"/>
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-ink-charcoal/25"></div>
+</div>
+<!-- Book 1 (Front Active) -->
+<div class="absolute left-12 bottom-1 w-13 h-17 bg-paper-surface rounded-[2px] shadow-[2px_2px_0px_#292724] rotate-[-1deg] overflow-hidden z-20" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Cover of The Dispossessed by Ursula K. Le Guin, warm terracotta and celestial twin moon graphics on matte textured letterpress paper, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNnxRiR_OUiyRHMUsrEWXm807Rlp6ucGgYbH8mQCP2o4szx1qZJrnmbXajo50W7AYrjwVzQIcLyHlbRF8ZXMdFgwaR-K2Nw7cxJx7SM4qhcv6pTM5b9jAn4AUDSPuAJ2JInpjbHoo8CI6uQX74Fox9ous1mUUGl3U7rrFtye_C0Tu_e7NEnPqbLz0s3PdygJXwOS-d0ZsGw3alau8dIPrYHfvDm0Cl0BWJQdhLqzo"/>
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-ink-charcoal/30"></div>
+<!-- Hand-drawn mini ribbon bookmark tag -->
+<div class="absolute top-0 right-1 w-2 h-4 bg-ochre-accent shadow-sm"></div>
+</div>
+</div>
+<!-- Shelf details & Action cue -->
+<div class="flex flex-col items-end space-y-1.5">
+<div class="inline-flex items-center space-x-1 px-2 py-0.5 bg-paper-container text-ink-charcoal font-label-sm text-label-sm" style="border: 1px dashed #292724; border-radius: 4px;">
+<span class="w-1.5 h-1.5 rounded-full bg-ochre-accent"></span>
+<span>The Dispossessed at 42%</span>
+</div>
+<div class="inline-flex items-center space-x-1 text-ink-charcoal font-label-md text-label-md font-semibold group-hover:translate-x-1 transition-transform min-h-[44px]">
+<span>Open Shelf</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Shelf 2: Want to Read -->
+<article aria-label="Want to Read Shelf" class="group relative w-full bg-paper-surface p-space-md shadow-[2px_2.5px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#292724] transition-all cursor-pointer" role="region" style="border: 1.5px solid #292724; border-radius: 14px 17px 13px 15px / 16px 13px 16px 13px;" tabindex="0">
+<div class="flex items-start justify-between mb-2">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-full flex items-center justify-center bg-surface-container-high text-ink-charcoal" style="border: 1.5px solid #292724; box-shadow: 1.5px 1.5px 0px #292724;">
+<span class="material-symbols-outlined text-[20px]">bookmark</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal tracking-tight">Want to Read</h2>
+<p class="font-label-sm text-label-sm text-ink-muted -mt-0.5">Queue for upcoming seasons</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 bg-paper-elevated text-ink-charcoal font-medium" style="border: 1.5px solid #292724; border-radius: 8px 5px 9px 4px; box-shadow: 1.5px 1.5px 0px #292724;">
+          14 volumes
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-charcoal line-clamp-2 mb-3">
+        Curated literary wishlist, prized recommendations &amp; awaiting titles gathered from fellow bibliophiles.
+      </p>
+<div class="flex items-center justify-between pt-1">
+<!-- Stack of 3 Books -->
+<div class="relative flex items-center h-20 w-36 pl-1">
+<div class="absolute left-0 bottom-0 w-12 h-16 bg-surface-container-high rounded-[2px] shadow-[1.5px_1.5px_0px_#292724] rotate-[-5deg] overflow-hidden" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Book cover of A Wizard of Earthsea by Ursula Le Guin, hand-drawn map of archipelago islands in sepia ink on rough parchment binding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb9Z4Z9f83ZPm3vaxx0XklasKfgUxDctSXIgrEidQVtAJttB0iH6lWLC7KR5r5T0V9oij7W-KyNwLgN6aqAuAbkBoj7vNgrAqMRSmifFRJ3e7G_qw9P3qPKhI0_Ri2RFDIIdiba6vHvrfe-LPK4fbDdpHTWki_QswAtAZR2eI8ysGsYoCont_jU3WFLN_teY_OP43jShIBiekgRqmEWTlC_m5MADBHvR7YXJy5PMo"/>
+</div>
+<div class="absolute left-6 bottom-0.5 w-12 h-16 bg-surface-container-high rounded-[2px] shadow-[1.5px_1.5px_0px_#292724] rotate-[2deg] overflow-hidden z-10" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Cover of Invisible Cities by Italo Calvino, surreal architectural sketch of gossamer towers and delicate arches in indigo on bone paper." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCswhblH_mqONEaf_CTKDwptwj05jFe_w_JyH4bFpkj150ovZy86VsD8azHHbNzLrv4azrYYjVHcfqQrKWmgpeUnU7ACYwcme6A_yp_Fs1TTXtTUc1awUrEt7tOl8xNW89FXlOUIBhhsGIsNixZ6VwQcMLZqH8hXS39WZaF-3u1GN7-DOlV0jXLHlFnLTGuAgyJe-zm18k-jha-LahXQcnu3_jnnzpz1fNRw4z4chI"/>
+</div>
+<div class="absolute left-12 bottom-1 w-13 h-17 bg-paper-surface rounded-[2px] shadow-[2px_2px_0px_#292724] rotate-[-2deg] overflow-hidden z-20" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Cover of Klara and the Sun by Kazuo Ishiguro, minimalist geometric radiant sun motif in pale terracotta and warm ochre on matte paper." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcQReApy0Wxf-MUJs1yn8AZUh80YFLcsyvk6gajUd6g_ix8Ga7JbRk4xuiUtwzsl3r2MFjGzoeF2Au6wIoVy0QPpdNMkgy7gI2B88W12oAefcPvPToNusosidK3yrodRTPCYIVGawwOuqU23wPiKGwa547okdZ19jPiYzQf0CbLXUS_sIpvIcy0Ob0oEJUFQCTNi_A-sI1gLItsdf4CEcBfjFRDZkQixpLyMutMVE"/>
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-ink-charcoal/20"></div>
+</div>
+</div>
+<div class="flex flex-col items-end space-y-1.5">
+<div class="inline-flex items-center space-x-1 px-2 py-0.5 bg-highlight-sage text-ink-charcoal font-label-sm text-label-sm" style="border: 1px solid #292724; border-radius: 4px;">
+<span class="material-symbols-outlined text-[13px] text-sage-accent">priority_high</span>
+<span>Next up: Klara and the Sun</span>
+</div>
+<div class="inline-flex items-center space-x-1 text-ink-charcoal font-label-md text-label-md group-hover:translate-x-1 transition-transform min-h-[44px]">
+<span>Inspect List</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Shelf 3: Completed -->
+<article aria-label="Completed Shelf" class="group relative w-full bg-paper-surface p-space-md shadow-[2px_2.5px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#292724] transition-all cursor-pointer" role="region" style="border: 1.5px solid #292724; border-radius: 15px 13px 16px 14px / 13px 16px 14px 17px;" tabindex="0">
+<div class="flex items-start justify-between mb-2">
+<div class="flex items-center space-x-2">
+<div class="w-9 h-9 rounded-full flex items-center justify-center bg-highlight-sage text-ink-charcoal" style="border: 1.5px solid #292724; box-shadow: 1.5px 1.5px 0px #292724;">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal tracking-tight">Completed</h2>
+<p class="font-label-sm text-label-sm text-ink-muted -mt-0.5">Finished journals &amp; saved logs</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2.5 py-0.5 bg-paper-elevated text-ink-charcoal font-medium" style="border: 1.5px solid #292724; border-radius: 6px 9px 5px 8px; box-shadow: 1.5px 1.5px 0px #292724;">
+          11 volumes
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-charcoal line-clamp-2 mb-3">
+        Finished volumes with archived marginalia, critical reflections, and logged reading timestamps.
+      </p>
+<div class="flex items-center justify-between pt-1">
+<!-- Stack of 2 Finished Books with Stamps -->
+<div class="relative flex items-center h-20 w-36 pl-1">
+<div class="absolute left-1 bottom-0 w-12 h-16 bg-surface-container-high rounded-[2px] shadow-[1.5px_1.5px_0px_#292724] rotate-[-4deg] overflow-hidden" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Book cover of The Left Hand of Darkness by Ursula Le Guin, snow glacier landscape ink line drawing on heavy vellum stock." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKVdEqT2PojS3sv-UE1GpyFO9FT0gURfVcB3CAo8h2FKhFX-rJ5SYEZdjCvb7i7IzhKUM6P8fhGjJJU2W0ZLD9apNMUXGaokdoG__tUaHfBP-aZSIbh7ZWRYibW4DH7QaLJdvS2r7KBZlNhFp9pRJkb9kw5hMjK7AuxXLx6RVqelkyUCDczFWjQvJd5Y0rxXnM5He7yYPuHUPSpQuUh0N5xwXGZ3lfPq5qIboBSCU"/>
+</div>
+<div class="absolute left-8 bottom-1 w-13 h-17 bg-paper-surface rounded-[2px] shadow-[2px_2px_0px_#292724] rotate-[3deg] overflow-hidden z-10" style="border: 1.5px solid #292724;">
+<img class="w-full h-full object-cover" data-alt="Book cover of Jorge Luis Borges Ficciones edition, dark textured buckram book cover with debossed geometric labyrinth in gold." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeIeYkYtOGJmoBRjc6KRUnqv88ce0DFTx4lO9eqKeHJtEdeLHHiqISwrqEhaQ8ddxrSuoooF3-fI5dgd0lXOaIqQmaRfb9Xpz-FoLMEYQfK_as0gzTDQRuoXIdSDvUu61gb07x1eI1v5AndU7lu9RAKGqqB8QR2BEsWMDfIRL8Bjx7ABfQqZXx0XfHKW7iU56ECqy7ceHVbraZT6e7yntM7dupP3siHPUj1QErXfU"/>
+<div class="absolute right-1 bottom-1 w-4 h-4 rounded-full bg-sage-accent text-on-secondary flex items-center justify-center text-[10px] border border-ink-charcoal">
+              ✓
+            </div>
+</div>
+</div>
+<div class="flex flex-col items-end space-y-1.5">
+<!-- Ink Speed Stamp -->
+<div class="inline-flex items-center space-x-1 px-2 py-0.5 bg-paper-container text-ink-charcoal font-label-sm text-label-sm" style="border: 1px solid #292724; border-radius: 4px;">
+<span class="text-ochre-accent font-bold">★ 4.6</span>
+<span class="text-ink-muted">•</span>
+<span>~6h / volume</span>
+</div>
+<div class="inline-flex items-center space-x-1 text-ink-charcoal font-label-md text-label-md group-hover:translate-x-1 transition-transform min-h-[44px]">
+<span>View Archives</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</div>
+</div>
+</div>
+</article>
+<!-- 2-Column Grid for Secondary Shelves (On Hold & Unread) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<!-- Shelf 4: On Hold -->
+<article aria-label="On Hold Shelf" class="group relative w-full bg-paper-surface p-space-md shadow-[2px_2px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#292724] transition-all cursor-pointer flex flex-col justify-between" role="region" style="border: 1.5px solid #292724; border-radius: 14px 16px 12px 15px;" tabindex="0">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-ochre-accent text-[22px]">hourglass_pause</span>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal">On Hold</h2>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 bg-paper-elevated text-ink-charcoal font-medium" style="border: 1.2px solid #292724; border-radius: 6px;">
+              4 vol
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-charcoal line-clamp-2 mb-3">
+            Temporarily paused works awaiting quiet winter evenings and dedicated focus.
+          </p>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-dashed border-ink-charcoal/30">
+<div class="flex items-center space-x-1 text-ink-muted font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">history</span>
+<span>Paused &gt;30 days</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-ink-charcoal group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</article>
+<!-- Shelf 5: Unread -->
+<article aria-label="Unread Shelf" class="group relative w-full bg-paper-surface p-space-md shadow-[2px_2px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#292724] transition-all cursor-pointer flex flex-col justify-between" role="region" style="border: 1.5px solid #292724; border-radius: 15px 13px 16px 13px;" tabindex="0">
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-sage-accent text-[22px]">mark_email_unread</span>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal">Unread</h2>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 bg-paper-elevated text-ink-charcoal font-medium" style="border: 1.2px solid #292724; border-radius: 6px;">
+              4 vol
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-charcoal line-clamp-2 mb-3">
+            Acquired editions newly catalogued, pristine and untouched in the digital collection.
+          </p>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-dashed border-ink-charcoal/30">
+<div class="flex items-center space-x-1 text-sage-accent font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">library_add_check</span>
+<span>Freshly imported</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-ink-charcoal group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</article>
+</div>
+<!-- Shelf 6: Abandoned (DNF) -->
+<article aria-label="Abandoned Did Not Finish Shelf" class="group relative w-full bg-surface-container-low p-space-md shadow-[1.5px_2px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[0.5px_0.5px_0px_#292724] transition-all cursor-pointer" role="region" style="border: 1.5px dashed #292724; border-radius: 14px 17px 13px 15px / 15px 14px 16px 13px;" tabindex="0">
+<div class="flex items-start justify-between mb-1.5">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full flex items-center justify-center bg-paper-surface text-ink-muted" style="border: 1.2px solid #292724;">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-ink-charcoal">Abandoned (DNF)</h2>
+<p class="font-label-sm text-label-sm text-ink-muted -mt-0.5">Shelved reflections</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 bg-paper-surface text-ink-muted font-medium" style="border: 1px solid #292724; border-radius: 6px;">
+          2 volumes
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-ink-muted line-clamp-2 mb-2">
+        Did not finish — shelved with honest reader reasons, reflections, and zero literary guilt.
+      </p>
+<div class="flex items-center justify-between text-ink-muted">
+<div class="flex items-center space-x-1 font-label-sm text-label-sm italic">
+<span class="material-symbols-outlined text-[14px]">favorite</span>
+<span>Archived without guilt</span>
+</div>
+<div class="flex items-center text-ink-charcoal font-label-md text-label-md group-hover:translate-x-1 transition-transform min-h-[44px]">
+<span>Review Notes</span>
+<span class="material-symbols-outlined text-[16px] ml-0.5">chevron_right</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Notebook Colophon / Footer -->
+<div class="pt-space-md pb-space-sm flex flex-col items-center justify-center text-center space-y-2">
+<!-- Hand-drawn styled ink divider with organic notch -->
+<div class="w-full max-w-xs flex items-center justify-center space-x-2 opacity-60">
+<div class="h-[1.5px] bg-ink-charcoal flex-1"></div>
+<span class="material-symbols-outlined text-[16px] text-ink-charcoal">local_library</span>
+<div class="h-[1.5px] bg-ink-charcoal flex-1"></div>
+</div>
+<div class="space-y-0.5">
+<p class="font-headline-sm text-headline-sm italic text-ink-charcoal">
+        Ex Libris Mia Legilo
+      </p>
+<p class="font-label-sm text-label-sm text-ink-muted">
+        All shelves synced locally with OPDS Calibre • SQLite v3
+      </p>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interaction tactile sound/haptic feedback simulation
+  document.querySelectorAll('article, button').forEach(elem => {
+    elem.addEventListener('click', () => {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(10);
+      }
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-1px_10px_rgba(0,0,0,0.03)]" data-active-classes="text-ink-charcoal font-bold [&amp;&gt;div]:bg-highlight-sage [&amp;&gt;div]:shadow-[1.5px_1.5px_0px_#292724] [&amp;&gt;span.active-ink]:opacity-100"><div class="flex items-center justify-around h-20 px-space-xs"><a class="relative flex flex-col items-center justify-center min-w-[64px] min-h-[48px] py-1 px-2 text-ink-muted hover:text-ink-charcoal transition-all group" data-path="library" href="#"><div class="flex items-center justify-center w-12 h-8 rounded-full transition-all"><span class="material-symbols-outlined text-[22px]">auto_stories</span></div><span class="font-label-sm text-label-sm mt-0.5">Library</span><span class="active-ink opacity-0 transition-opacity absolute bottom-1 w-4 h-[1.5px] bg-ink-charcoal rounded-full"></span></a><a aria-current="page" class="relative flex flex-col items-center justify-center min-w-[64px] min-h-[48px] py-1 px-2 transition-all group text-ink-charcoal font-bold [&amp;&gt;div]:bg-highlight-sage [&amp;&gt;div]:shadow-[1.5px_1.5px_0px_#292724] [&amp;&gt;span.active-ink]:opacity-100" data-path="reading-shelves" href="#"><div class="flex items-center justify-center w-12 h-8 rounded-full transition-all"><span class="material-symbols-outlined text-[22px]">shelves</span></div><span class="font-label-sm text-label-sm mt-0.5">Shelves</span><span class="active-ink opacity-0 transition-opacity absolute bottom-1 w-4 h-[1.5px] bg-ink-charcoal rounded-full"></span></a><a class="relative flex flex-col items-center justify-center min-w-[64px] min-h-[48px] py-1 px-2 text-ink-muted hover:text-ink-charcoal transition-all group" data-path="search-catalogue" href="#"><div class="flex items-center justify-center w-12 h-8 rounded-full transition-all"><span class="material-symbols-outlined text-[22px]">search</span></div><span class="font-label-sm text-label-sm mt-0.5">Search</span><span class="active-ink opacity-0 transition-opacity absolute bottom-1 w-4 h-[1.5px] bg-ink-charcoal rounded-full"></span></a><a class="relative flex flex-col items-center justify-center min-w-[64px] min-h-[48px] py-1 px-2 text-ink-muted hover:text-ink-charcoal transition-all group" data-path="notebook-settings" href="#"><div class="flex items-center justify-center w-12 h-8 rounded-full transition-all"><span class="material-symbols-outlined text-[22px]">tune</span></div><span class="font-label-sm text-label-sm mt-0.5">Settings</span><span class="active-ink opacity-0 transition-opacity absolute bottom-1 w-4 h-[1.5px] bg-ink-charcoal rounded-full"></span></a></div></nav></body></html>

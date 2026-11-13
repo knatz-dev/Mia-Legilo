@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "border-ink": "#b3a286",
+          "on-secondary": "#ffffff",
+          "primary": "#382c1e",
+          "inverse-surface": "#35301f",
+          "on-background": "#201b0c",
+          "surface-container-lowest": "#ffffff",
+          "highlight-sage": "#e1e8db",
+          "surface-container": "#f5ebd8",
+          "on-tertiary-container": "#8c9a82",
+          "paper-elevated": "#eae0c7",
+          "tertiary-fixed": "#d8e7cc",
+          "on-error": "#ffffff",
+          "outline": "#7f756d",
+          "on-surface": "#201b0c",
+          "primary-container": "#382c1e",
+          "inverse-primary": "#d7c3af",
+          "outline-variant": "#c5b69c",
+          "on-primary-fixed": "#241a0d",
+          "background": "#f6efdf",
+          "on-secondary-fixed-variant": "#78311a",
+          "on-primary-fixed-variant": "#524435",
+          "ink-charcoal": "#382c1e",
+          "on-tertiary-fixed": "#131f0e",
+          "surface-tint": "#6b5c4b",
+          "sage-accent": "#6e7d65",
+          "secondary-container": "#fd997b",
+          "surface-container-highest": "#ece2c9",
+          "tertiary-fixed-dim": "#bccbb1",
+          "inverse-on-surface": "#faf0d7",
+          "on-tertiary": "#ffffff",
+          "on-primary": "#ffffff",
+          "surface-variant": "#ece2c9",
+          "ochre-accent": "#b85c3f",
+          "surface-container-low": "#fdf3d9",
+          "on-surface-variant": "#534330",
+          "tertiary": "#111d0c",
+          "on-tertiary-fixed-variant": "#3d4a36",
+          "secondary-fixed-dim": "#ffb59f",
+          "tertiary-container": "#26321f",
+          "surface-bright": "#fff8ef",
+          "highlight-ochre": "#f5dcd2",
+          "surface-dim": "#e3d9c1",
+          "ink-muted": "#7e6c56",
+          "secondary-fixed": "#ffdbd1",
+          "surface-container-high": "#f2e7ce",
+          "secondary": "#96472f",
+          "on-secondary-container": "#762f19",
+          "on-secondary-fixed": "#3a0a00",
+          "paper-surface": "#f6efdf",
+          "error": "#ba1a1a",
+          "primary-fixed": "#f4dfca",
+          "surface": "#fff8ef",
+          "on-error-container": "#93000a",
+          "primary-fixed-dim": "#d7c3af",
+          "on-primary-container": "#a49380",
+          "error-container": "#ffdad6",
+          "paper-container": "#fbf5eb"
+        },
+        borderRadius: {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        spacing: {
+          "space-md": "1rem",
+          "space-xl": "2rem",
+          "gutter": "1rem",
+          "gutter-tablet": "1.5rem",
+          "space-sm": "0.5rem",
+          "space-lg": "1.5rem",
+          "margin-desktop": "3rem",
+          "margin": "1rem",
+          "margin-tablet": "2rem",
+          "space-xs": "0.25rem"
+        },
+        fontFamily: {
+          "body-md": ["Newsreader", "serif"],
+          "label-lg": ["Newsreader", "serif"],
+          "headline-lg-mobile": ["Newsreader", "serif"],
+          "label-md": ["Newsreader", "serif"],
+          "headline-lg": ["Newsreader", "serif"],
+          "headline-sm": ["Newsreader", "serif"],
+          "headline-md": ["Newsreader", "serif"],
+          "headline-xl-mobile": ["Newsreader", "serif"],
+          "body-sm": ["Newsreader", "serif"],
+          "label-sm": ["Newsreader", "serif"],
+          "headline-xl": ["Newsreader", "serif"],
+          "body-lg": ["Newsreader", "serif"]
+        },
+        fontSize: {
+          "body-md": ["17px", { "lineHeight": "28px", "fontWeight": "400" }],
+          "label-lg": ["16px", { "lineHeight": "22px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+          "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "400" }],
+          "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+          "headline-lg": ["36px", { "lineHeight": "44px", "fontWeight": "400" }],
+          "headline-sm": ["22px", { "lineHeight": "30px", "fontWeight": "500" }],
+          "headline-md": ["28px", { "lineHeight": "36px", "fontWeight": "500" }],
+          "headline-xl-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.015em", "fontWeight": "400" }],
+          "body-sm": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
+          "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "500" }],
+          "headline-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+          "body-lg": ["19px", { "lineHeight": "32px", "fontWeight": "400" }]
+        }
+      }
+    }
+  };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-[#f6efdf] font-body-md text-body-md text-[#201b0c] flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-[#f6efdf]/92 backdrop-blur-xl border-b border-[#c5b69c]/40 shadow-[0_1px_6px_rgba(56,44,30,0.04)] pt-safe"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-sm"><span class="font-headline-md text-headline-md tracking-tight text-[#382c1e] italic select-none">Mia Legilo</span><span class="hidden">Library</span></div><div class="flex items-center gap-space-xs"><button aria-label="Import Book" class="w-12 h-12 flex items-center justify-center text-[#534330] hover:text-[#382c1e] transition-colors"><span class="material-symbols-outlined text-[22px]">note_add</span></button><button aria-label="Cloud Sync Status" class="relative w-12 h-12 flex items-center justify-center text-[#534330] hover:text-[#382c1e] transition-colors"><span class="material-symbols-outlined text-[22px]">sync</span><span class="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#6e7d65]"></span></button><div class="w-8 h-8 rounded-full bg-[#382c1e] flex items-center justify-center ml-space-xs shadow-[1px_1px_0px_#b3a286]"><span class="material-symbols-outlined text-[#fff8ef] text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-20 bg-[#f6efdf]"><div class="flex flex-col w-full px-margin pb-space-xl">
+<!-- Sub-Header Meta & Sync Stamp -->
+<div class="flex items-center justify-between pt-space-xs pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-[#382c1e] font-semibold">Library</span>
+<span class="text-[#7e6c56] text-[13px] tracking-wide">•</span>
+<span class="font-label-sm text-label-sm text-[#7e6c56] tracking-wider uppercase bg-[#fbf5eb] border border-[#c5b69c] px-2 py-0.5 rounded-full shadow-[1px_1px_0px_#b3a286]">38 In Stock</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-[#f5ebd8] border border-[#c5b69c] rounded-full shadow-[1px_1px_0px_#b3a286]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#6e7d65]"></span>
+<span class="font-label-sm text-label-sm text-[#382c1e] font-medium">Calibre Synced</span>
+</div>
+</div>
+<!-- Tactile Search Omnibox -->
+<div class="relative w-full mb-space-md">
+<div class="relative flex items-center bg-[#fbf5eb] border border-[#c5b69c] rounded-xl shadow-[2px_2px_0px_#b3a286] transition-all focus-within:shadow-[2px_2px_0px_#b85c3f] focus-within:border-[#b85c3f]">
+<div class="w-12 h-12 flex items-center justify-center text-[#382c1e]">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent font-label-md text-label-md text-[#382c1e] placeholder:text-[#7e6c56] placeholder:font-normal focus:outline-none pr-10 py-3" placeholder="Search title, author, or series..." type="search"/>
+<button aria-label="Voice or clear" class="w-12 h-12 flex items-center justify-center text-[#7e6c56] hover:text-[#382c1e] transition-colors">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Filter Pills Horizontal Strip -->
+<div class="flex items-center gap-2 overflow-x-auto pb-space-sm -mx-margin px-margin no-scrollbar">
+<button class="flex items-center gap-1.5 px-3.5 h-9 bg-[#6e7d65] text-[#fff8ef] border border-[#525f4b] rounded-full shadow-[1.5px_1.5px_0px_#b3a286] shrink-0 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform">
+<span class="font-label-md text-label-md">All</span>
+<span class="font-label-sm text-label-sm bg-[#382c1e] text-[#fff8ef] rounded-full px-1.5 py-0.2">38</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 h-9 bg-[#fbf5eb] text-[#382c1e] border border-[#c5b69c] rounded-full shadow-[1px_1px_0px_#b3a286] shrink-0 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform">
+<span class="font-label-md text-label-md">Reading</span>
+<span class="font-label-sm text-label-sm bg-[#eae0c7] text-[#382c1e] rounded-full px-1.5 py-0.2">3</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 h-9 bg-[#fbf5eb] text-[#382c1e] border border-[#c5b69c] rounded-full shadow-[1px_1px_0px_#b3a286] shrink-0 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform">
+<span class="font-label-md text-label-md">Unread</span>
+<span class="font-label-sm text-label-sm bg-[#eae0c7] text-[#382c1e] rounded-full px-1.5 py-0.2">22</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 h-9 bg-[#fbf5eb] text-[#382c1e] border border-[#c5b69c] rounded-full shadow-[1px_1px_0px_#b3a286] shrink-0 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform">
+<span class="material-symbols-outlined text-[16px] text-[#6e7d65]">download_done</span>
+<span class="font-label-md text-label-md">Downloaded</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 h-9 bg-[#fbf5eb] text-[#382c1e] border border-[#c5b69c] rounded-full shadow-[1px_1px_0px_#b3a286] shrink-0 active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-transform">
+<span class="font-label-md text-label-md">Hainish Cycle</span>
+<span class="font-label-sm text-label-sm bg-[#eae0c7] text-[#382c1e] rounded-full px-1.5 py-0.2">6</span>
+</button>
+</div>
+<!-- Hero: Currently Reading Tactile Folio Card -->
+<section class="mt-space-sm mb-space-lg">
+<div class="relative bg-[#fbf5eb] border border-[#c5b69c] rounded-xl shadow-[3px_3px_0px_#b3a286] p-space-md overflow-hidden">
+<!-- Ribbon Bookmark Marker in Corner -->
+<div class="absolute -top-1 right-6 w-5 h-8 bg-[#b85c3f] shadow-[1px_1px_0px_#b3a286] flex items-end justify-center pb-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#fff8ef]"></span>
+</div>
+<div class="flex items-center gap-2 mb-space-sm">
+<span class="font-label-sm text-label-sm tracking-wider uppercase text-[#7e6c56]">In Progress</span>
+<span class="text-[#7e6c56] text-xs">•</span>
+<span class="font-label-sm text-label-sm text-[#b85c3f] font-medium">Read today at 2:15 PM</span>
+</div>
+<div class="flex gap-space-md">
+<!-- Tactile Book Spine Cover -->
+<div class="relative w-24 h-36 shrink-0 rounded-lg overflow-hidden shadow-[2px_2px_4px_rgba(56,44,30,0.22)] bg-[#382c1e] border border-[#b3a286]/50">
+<!-- Linen Spine Fold Shadow -->
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Dignified vintage clothbound book cover for The Dispossessed by Ursula K. Le Guin, warm terracotta woven fabric background with delicate cream debossed geometric moon typography, fine literary craft finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXzy-9eeS9yob9BwGK-rToFYcnD7r130x1hfRTAQyAWbW5Ee1Dyy9VmV6L9zHU-ZWJOt5FEopgbWjJEJxcZ_dKdFfF8SEAjlQmAltags_bmRRkxuYisJMJKo_FnyhrSbmweWg_3PrCxOixuDlsjIvR6Jf45HvRD-B28d1UAyQ_hlh5AtmYdDDdfTPhcBjnC_iqdNg2gfZlzGGtSNkQcXLELyhg5W5MOV_EF5ozXlk"/>
+</div>
+<!-- Telemetry & Details -->
+<div class="flex flex-col justify-between flex-1 min-w-0 py-0.5">
+<div>
+<h2 class="font-headline-md text-headline-md text-[#382c1e] leading-tight truncate">The Dispossessed</h2>
+<p class="font-label-md text-label-md text-[#7e6c56] mt-0.5">Ursula K. Le Guin</p>
+<div class="mt-2.5 flex items-center gap-2 text-[#382c1e] font-label-sm text-label-sm">
+<span class="bg-[#eae0c7] border border-[#c5b69c] px-2 py-0.5 rounded shadow-[1px_1px_0px_#b3a286]">Ch. 14</span>
+<span>42% complete</span>
+</div>
+</div>
+<!-- Sketched Progress Bar -->
+<div class="mt-space-xs">
+<div class="flex justify-between items-center text-[12px] font-label-sm text-[#7e6c56] mb-1">
+<span>Page 178 of 412</span>
+<span>~2h 10m left</span>
+</div>
+<div class="w-full h-2 bg-[#eae0c7] border border-[#c5b69c] rounded-full shadow-[inset_0_1px_2px_rgba(56,44,30,0.12)] overflow-hidden p-0.5">
+<div class="h-full bg-[#6e7d65] rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Controls -->
+<div class="flex items-center gap-space-sm mt-space-md pt-space-xs">
+<button class="flex-1 h-12 flex items-center justify-center gap-2 bg-[#6e7d65] text-[#fff8ef] rounded-xl shadow-[2px_2px_0px_#b3a286] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none transition-all">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">book_online</span>
+<span class="font-label-lg text-label-lg tracking-wide">Resume Reading</span>
+</button>
+<button aria-label="Book Details and Options" class="w-12 h-12 flex items-center justify-center bg-[#f6efdf] border border-[#c5b69c] text-[#382c1e] rounded-xl shadow-[2px_2px_0px_#b3a286] active:translate-x-[1.5px] active:translate-y-[1.5px] active:shadow-none transition-all">
+<span class="material-symbols-outlined text-[22px]">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Library Controls & View Bar -->
+<div class="flex items-center justify-between mb-space-md py-1">
+<div class="flex items-center gap-space-xs">
+<button class="flex items-center gap-1 px-3 h-10 bg-[#fbf5eb] border border-[#c5b69c] text-[#382c1e] rounded-lg shadow-[1px_1px_0px_#b3a286] active:translate-x-[1px] active:translate-y-[1px] transition-transform">
+<span class="font-label-md text-label-md">Recent Activity</span>
+<span class="material-symbols-outlined text-[18px]">arrow_drop_down</span>
+</button>
+<button aria-label="Filters" class="w-10 h-10 flex items-center justify-center bg-[#fbf5eb] border border-[#c5b69c] text-[#382c1e] rounded-lg shadow-[1px_1px_0px_#b3a286]">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+</div>
+<!-- Layout Toggle -->
+<div class="flex items-center p-1 bg-[#fbf5eb] border border-[#c5b69c] rounded-lg shadow-[1px_1px_0px_#b3a286]">
+<button aria-label="Grid View" class="w-8 h-8 flex items-center justify-center bg-[#6e7d65] text-[#fff8ef] rounded shadow-[1px_1px_0px_#b3a286]">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button aria-label="List View" class="w-8 h-8 flex items-center justify-center text-[#7e6c56] hover:text-[#382c1e]">
+<span class="material-symbols-outlined text-[18px]">view_list</span>
+</button>
+</div>
+</div>
+<!-- Two-Column Literary Book Grid -->
+<div class="grid grid-cols-2 gap-x-space-md gap-y-space-lg">
+<!-- Book Item 1: Piranesi -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Artistic book cover of Piranesi by Susanna Clarke, neo-classical stone tides and marble statues, misty teal and soft vellum tones with serif lettering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ2NLtu9B0sa5LbkUob4S6QI9zO9IdsM-yeKViVuC3zRrsQZH00js-YAXEWw_uIxRpXqPD_9t2yyDS5KsG8b3DTi6-8K2iJVj7u5U9OeobhXrRtVlqswZBsd3kUyezUc8V8IPFSQMa_XC9w7jvvSi-WucpK-D0LY6Wn40JMTTgQk5hgRmGybnGFWKSDfyWeg1Pb4lW8ExgksEdFpRlAhYNbVX2z4eqbUn2O7q1xBw"/>
+<!-- Progress Stamp Flag -->
+<div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-[#fbf5eb]/95 border border-[#c5b69c] text-[#382c1e] font-label-sm text-label-sm rounded shadow-[1px_1px_0px_#b3a286] z-20">
+          42%
+        </div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">Piranesi</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Susanna Clarke</p>
+<div class="w-full h-1 bg-[#eae0c7] border border-[#c5b69c]/60 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-[#6e7d65] rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+</div>
+<!-- Book Item 2: The Left Hand of Darkness -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Clothbound book cover for The Left Hand of Darkness by Ursula K. Le Guin, minimalist polar glacier silhouette, deep charcoal blue and frosty ice mist styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFea3PRRe4siO0T9auqsD6L2c-5cKeU-3143qM7JkIDWjQ7d6ktTltSwgY3X1HNzvOxmtcRlKhu5eTECnr5bJs4OrIX_Ln_txY82He4hSSBap1aJWSW_LGtLKk1w-6g7IWVx3_crM-FEu0IsVg266nr4XzXi7-g_ujAWPZw0tJ5DOqycMUEqfJhqzHX4b9Yirw39VvAds2jY1StcPserncalbfDaIWRB0Cov6MqBc"/>
+<!-- Completed Stamp -->
+<div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-[#6e7d65] text-[#fff8ef] border border-[#525f4b] font-label-sm text-label-sm rounded shadow-[1px_1px_0px_#b3a286] flex items-center gap-0.5 z-20">
+<span class="material-symbols-outlined text-[12px]">done</span>
+<span>Read</span>
+</div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">The Left Hand of Darkness</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Ursula K. Le Guin</p>
+<div class="flex items-center gap-1 mt-1 text-[#6e7d65] font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">star</span>
+<span class="text-[#7e6c56] font-normal">Finished Feb 24</span>
+</div>
+</div>
+</div>
+<!-- Book Item 3: A Wizard of Earthsea -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Literary novel cover of A Wizard of Earthsea by Ursula K. Le Guin, warm ochre textured paper with hand-drawn archipelago dragon woodcut illustration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaEKpQemO04zsDkfY4cb5Qgysb788za9U64SL7lQAPismkmxRQ_lJkW74ToxOH11EoMNtIVqUiixwJQ3m4yOgAYseruISM3B1xS6wG_Bcvzxpp5A4385I2Byj8tp1UNB-27brTKEJW-v4dNJ8Io7N1A3Z6LMXqRq5cvDnGkddvs0rYaGjMtDikQb_x2JW39NxBFR1uhAn35sqols8M_j826e_vq_lbIwbhplsArgk"/>
+<div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-[#fbf5eb]/95 border border-[#c5b69c] text-[#382c1e] font-label-sm text-label-sm rounded shadow-[1px_1px_0px_#b3a286] z-20">
+          18%
+        </div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">A Wizard of Earthsea</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Ursula K. Le Guin</p>
+<div class="w-full h-1 bg-[#eae0c7] border border-[#c5b69c]/60 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-[#6e7d65] rounded-full" style="width: 18%;"></div>
+</div>
+</div>
+</div>
+<!-- Book Item 4: Klara and the Sun -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Book cover of Klara and the Sun by Kazuo Ishiguro, minimalist cadmium yellow solar disc on muted natural linen cloth texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgI1sB188_RzBDxE9CyJ-7wjMr-itVy8IgeFw5Mi6DXduaBKOWDC9DjnLqfiNd1gaNVItc67ski9jcjGiv_N_8nfDvnjHGL08AzRrQucL47zK-60tRHgO3gjBoqCks_uRJpc_icl5jZZDhFMGQ5gmx1F6xesQ5cXFRrBOm8G-PhYxDTfKHSkmtoTZ2RxuCXt8yzrEOfU226-csff1siuVBVlLwZ-_GygBP4mHCfwU"/>
+<div class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#b85c3f] shadow-[1px_1px_0px_#b3a286] z-20"></div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">Klara and the Sun</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Kazuo Ishiguro</p>
+<p class="font-label-sm text-label-sm text-[#b85c3f] mt-1 font-medium">Unread • 304 pages</p>
+</div>
+</div>
+<!-- Book Item 5: Invisible Cities -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Editorial book cover for Invisible Cities by Italo Calvino, intricate geometric archways and dreamlike optical chess patterns on heavy cream paper stock." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_7z-AdDT4_pUokjGDNSbDD7uerORF0xNBw7wD0zoaqKlcali1m6aXA6_krMut7ToolT8uYNzOKD5FgOaqhoak7XUajU6z5uCkkBJkoHDwjKnCL1j_CHHtrUbE652oyFjgLWqS_kmGQs_OidwgBDhup6AlPo7Ur70OH1kfzv1MHcPl6mV00puYs9ASTofU9TmVo8fQsISR1vfEyJGbxUoRDC2iORoQ0KhpNXE-RQM"/>
+<div class="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#b85c3f] shadow-[1px_1px_0px_#b3a286] z-20"></div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">Invisible Cities</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Italo Calvino</p>
+<p class="font-label-sm text-label-sm text-[#b85c3f] mt-1 font-medium">Unread • 165 pages</p>
+</div>
+</div>
+<!-- Book Item 6: Ficciones -->
+<div class="flex flex-col group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden shadow-[2px_3px_6px_rgba(56,44,30,0.18)] bg-[#f5ebd8] border border-[#c5b69c] transition-transform group-active:scale-[0.98]">
+<div class="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-black/40 via-black/15 to-transparent z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Classic book cover of Ficciones by Jorge Luis Borges, complex woodcut ink maze labyrinth artwork on aged antique vellum background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK92udjOStItTKNhIEJYYjfIhPQvDpl36Rnwqn8f-vawOoLFoZ1t4E_yd4VZ6Hvq6KU0wM3pYl8kALTI63NPNcG1lj4QOiyhryUfFdcACBnXVe0I9aJaDkurmLL_9U1rUaEgo-z9lbac5pAJstrbhvgA8tLpSM4s_peiKD2RMZFHPY0u9grZeqegTP0c4FvuZ7_H-TpSwotuCBaueIKRHjwXGTvlr64GkVcC2hj-4"/>
+<div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-[#fbf5eb]/95 border border-[#c5b69c] text-[#382c1e] font-label-sm text-label-sm rounded shadow-[1px_1px_0px_#b3a286] z-20">
+          88%
+        </div>
+</div>
+<div class="mt-2 flex flex-col min-w-0">
+<h3 class="font-headline-sm text-headline-sm text-[#382c1e] leading-snug line-clamp-1">Ficciones</h3>
+<p class="font-label-md text-label-md text-[#7e6c56] truncate">Jorge Luis Borges</p>
+<div class="w-full h-1 bg-[#eae0c7] border border-[#c5b69c]/60 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-[#6e7d65] rounded-full" style="width: 88%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- End-of-List Tactile Stamp Signifier -->
+<div class="mt-space-xl flex flex-col items-center justify-center text-center">
+<div class="w-10 h-0.5 bg-[#c5b69c] mb-space-sm rounded-full"></div>
+<span class="font-headline-sm text-headline-sm italic text-[#7e6c56]">Finis Bibliothecae</span>
+<span class="font-label-sm text-label-sm text-[#7e6c56] mt-0.5">38 volumes preserved in local storage</span>
+</div>
+</div>
+<script>
+  // Filter chips active toggle behavior
+  document.querySelectorAll('div > button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (this.closest('.flex.items-center.gap-2')) {
+        const siblings = this.parentElement.querySelectorAll('button');
+        siblings.forEach(s => {
+          s.classList.remove('bg-[#6e7d65]', 'text-[#fff8ef]', 'border-[#525f4b]');
+          s.classList.add('bg-[#fbf5eb]', 'text-[#382c1e]', 'border-[#c5b69c]');
+          const badge = s.querySelector('span:last-child');
+          if (badge && !badge.classList.contains('material-symbols-outlined')) {
+            badge.classList.remove('bg-[#382c1e]', 'text-[#fff8ef]');
+            badge.classList.add('bg-[#eae0c7]', 'text-[#382c1e]');
+          }
+        });
+        this.classList.remove('bg-[#fbf5eb]', 'text-[#382c1e]', 'border-[#c5b69c]');
+        this.classList.add('bg-[#6e7d65]', 'text-[#fff8ef]', 'border-[#525f4b]');
+        const badge = this.querySelector('span:last-child');
+        if (badge && !badge.classList.contains('material-symbols-outlined')) {
+          badge.classList.remove('bg-[#eae0c7]', 'text-[#382c1e]');
+          badge.classList.add('bg-[#382c1e]', 'text-[#fff8ef]');
+        }
+      }
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#f6efdf]/95 backdrop-blur-xl border-t border-[#c5b69c]/50 shadow-[0_-2px_12px_rgba(56,44,30,0.05)]" data-active-classes="text-[#382c1e] font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 transition-colors text-[#382c1e] font-semibold" data-path="library" href="#"><span class="material-symbols-outlined text-[24px]">local_library</span><span class="font-label-sm text-label-sm tracking-wide mt-0.5">Library</span></a><a class="flex flex-col items-center justify-center w-16 h-12 text-[#7e6c56] hover:text-[#382c1e] transition-colors" data-path="shelves" href="#"><span class="material-symbols-outlined text-[24px]">bookmarks</span><span class="font-label-sm text-label-sm tracking-wide mt-0.5">Shelves</span></a><a class="flex flex-col items-center justify-center w-16 h-12 text-[#7e6c56] hover:text-[#382c1e] transition-colors" data-path="search" href="#"><span class="material-symbols-outlined text-[24px]">search</span><span class="font-label-sm text-label-sm tracking-wide mt-0.5">Search</span></a><a class="flex flex-col items-center justify-center w-16 h-12 text-[#7e6c56] hover:text-[#382c1e] transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm tracking-wide mt-0.5">Settings</span></a></div></nav></body></html>

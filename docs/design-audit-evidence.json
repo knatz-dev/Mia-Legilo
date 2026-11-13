@@ -1,0 +1,1046 @@
+{
+  "scope": "Static HTML inventory; sampled Chromium axe-core 4.10.3 audits at 390x844. Not Android conformance.",
+  "inventory": [
+    {
+      "screen": "advanced_library_filtering_sheet",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        53
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 4
+    },
+    {
+      "screen": "cards_chips_navigation_headers_showcase",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        420,
+        428,
+        436,
+        444,
+        451,
+        476,
+        483,
+        490
+      ],
+      "zoom_restricted": false,
+      "dialog_elements": 0,
+      "focus_utilities": 2
+    },
+    {
+      "screen": "currently_reading_shelf_detail",
+      "images": 3,
+      "missing_alt": 3,
+      "small_buttons": [
+        66,
+        69,
+        72
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "group_books_mia_legilo_bottom_sheet",
+      "images": 2,
+      "missing_alt": 2,
+      "small_buttons": [
+        87
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 1,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "immersive_reader_controls_active",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        67,
+        82,
+        86,
+        91,
+        95
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "immersive_reader_controls_active_obsidian_dark",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        173,
+        188,
+        192,
+        197,
+        201
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "immersive_reader_controls_active_warm_sepia",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        189,
+        204,
+        208,
+        213,
+        217
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "immersive_reader_pure_book_controls_hidden",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "interactive_controls_button_showcase",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [],
+      "zoom_restricted": false,
+      "dialog_elements": 0,
+      "focus_utilities": 3
+    },
+    {
+      "screen": "mia_legilo_book_details_obsidian_dark",
+      "images": 1,
+      "missing_alt": 1,
+      "small_buttons": [],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "mia_legilo_library_home",
+      "images": 7,
+      "missing_alt": 7,
+      "small_buttons": [
+        36,
+        40,
+        44,
+        48,
+        52,
+        113,
+        117,
+        123,
+        126
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 2
+    },
+    {
+      "screen": "mia_legilo_library_home_obsidian_dark",
+      "images": 7,
+      "missing_alt": 7,
+      "small_buttons": [
+        143,
+        147,
+        151,
+        155,
+        159,
+        220,
+        224,
+        230,
+        233
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 3
+    },
+    {
+      "screen": "mia_legilo_library_home_warm_sepia",
+      "images": 7,
+      "missing_alt": 7,
+      "small_buttons": [
+        147,
+        151,
+        155,
+        159,
+        163,
+        224,
+        228,
+        234,
+        237
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 3
+    },
+    {
+      "screen": "mia_legilo_literary_notebook_design_system_showcase",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        524
+      ],
+      "zoom_restricted": false,
+      "dialog_elements": 0,
+      "focus_utilities": 6
+    },
+    {
+      "screen": "mia_legilo_reading_shelves",
+      "images": 8,
+      "missing_alt": 8,
+      "small_buttons": [],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "mia_legilo_sketchcn_tactile_bottom_sheets_showcase",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        489
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "reader_appearance_sheet_obsidian_dark",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        160,
+        163,
+        360,
+        363,
+        372,
+        375
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "reader_appearance_sheet_warm_sepia",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        49,
+        52,
+        249,
+        252,
+        261,
+        264
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "reader_appearance_sketchcn_bottom_sheet",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [
+        48,
+        51,
+        248,
+        251,
+        260,
+        263
+      ],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "sort_books_mia_legilo_bottom_sheet",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    },
+    {
+      "screen": "sort_books_multi_level_sorting_sheet",
+      "images": 0,
+      "missing_alt": 0,
+      "small_buttons": [],
+      "zoom_restricted": true,
+      "dialog_elements": 0,
+      "focus_utilities": 0
+    }
+  ],
+  "browser_samples": [
+    {
+      "url": "http://127.0.0.1:8765/mia_legilo_library_home/code.html",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<span class=\"font-label-md text-label-md\">All</span>",
+              "target": [
+                ".text-paper-surface > .font-label-md.text-label-md"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.14 (foreground color: #faf8f2, background color: #83917a, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"font-label-sm text-label-sm text-ochre-accent font-medium\">Read today at 2:15 PM</span>",
+              "target": [
+                ".font-medium.text-ochre-accent.text-label-sm"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.71 (foreground color: #c87d55, background color: #f2ebe0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"font-label-lg text-label-lg tracking-wide\">Resume Reading</span>",
+              "target": [
+                ".font-label-lg"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.33 (foreground color: #ffffff, background color: #83917a, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>Read</span>",
+              "target": [
+                ".gap-0\\.5 > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.33 (foreground color: #ffffff, background color: #83917a, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<p class=\"font-label-sm text-label-sm text-ochre-accent mt-1\">Unread • 304 pages</p>",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(4) > .mt-2.min-w-0.flex-col > .text-ochre-accent.mt-1"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.03 (foreground color: #c87d55, background color: #faf8f2, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<p class=\"font-label-sm text-label-sm text-ochre-accent mt-1\">Unread • 165 pages</p>",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(5) > .mt-2.min-w-0.flex-col > .text-ochre-accent.mt-1"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.03 (foreground color: #c87d55, background color: #faf8f2, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "document-title",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\">",
+              "target": [
+                "html"
+              ],
+              "summary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+            }
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "nodes": [
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Dignified vintage clothbound book cover for The Dispossessed by Ursula K. Le Guin, warm terracotta woven fabric background with delicate cream debossed geometric moon typography, fine literary craft finish.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCXzy-9eeS9yob9BwGK-rToFYcnD7r130x1hfRTAQyAWbW5Ee1Dyy9VmV6L9zHU-ZWJOt5FEopgbWjJEJxcZ_dKdFfF8SEAjlQmAltags_bmRRkxuYisJMJKo_FnyhrSbmweWg_3PrCxOixuDlsjIvR6Jf45HvRD-B28d1UAyQ_hlh5AtmYdDDdfTPhcBjnC_iqdNg2gfZlzGGtSNkQcXLELyhg5W5MOV_EF5ozXlk\">",
+              "target": [
+                ".w-24 > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Artistic book cover of Piranesi by Susanna Clarke, neo-classical stone tides and marble statues, misty teal and soft vellum tones with serif lettering.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuBJ2NLtu9B0sa5LbkUob4S6QI9zO9IdsM-yeKViVuC3zRrsQZH00js-YAXEWw_uIxRpXqPD_9t2yyDS5KsG8b3DTi6-8K2iJVj7u5U9OeobhXrRtVlqswZBsd3kUyezUc8V8IPFSQMa_XC9w7jvvSi-WucpK-D0LY6Wn40JMTTgQk5hgRmGybnGFWKSDfyWeg1Pb4lW8ExgksEdFpRlAhYNbVX2z4eqbUn2O7q1xBw\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(1) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Clothbound book cover for The Left Hand of Darkness by Ursula K. Le Guin, minimalist polar glacier silhouette, deep charcoal blue and frosty ice mist styling.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCFea3PRRe4siO0T9auqsD6L2c-5cKeU-3143qM7JkIDWjQ7d6ktTltSwgY3X1HNzvOxmtcRlKhu5eTECnr5bJs4OrIX_Ln_txY82He4hSSBap1aJWSW_LGtLKk1w-6g7IWVx3_crM-FEu0IsVg266nr4XzXi7-g_ujAWPZw0tJ5DOqycMUEqfJhqzHX4b9Yirw39VvAds2jY1StcPserncalbfDaIWRB0Cov6MqBc\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(2) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Literary novel cover of A Wizard of Earthsea by Ursula K. Le Guin, warm ochre textured paper with hand-drawn archipelago dragon woodcut illustration.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuCaEKpQemO04zsDkfY4cb5Qgysb788za9U64SL7lQAPismkmxRQ_lJkW74ToxOH11EoMNtIVqUiixwJQ3m4yOgAYseruISM3B1xS6wG_Bcvzxpp5A4385I2Byj8tp1UNB-27brTKEJW-v4dNJ8Io7N1A3Z6LMXqRq5cvDnGkddvs0rYaGjMtDikQb_x2JW39NxBFR1uhAn35sqols8M_j826e_vq_lbIwbhplsArgk\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(3) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Book cover of Klara and the Sun by Kazuo Ishiguro, minimalist cadmium yellow solar disc on muted natural linen cloth texture.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuDgI1sB188_RzBDxE9CyJ-7wjMr-itVy8IgeFw5Mi6DXduaBKOWDC9DjnLqfiNd1gaNVItc67ski9jcjGiv_N_8nfDvnjHGL08AzRrQucL47zK-60tRHgO3gjBoqCks_uRJpc_icl5jZZDhFMGQ5gmx1F6xesQ5cXFRrBOm8G-PhYxDTfKHSkmtoTZ2RxuCXt8yzrEOfU226-csff1siuVBVlLwZ-_GygBP4mHCfwU\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(4) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Editorial book cover for Invisible Cities by Italo Calvino, intricate geometric archways and dreamlike optical chess patterns on heavy cream paper stock.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuA_7z-AdDT4_pUokjGDNSbDD7uerORF0xNBw7wD0zoaqKlcali1m6aXA6_krMut7ToolT8uYNzOKD5FgOaqhoak7XUajU6z5uCkkBJkoHDwjKnCL1j_CHHtrUbE652oyFjgLWqS_kmGQs_OidwgBDhup6AlPo7Ur70OH1kfzv1MHcPl6mV00puYs9ASTofU9TmVo8fQsISR1vfEyJGbxUoRDC2iORoQ0KhpNXE-RQM\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(5) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "html": "<img class=\"w-full h-full object-cover\" data-alt=\"Classic book cover of Ficciones by Jorge Luis Borges, complex woodcut ink maze labyrinth artwork on aged antique vellum background.\" src=\"https://lh3.googleusercontent.com/aida-public/AB6AXuAK92udjOStItTKNhIEJYYjfIhPQvDpl36Rnwqn8f-vawOoLFoZ1t4E_yd4VZ6Hvq6KU0wM3pYl8kALTI63NPNcG1lj4QOiyhryUfFdcACBnXVe0I9aJaDkurmLL_9U1rUaEgo-z9lbac5pAJstrbhvgA8tLpSM4s_peiKD2RMZFHPY0u9grZeqegTP0c4FvuZ7_H-TpSwotuCBaueIKRHjwXGTvlr64GkVcC2hj-4\">",
+              "target": [
+                ".group.cursor-pointer.flex-col:nth-child(6) > .aspect-\\[2\\/3\\].shadow-\\[2px_3px_6px_rgba\\(41\\,39\\,36\\,0\\.22\\)\\].group-active\\:scale-\\[0\\.98\\] > img"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        },
+        {
+          "id": "meta-viewport",
+          "impact": "critical",
+          "nodes": [
+            {
+              "html": "<meta content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover\" name=\"viewport\">",
+              "target": [
+                "meta[name=\"viewport\"]"
+              ],
+              "summary": "Fix any of the following:\n  user-scalable=no on <meta> tag disables zooming on mobile devices"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 7
+        }
+      ],
+      "buttons": [
+        {
+          "text": "note_add",
+          "label": "Import Book",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "sync",
+          "label": "Cloud Sync Status",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "tune",
+          "label": "Voice or clear",
+          "width": 36.875,
+          "height": 48
+        },
+        {
+          "text": "All\n38",
+          "label": null,
+          "width": 75.203125,
+          "height": 36
+        },
+        {
+          "text": "Reading\n3",
+          "label": null,
+          "width": 102.328125,
+          "height": 36
+        },
+        {
+          "text": "Unread\n22",
+          "label": null,
+          "width": 103.484375,
+          "height": 36
+        },
+        {
+          "text": "download_done\nDownloaded",
+          "label": null,
+          "width": 127.453125,
+          "height": 36
+        },
+        {
+          "text": "Hainish Cycle\n6",
+          "label": null,
+          "width": 133.578125,
+          "height": 36
+        },
+        {
+          "text": "book_online\nResume Reading",
+          "label": null,
+          "width": 270,
+          "height": 48
+        },
+        {
+          "text": "more_vert",
+          "label": "Book Details and Options",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "Recent Activity\narrow_drop_down",
+          "label": null,
+          "width": 137.4375,
+          "height": 40
+        },
+        {
+          "text": "filter_list",
+          "label": "Filters",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "text": "grid_view",
+          "label": "Grid View",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "text": "view_list",
+          "label": "List View",
+          "width": 32,
+          "height": 32
+        }
+      ],
+      "screen": "mia_legilo_library_home"
+    },
+    {
+      "url": "http://127.0.0.1:8765/advanced_library_filtering_sheet/code.html",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<span class=\"font-label-sm text-label-sm tracking-widest\">09:41</span>",
+              "target": [
+                ".tracking-widest"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.37 (foreground color: #566b68, background color: #64837f, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"font-headline-sm text-headline-sm text-paper-surface italic\">Mia Legilo · Library</span>",
+              "target": [
+                ".italic.font-headline-sm.text-headline-sm"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.77 (foreground color: #465a58, background color: #64837f, font size: 15.0pt (20px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "document-title",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\">",
+              "target": [
+                "html"
+              ],
+              "summary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+            }
+          ]
+        },
+        {
+          "id": "meta-viewport",
+          "impact": "critical",
+          "nodes": [
+            {
+              "html": "<meta content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover\" name=\"viewport\">",
+              "target": [
+                "meta[name=\"viewport\"]"
+              ],
+              "summary": "Fix any of the following:\n  user-scalable=no on <meta> tag disables zooming on mobile devices"
+            }
+          ]
+        },
+        {
+          "id": "target-size",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<button class=\"material-symbols-outlined absolute right-2.5 top-2.5 text-ink-muted text-base hover:text-ink-charcoal\">backspace</button>",
+              "target": [
+                ".right-2\\.5"
+              ],
+              "summary": "Fix any of the following:\n  Target has insufficient size (16px by 24px, should be at least 24px by 24px)\n  Target has insufficient space to its closest neighbors. Safe clickable space has a diameter of 16px instead of at least 24px."
+            }
+          ]
+        }
+      ],
+      "incomplete": [],
+      "buttons": [
+        {
+          "text": "Clear All (4)",
+          "label": null,
+          "width": 79.25,
+          "height": 24
+        },
+        {
+          "text": "close",
+          "label": "Close bottom sheet",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "text": "backspace",
+          "label": null,
+          "width": 16,
+          "height": 24
+        },
+        {
+          "text": "+ 18 more authors in catalog\nunfold_more",
+          "label": null,
+          "width": 328,
+          "height": 34
+        },
+        {
+          "text": "restart_alt\nReset",
+          "label": null,
+          "width": 89.46875,
+          "height": 48
+        },
+        {
+          "text": "filter_alt\nApply (14 Books)",
+          "label": null,
+          "width": 131.09375,
+          "height": 48
+        }
+      ],
+      "screen": "advanced_library_filtering_sheet"
+    },
+    {
+      "url": "http://127.0.0.1:8765/reader_appearance_sketchcn_bottom_sheet/code.html",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<button class=\"h-10 px-2.5 flex items-center justify-center text-ochre-accent font-label-md text-label-md underline underline-offset-4 decoration-ochre-accent/60 active:scale-95 transition-transform\" id=\"reset-btn\" type=\"button\">\n            Reset\n          </button>",
+              "target": [
+                "#reset-btn"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.03 (foreground color: #c87d55, background color: #faf8f2, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"font-label-sm text-label-sm text-sage-accent font-semibold\" id=\"active-theme-label\">Ivory (Active)</span>",
+              "target": [
+                "#active-theme-label"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.14 (foreground color: #83917a, background color: #faf8f2, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span class=\"text-ochre-accent font-medium\" id=\"specimen-stats\">Newsreader • 18pt / 1.75x</span>",
+              "target": [
+                "#specimen-stats"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.03 (foreground color: #c87d55, background color: #faf8f2, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<div class=\"absolute top-0 right-0 transform translate-x-3 -translate-y-2 opacity-10 pointer-events-none select-none font-headline-xl text-5xl\">\n            §1\n          </div>",
+              "target": [
+                ".right-0"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.2 (foreground color: #ded7cd, background color: #f2ebe0, font size: 36.0pt (48px), font weight: normal). Expected contrast ratio of 3:1"
+            },
+            {
+              "html": "<span class=\"font-label-sm text-label-sm font-semibold text-ochre-accent\" id=\"font-size-indicator\">18 pt</span>",
+              "target": [
+                "#font-size-indicator"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.71 (foreground color: #c87d55, background color: #f2ebe0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "html": "<span>Apply to \"The Dispossessed\"</span>",
+              "target": [
+                "#apply-btn > span:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.14 (foreground color: #faf8f2, background color: #83917a, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "document-title",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<html lang=\"en\">",
+              "target": [
+                "html"
+              ],
+              "summary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+            }
+          ]
+        },
+        {
+          "id": "meta-viewport",
+          "impact": "critical",
+          "nodes": [
+            {
+              "html": "<meta content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover\" name=\"viewport\">",
+              "target": [
+                "meta[name=\"viewport\"]"
+              ],
+              "summary": "Fix any of the following:\n  user-scalable=no on <meta> tag disables zooming on mobile devices"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 8
+        }
+      ],
+      "buttons": [
+        {
+          "text": "Reset",
+          "label": null,
+          "width": 54.40625,
+          "height": 40
+        },
+        {
+          "text": "close",
+          "label": "Close appearance drawer",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "text": "Abc\ncheck\nLight Ivory\nPaper vellum",
+          "label": null,
+          "width": 112.65625,
+          "height": 77
+        },
+        {
+          "text": "Abc\ncheck\nSepia\nWarm honey",
+          "label": null,
+          "width": 112.671875,
+          "height": 77
+        },
+        {
+          "text": "Abc\ncheck\nObsidian\nNight ink",
+          "label": null,
+          "width": 112.65625,
+          "height": 77
+        },
+        {
+          "text": "Newsreader",
+          "label": null,
+          "width": 128.5625,
+          "height": 40
+        },
+        {
+          "text": "Literata",
+          "label": null,
+          "width": 84.984375,
+          "height": 40
+        },
+        {
+          "text": "Spectral",
+          "label": null,
+          "width": 87.03125,
+          "height": 40
+        },
+        {
+          "text": "Atkinson Sans",
+          "label": null,
+          "width": 119.6875,
+          "height": 40
+        },
+        {
+          "text": "Baskerville",
+          "label": null,
+          "width": 108.953125,
+          "height": 40
+        },
+        {
+          "text": "A-",
+          "label": "Decrease font size",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "A+",
+          "label": "Increase font size",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "Tight\n1.40",
+          "label": null,
+          "width": 106,
+          "height": 44
+        },
+        {
+          "text": "Relaxed\n1.75",
+          "label": null,
+          "width": 106,
+          "height": 44
+        },
+        {
+          "text": "Spacious\n2.10",
+          "label": null,
+          "width": 106,
+          "height": 44
+        },
+        {
+          "text": "Narrow",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Balanced",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Generous",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Classic Indent",
+          "label": null,
+          "width": 103.234375,
+          "height": 26
+        },
+        {
+          "text": "format_align_left",
+          "label": null,
+          "width": 74,
+          "height": 36
+        },
+        {
+          "text": "format_align_justify",
+          "label": null,
+          "width": 74,
+          "height": 36
+        },
+        {
+          "text": "swap_vert",
+          "label": null,
+          "width": 74,
+          "height": 36
+        },
+        {
+          "text": "auto_stories",
+          "label": null,
+          "width": 74,
+          "height": 36
+        },
+        {
+          "text": "check_circle\nApply to \"The Dispossessed\"",
+          "label": null,
+          "width": 358,
+          "height": 48
+        }
+      ],
+      "screen": "reader_appearance_sketchcn_bottom_sheet"
+    },
+    {
+      "url": "http://127.0.0.1:8765/reader_appearance_sheet_obsidian_dark/code.html",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<div class=\"absolute top-0 right-0 transform translate-x-3 -translate-y-2 opacity-15 pointer-events-none select-none font-headline-lg text-5xl text-on-surface\">\n            §1\n          </div>",
+              "target": [
+                ".right-0"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.51 (foreground color: #46433f, background color: #2a2723, font size: 36.0pt (48px), font weight: normal). Expected contrast ratio of 3:1"
+            }
+          ]
+        },
+        {
+          "id": "document-title",
+          "impact": "serious",
+          "nodes": [
+            {
+              "html": "<html class=\"dark\" lang=\"en\">",
+              "target": [
+                "html"
+              ],
+              "summary": "Fix any of the following:\n  Document does not have a non-empty <title> element"
+            }
+          ]
+        },
+        {
+          "id": "meta-viewport",
+          "impact": "critical",
+          "nodes": [
+            {
+              "html": "<meta content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover\" name=\"viewport\">",
+              "target": [
+                "meta[name=\"viewport\"]"
+              ],
+              "summary": "Fix any of the following:\n  user-scalable=no on <meta> tag disables zooming on mobile devices"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "count": 8
+        }
+      ],
+      "buttons": [
+        {
+          "text": "Reset",
+          "label": null,
+          "width": 54.40625,
+          "height": 40
+        },
+        {
+          "text": "close",
+          "label": "Close appearance drawer",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "text": "Abc\ncheck\nLight Ivory\nPaper vellum",
+          "label": null,
+          "width": 112.65625,
+          "height": 85
+        },
+        {
+          "text": "Abc\ncheck\nSepia\nWarm honey",
+          "label": null,
+          "width": 112.671875,
+          "height": 85
+        },
+        {
+          "text": "Abc\ncheck\nObsidian\nNight ink",
+          "label": null,
+          "width": 112.65625,
+          "height": 85
+        },
+        {
+          "text": "Newsreader",
+          "label": null,
+          "width": 141.078125,
+          "height": 46
+        },
+        {
+          "text": "Literata",
+          "label": null,
+          "width": 91.5625,
+          "height": 46
+        },
+        {
+          "text": "Spectral",
+          "label": null,
+          "width": 94.15625,
+          "height": 46
+        },
+        {
+          "text": "Atkinson Sans",
+          "label": null,
+          "width": 126.359375,
+          "height": 46
+        },
+        {
+          "text": "Baskerville",
+          "label": null,
+          "width": 117.640625,
+          "height": 46
+        },
+        {
+          "text": "A-",
+          "label": "Decrease font size",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "A+",
+          "label": "Increase font size",
+          "width": 48,
+          "height": 48
+        },
+        {
+          "text": "Tight\n1.40",
+          "label": null,
+          "width": 105.328125,
+          "height": 44
+        },
+        {
+          "text": "Relaxed\n1.75",
+          "label": null,
+          "width": 105.328125,
+          "height": 44
+        },
+        {
+          "text": "Spacious\n2.10",
+          "label": null,
+          "width": 105.34375,
+          "height": 44
+        },
+        {
+          "text": "Narrow",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Balanced",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Generous",
+          "label": null,
+          "width": 114,
+          "height": 56
+        },
+        {
+          "text": "Classic Indent",
+          "label": null,
+          "width": 105.234375,
+          "height": 28
+        },
+        {
+          "text": "format_align_left",
+          "label": null,
+          "width": 73,
+          "height": 36
+        },
+        {
+          "text": "format_align_justify",
+          "label": null,
+          "width": 73,
+          "height": 36
+        },
+        {
+          "text": "swap_vert",
+          "label": null,
+          "width": 73,
+          "height": 36
+        },
+        {
+          "text": "auto_stories",
+          "label": null,
+          "width": 73,
+          "height": 36
+        },
+        {
+          "text": "check_circle\nApply to \"The Dispossessed\"",
+          "label": null,
+          "width": 358,
+          "height": 48
+        }
+      ],
+      "screen": "reader_appearance_sheet_obsidian_dark"
+    }
+  ]
+}

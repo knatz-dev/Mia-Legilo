@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100vh; background-color: #fbf9f3; color: #1b1c19; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } .pl-safe { padding-left: env(safe-area-inset-left, 0px); } .pr-safe { padding-right: env(safe-area-inset-right, 0px); } } ::-webkit-scrollbar { display: none; } * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-low": "#f5f3ee", "inverse-on-surface": "#f2f1eb", "on-secondary-fixed-variant": "#3e4a37", "sage-accent": "#83917A", "highlight-sage": "#E1E6DE", "primary-fixed": "#e7e1dd", "on-tertiary-fixed-variant": "#713714", "on-secondary-container": "#596652", "outline": "#7b766f", "on-surface": "#1b1c19", "surface-container": "#f0eee8", "secondary-container": "#d6e4ca", "on-error": "#ffffff", "surface-bright": "#fbf9f3", "outline-variant": "#ccc5bc", "on-background": "#1b1c19", "secondary": "#55624e", "inverse-surface": "#30312d", "secondary-fixed": "#d8e7cd", "on-tertiary-fixed": "#341100", "on-primary-fixed-variant": "#494643", "surface-tint": "#615e5a", "on-tertiary": "#ffffff", "on-error-container": "#93000a", "border-ink": "#292724", "surface-dim": "#dcdad4", "primary-fixed-dim": "#cbc6c1", "tertiary-fixed": "#ffdbcb", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "ink-muted": "#6E6962", "surface-container-high": "#eae8e2", "ochre-accent": "#C87D55", "highlight-ochre": "#F2DDCF", "surface-variant": "#e4e2dd", "primary": "#141310", "on-secondary": "#ffffff", "secondary-fixed-dim": "#bccbb2", "on-primary-container": "#928e89", "inverse-primary": "#cbc6c1", "tertiary-container": "#461a00", "background": "#fbf9f3", "ink-charcoal": "#292724", "surface": "#fbf9f3", "on-primary-fixed": "#1d1b18", "tertiary-fixed-dim": "#ffb691", "on-primary": "#ffffff", "on-tertiary-container": "#c77c54", "paper-container": "#F2EBE0", "on-surface-variant": "#4a463f", "paper-elevated": "#E8E0D2", "paper-surface": "#FAF8F2", "tertiary": "#260a00", "primary-container": "#292724", "on-secondary-fixed": "#131f0e", "surface-container-highest": "#e4e2dd", "error-container": "#ffdad6" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-sm": "0.5rem", "gutter": "1rem", "space-xs": "0.25rem", "margin": "1rem", "space-lg": "1.5rem", "margin-desktop": "3rem", "space-md": "1rem", "margin-tablet": "2rem", "gutter-tablet": "1.5rem", "space-xl": "2rem" }, "fontFamily": { "headline-md": ["Newsreader"], "label-lg": ["Plus Jakarta Sans"], "headline-sm": ["Newsreader"], "label-md": ["Plus Jakarta Sans"], "body-sm": ["Newsreader"], "body-lg": ["Newsreader"], "label-sm": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Newsreader"], "headline-xl": ["Newsreader"], "body-md": ["Newsreader"], "headline-lg": ["Newsreader"], "headline-xl-mobile": ["Newsreader"] }, "fontSize": { "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-sm": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "body-lg": ["19px", { "lineHeight": "30px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "500" }], "headline-xl": ["38px", { "lineHeight": "46px", "letterSpacing": "-0.02em", "fontWeight": "500" }], "body-md": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "headline-lg": ["28px", { "lineHeight": "36px", "fontWeight": "500" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "500" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface antialiased select-none"><main class="flex flex-col relative w-full min-h-screen bg-surface"><div class="flex flex-col w-full relative select-none">
+<!-- Interactive Bookmarking & Toast Controller Script -->
+<script>
+    function toggleBookmarkState(btn) {
+      const ribbon = document.getElementById('floating-ribbon');
+      const toast = document.getElementById('bookmark-toast');
+      const isSaved = btn.getAttribute('data-active') === 'true';
+      
+      if (isSaved) {
+        btn.setAttribute('data-active', 'false');
+        btn.classList.remove('bg-ochre-accent', 'text-paper-surface');
+        btn.classList.add('bg-paper-container', 'text-ink-charcoal');
+        if (ribbon) ribbon.classList.add('opacity-0', '-translate-y-4');
+        if (toast) {
+          toast.innerHTML = '<span class="material-symbols-outlined text-[14px]">bookmark_remove</span> Ribbon removed from p. 178';
+          toast.classList.remove('opacity-0');
+          setTimeout(() => toast.classList.add('opacity-0'), 2200);
+        }
+      } else {
+        btn.setAttribute('data-active', 'true');
+        btn.classList.add('bg-ochre-accent', 'text-paper-surface');
+        btn.classList.remove('bg-paper-container', 'text-ink-charcoal');
+        if (ribbon) ribbon.classList.remove('opacity-0', '-translate-y-4');
+        if (toast) {
+          toast.innerHTML = '<span class="material-symbols-outlined text-[14px] text-ochre-accent">bookmark_added</span> Ribbon pinned to Page 178';
+          toast.classList.remove('opacity-0');
+          setTimeout(() => toast.classList.add('opacity-0'), 2400);
+        }
+      }
+    }
+
+    function updateProgress(e) {
+      const bar = document.getElementById('progress-fill');
+      const thumb = document.getElementById('slider-thumb');
+      const percentLabel = document.getElementById('percent-label');
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      const pct = Math.round((x / rect.width) * 100);
+      
+      if (bar) bar.style.width = pct + '%';
+      if (thumb) thumb.style.left = pct + '%';
+      if (percentLabel) percentLabel.textContent = pct + '% completed';
+    }
+  </script>
+<!-- Physical Hanging Silk Ribbon Bookmark (Decorative Immersion) -->
+<div class="fixed right-8 top-0 z-40 transition-all duration-300 pointer-events-none drop-shadow-md" id="floating-ribbon">
+<div class="w-5 h-28 bg-ochre-accent flex flex-col justify-end items-center relative" style="clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 86%, 0% 100%);">
+<div class="w-[1px] h-full bg-paper-surface/30"></div>
+<div class="mb-5 text-paper-surface/80">
+<span class="material-symbols-outlined text-[11px] block">bookmark</span>
+</div>
+</div>
+</div>
+<!-- FLOATING TOP TOOLBAR CONTAINER -->
+<aside aria-label="Reading Controls" class="fixed top-3 inset-x-0 z-50 px-3 flex flex-col items-center pointer-events-auto">
+<!-- Tactile Sketched Top Bar Card -->
+<header class="w-full max-w-md bg-paper-surface rounded-full shadow-[2.5px_2.5px_0px_#292724] px-2 py-1.5 flex items-center justify-between transition-transform" style="box-shadow: 2px 2.5px 0px #292724;">
+<!-- Back Navigation Target -->
+<button aria-label="Return to Library" class="w-10 h-10 min-w-[40px] flex items-center justify-center rounded-full text-ink-charcoal hover:bg-paper-container active:translate-x-[1px] active:translate-y-[1px] transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<!-- Literary Monograph / Book Identity -->
+<div class="flex-1 flex flex-col items-center justify-center px-1 min-w-0">
+<h1 class="font-headline-sm text-headline-sm italic text-ink-charcoal truncate max-w-[170px] leading-tight">
+          The Dispossessed
+        </h1>
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-ink-muted truncate font-medium text-[10px]">
+          Ursula K. Le Guin
+        </p>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center space-x-1">
+<!-- Search In-Text -->
+<button aria-label="Search within text" class="w-9 h-9 flex items-center justify-center rounded-full text-ink-charcoal hover:bg-paper-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[19px]">search</span>
+</button>
+<!-- Prominent One-Tap Terracotta Silk Ribbon Bookmark Action -->
+<button aria-label="Toggle ribbon bookmark" class="h-9 px-2.5 rounded-full bg-ochre-accent text-paper-surface flex items-center space-x-1 shadow-[1.5px_1.5px_0px_#292724] active:translate-x-[1px] active:translate-y-[1px] transition-all" data-active="true" id="bookmark-toggle" onclick="toggleBookmarkState(this)" type="button">
+<span class="material-symbols-outlined text-[17px]" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+<span class="font-label-md text-label-md font-semibold tracking-tight text-[11px] pr-0.5">178</span>
+</button>
+<!-- Typography / Appearance Settings -->
+<button aria-label="Reading appearance settings" class="w-9 h-9 flex items-center justify-center rounded-full text-ink-charcoal hover:bg-paper-container active:scale-95 transition-transform" type="button">
+<span class="font-headline-md text-headline-md italic font-semibold text-[17px] leading-none pt-0.5">Aa</span>
+</button>
+<!-- Table of Contents & Navigation Sheet -->
+<button aria-label="Contents and index" class="w-9 h-9 flex items-center justify-center rounded-full text-ink-charcoal hover:bg-paper-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[19px]">menu_book</span>
+</button>
+</div>
+</header>
+<!-- Tactile Ribbon Saved Badge Indicator -->
+<div class="mt-2 px-3 py-1 bg-paper-container rounded-full shadow-[1.5px_1.5px_0px_#292724] flex items-center space-x-1.5 transition-all duration-300" id="bookmark-toast">
+<span class="material-symbols-outlined text-[13px] text-ochre-accent" style="font-variation-settings: 'FILL' 1;">bookmark_added</span>
+<span class="font-label-sm text-label-sm text-ink-charcoal font-medium text-[11px]">Page 178 pinned with ribbon</span>
+<span class="text-ink-muted text-[10px] pl-1 font-mono">14:02</span>
+</div>
+</aside>
+<!-- CENTER SUBTLE INTERACTION PILL (Dismissal Hint) -->
+<div class="fixed top-24 inset-x-0 z-30 pointer-events-none flex justify-center px-4">
+<div class="bg-paper-surface/90 backdrop-blur-sm px-3.5 py-1 rounded-full shadow-sm">
+<p class="font-label-sm text-label-sm text-ink-muted tracking-tight text-[11px] text-center">
+        Tap center to toggle controls · Scroll continuously
+      </p>
+</div>
+</div>
+<!-- PRISTINE IMMERSIVE UNDERLYING READING SURFACE -->
+<article class="w-full max-w-xl mx-auto px-6 pt-16 pb-48 text-ink-charcoal">
+<!-- Ending Segment of Chapter 13 -->
+<div class="space-y-5 opacity-90">
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        Shevek had not spoken for some miles. The dust of the road settled on his wool coat, silvering the heavy grey fabric. Across the dry scrub-plain of the South Anarres tableland, the wind moved like something alive, ancient, without hurry or malice.
+      </p>
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        "It is not that we have less than the Urras people," Takver said softly, leaning her cheek against the coarse curve of his collar. "It is that we do not have things between us and our lives. Our poverty is real; but our hands are clean."
+      </p>
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        He took her hand. It was rough-skinned, sun-darkened, familiar as his own breathing. The low lorry rattled down into the hollow where the water-station stood, its silver cistern catching the pale glare of the twin moons rising together in the violet twilight.
+      </p>
+</div>
+<!-- Hand-drawn Tactile Ink Chapter Finial / Break Marker -->
+<div class="my-12 flex items-center justify-center space-x-3 text-ink-muted">
+<div class="w-12 h-[1.5px] bg-ink-charcoal/20"></div>
+<div class="flex items-center space-x-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-ochre-accent"></span>
+<span class="w-2 h-2 rotate-45 bg-ink-charcoal"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-sage-accent"></span>
+</div>
+<div class="w-12 h-[1.5px] bg-ink-charcoal/20"></div>
+</div>
+<!-- Chapter 14 Header Section -->
+<header class="text-center mb-8">
+<span class="font-label-md text-label-md uppercase tracking-[0.25em] text-ochre-accent font-semibold block mb-1">
+        Chapter Fourteen
+      </span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-headline-lg text-ink-charcoal tracking-tight">
+        On Anarres
+      </h2>
+</header>
+<!-- Chapter 14 Prose Body with Handcrafted Drop Cap -->
+<div class="space-y-5">
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+<span class="float-left font-headline-xl text-headline-xl font-headline-xl-mobile leading-[0.78] pr-2.5 pt-1 text-ink-charcoal font-semibold">T</span>he Institute of Sciences at Abenay had no gates. Its low adobe pavilions spread over the arid rise above the town like sunbaked terraces, unadorned by crests or guards. A student or an elder walked through the open courtyards with the same calm, unhurried stride, their sandals clicking faintly on the clay pavers.
+      </p>
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        There were no keys because there were no locks. In the communal dining refectory, bread baked from the hard northern grains was stacked in wide wicker hampers beside jugs of fermented herb-tea. Shevek stood in the morning doorway watching the light break across the cinder-cone of Mount Silum.
+      </p>
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        He had begun the calculations for the General Temporal Theory three years before, while sleeping in a tent at the copper mines. Now, surrounded by chalkboards stained with decades of ghost-equations, the solution seemed both impossibly distant and as immediate as the cold air entering his throat.
+      </p>
+<!-- In-Page Ribbon Insertion Marker Indicating Exact Saved Locus -->
+<div class="my-6 p-3 rounded bg-highlight-ochre/40 flex items-start space-x-3">
+<span class="material-symbols-outlined text-ochre-accent text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm font-semibold uppercase tracking-wider text-ochre-accent">Current Reading Bookmark</p>
+<p class="font-body-sm text-body-sm text-ink-charcoal italic">"Time cannot be owned; we are merely the medium through which its sequence passes..."</p>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-justify leading-relaxed">
+        "You look like a stone pillar, Shevek," Sabul muttered from behind the stacks of parchment slips. His fingernails were split and black with printing ink; his breath smelled of sour ration-cakes. "Come inside and look at this transmission from the council at Chotteng. They claim the radio array has caught another pulse from the third planet."
+      </p>
+</div>
+</article>
+<!-- TACTILE FLOATING BOTTOM READING CONTROL DOCK -->
+<aside aria-label="Reading Progress and Tools" class="fixed bottom-4 inset-x-0 z-50 px-3 flex justify-center pointer-events-auto">
+<div class="w-full max-w-md bg-paper-surface rounded-2xl shadow-[3px_3px_0px_#292724] p-3.5 space-y-3 transition-transform" style="box-shadow: 2.5px 3.5px 0px #292724;">
+<!-- Top Row: Chapter Name & Percentage Progress -->
+<div class="flex items-baseline justify-between px-1">
+<div class="flex items-center space-x-1.5 min-w-0">
+<span class="w-2 h-2 rounded-full bg-sage-accent shrink-0"></span>
+<span class="font-headline-sm text-headline-sm text-ink-charcoal truncate font-medium text-[15px]">
+            Ch. 14: On Anarres
+          </span>
+</div>
+<span class="font-label-md text-label-md font-semibold text-ochre-accent shrink-0 tracking-tight" id="percent-label">
+          42% completed
+        </span>
+</div>
+<!-- Tactile Hand-Drawn Inked Progress Scrub-Bar -->
+<div class="px-1">
+<div class="relative w-full h-8 flex items-center cursor-pointer touch-none" onclick="updateProgress(event)">
+<!-- Dual Track Ink Lines (SketchCN double-rail aesthetic) -->
+<div class="w-full h-[6px] bg-paper-container rounded-full relative overflow-visible">
+<div class="absolute inset-0 bg-paper-container"></div>
+<!-- Inked filled track progress -->
+<div class="h-full bg-ink-charcoal relative rounded-full" id="progress-fill" style="width: 42%;">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2">
+<!-- Diamond Hand-Drawn Thumb Marker -->
+<div class="w-4 h-4 bg-paper-surface rotate-45 shadow-[1.5px_1.5px_0px_#292724] flex items-center justify-center" id="slider-thumb">
+<div class="w-1.5 h-1.5 bg-ochre-accent rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Telemetry Subtitle Row (Page Number + Reading Time Left) -->
+<div class="flex items-center justify-between px-1 text-ink-muted">
+<div class="flex items-center space-x-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">auto_stories</span>
+<span class="font-medium text-ink-charcoal">Page 178</span>
+<span>of 412</span>
+</div>
+<div class="flex items-center space-x-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] text-sage-accent">timer</span>
+<span>~2h 10m left in book</span>
+</div>
+</div>
+<!-- Divider Ink Line -->
+<div class="w-full h-[1px] bg-paper-container"></div>
+<!-- Bottom Tactile Reading Quick-Action Pills -->
+<footer class="grid grid-cols-4 gap-2 pt-0.5">
+<!-- Landmarks / TOC Pill -->
+<button aria-label="Table of Contents" class="py-1.5 px-2 bg-paper-container hover:bg-paper-elevated text-ink-charcoal rounded-xl shadow-[1.5px_1.5px_0px_#292724] flex flex-col items-center justify-center active:translate-x-[1px] active:translate-y-[1px] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
+<span class="font-label-sm text-label-sm text-[10px] mt-0.5 font-medium tracking-tight">TOC</span>
+</button>
+<!-- Marginalia / Notes Pill -->
+<button aria-label="Reading Notes" class="py-1.5 px-2 bg-paper-container hover:bg-paper-elevated text-ink-charcoal rounded-xl shadow-[1.5px_1.5px_0px_#292724] flex flex-col items-center justify-center active:translate-x-[1px] active:translate-y-[1px] transition-all" type="button">
+<div class="relative">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="absolute -top-1 -right-2 px-1 bg-ochre-accent text-paper-surface text-[8px] font-bold rounded-full leading-none py-0.5">12</span>
+</div>
+<span class="font-label-sm text-label-sm text-[10px] mt-0.5 font-medium tracking-tight">Notes</span>
+</button>
+<!-- Audio Sync Pill -->
+<button aria-label="Audio Synchronization" class="py-1.5 px-2 bg-paper-container hover:bg-paper-elevated text-ink-charcoal rounded-xl shadow-[1.5px_1.5px_0px_#292724] flex flex-col items-center justify-center active:translate-x-[1px] active:translate-y-[1px] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">headphones</span>
+<span class="font-label-sm text-label-sm text-[10px] mt-0.5 font-medium tracking-tight">Audio</span>
+</button>
+<!-- Visual / Ink Contrast Mode Pill -->
+<button aria-label="Warm Paper Tone Settings" class="py-1.5 px-2 bg-paper-container hover:bg-paper-elevated text-ink-charcoal rounded-xl shadow-[1.5px_1.5px_0px_#292724] flex flex-col items-center justify-center active:translate-x-[1px] active:translate-y-[1px] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">texture</span>
+<span class="font-label-sm text-label-sm text-[10px] mt-0.5 font-medium tracking-tight">Vellum</span>
+</button>
+</footer>
+</div>
+</aside>
+</div></main></body></html>
