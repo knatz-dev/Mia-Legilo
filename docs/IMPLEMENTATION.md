@@ -74,7 +74,7 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 ### Phase 3 — Offline library and advanced organization
 
 - [ ] `LIB-001` Implement versioned Drift schema and migration tests for books, authors, series, provider links, reading states, downloads, shelves, annotations, outbox, conflicts, and settings.
-- [ ] `LIB-002` Implement SAF import, EPUB validation, safe archive handling, metadata extraction, app-private storage, and duplicate identity policy.
+- [x] `LIB-002` Implement SAF import, EPUB validation, safe archive handling, metadata extraction, app-private storage, and duplicate identity policy. (lib/library/*; docs/LIBRARY_IMPORT.md; device-verified on emulator-5554)
 - [ ] `LIB-003` Implement reactive cover grid and detailed list, persisted view selection, empty/loading/error states, and adaptive layouts.
 - [ ] `LIB-004` Implement title/author/series search, stable sorting (title, author, added, last read), deterministic tie breakers, and series numeric index ordering.
 - [ ] `LIB-005` Implement **first-class grouping and filtering**: author, series, reading status/shelf, source and local availability where metadata supports them. Combine search, sorting, grouping, and multiple filters consistently; preserve user selections.
@@ -207,7 +207,7 @@ A failed hard gate blocks advancement. Record exceptions only for non-P0 criteri
 
 ## 10. Engineering progress ledger
 
-**Last reviewed:** 2026-11-14  
+**Last reviewed:** 2026-11-15  
 **Production implementation completion:** Phase 0 (Foundation) complete with verified debug build; Phase 1 not started.  
 **Discovery evidence:** Android debug APK comparison favored Foliate-js; ADR-001 selected it. Device benchmark and production integration remain unverified.  
 **Current critical path:** Foundation → Reader Lab / renderer ADR → production reader → local/connected acceptance → release hardening.  
@@ -220,6 +220,8 @@ Record future updates as: `date | task ID | status | PR/commit | evidence | bloc
 | 2026-11-14 | `LAB-002` | done (revised) | uncommitted | Renderer + EPUB now served from an in-app loopback HTTP origin (`lib/reader_engines/foliate/foliate_server.dart`); harness at `assets/foliate/host.html`. Emulator-5554 logcat: `FoliateEngine.book: The Count of Monte Cristo (123 sections)`, `FoliateEngine.page 1/2/3/4` with real chapter text, `relocate` CFIs advancing on page turns. `flutter analyze` clean, `flutter test` 29/29. | Commit the change; remove the `10.0.2.2:8080` dev-host remnants from `serve/` and the debug cleartext flag before release. |
 | 2026-11-14 | `LAB-003` | done | uncommitted | Vertical scrolling is the default reading mode: `assets/foliate/host.html` sets `flow="scrolled"` in `openBook()` and calls `goTo(0)` instead of the paginated `next()`. On emulator-5554 three consecutive vertical swipes produced monotonic relocations (0.002454 → 0.002704 → 0.003062), earlier swipes crossed a spine boundary (`/6/6` → `/6/10`), and no forced page-turn gestures were needed. `FoliateEngine.setLayout()` + a ReaderPage app-bar toggle switch scroll ↔ paginated. Toggle round-trip preserved position (0.001932 paginated → 0.002260 back in scrolled). Evidence: `docs/screenshots/reader-scrolled-toggle.png`. | Fold the mode switch into `LAB-004` (persist layout preference). |
 | 2026-11-14 | `LAB-004` | partial | uncommitted | Mode switch (scrolled ↔ paginated) preserves the semantic location: same CFI/percentage emitted before and after toggling, and horizontal pagination from that anchor advances correctly (0.001932 → 0.002356). Restart, orientation, and font/theme-change restoration still untested on device. | Run the restart/orientation/typography restoration trials and record CFI/anchor limitations. |
+| 2026-11-15 | `LIB-002` | done | uncommitted | EPUB import pipeline in `lib/library/`: `epub_inspector.dart` (ZIP/DRM/zip-bomb/path checks, EPUB 2+3 metadata, cover), `library_importer.dart` (SHA-256 identity, content-addressed atomic promotion, duplicate + missing-file repair), `library_store.dart` (Drift persistence), `library_service.dart`, `main.dart` SAF picker and DB-backed shelf. `docs/LIBRARY_IMPORT.md` records the policy. `flutter analyze` clean; 56/56 tests including 27 new library tests (real Gutenberg EPUB parse, malformed archives, path traversal, DRM, series/cover, duplicate/repair, Range resume and integrity). Emulator-5554 adopted two books from the shelf (`The Count of Monte Cristo`, `Pride and Prejudice`) and rendered the second (`book`/`page`/`ready` bridge events). | Commit the change and add the `serve/` cleanup; manually exercise the SAF picker once (`docs/LIBRARY_IMPORT.md` known limits). |
+| 2026-11-15 | `NET-001` | partial | uncommitted | `lib/library/resumable_downloader.dart`: `Range` + `If-Range` resume, 200/416 restart, 1 GB cap, size and optional SHA-256 verification, cancellation that keeps partial data, and `ENOSPC` → `StoragePressureException`. Covered by `test/library/resumable_downloader_test.dart` against a local Range-capable HTTP server (full, resume, ignore-Range, integrity failure, 404). | Add the durable bounded queue and journal integration under `DATA-002`; persist ETags/checksums in the database. |
 
 ## 11. Architecture v2.7 gap-closure backlog
 
@@ -245,7 +247,7 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 
 ### Network, synchronization and operations
 
-- [ ] `NET-001` Implement validated resumable downloads, bounded durable queue, safe cancellation, file journal integration, storage pressure recovery and no eviction of downloaded EPUBs (G-05/G-11).
+- [~] `NET-001` Implement validated resumable downloads, bounded durable queue, safe cancellation, file journal integration, storage pressure recovery and no eviction of downloaded EPUBs (G-05/G-11). (Range resume, size/integrity checks, cancellation and ENOSPC handling in lib/library/resumable_downloader.dart; durable queue and journal pending DATA-002)
 - [ ] `SYN-010` Implement revisioned per-field outbox state machine, worker leases, conditional/idempotent retries, failure classification and capability-change blocking (G-12/G-13).
 - [ ] `SYN-011` Implement persisted dual-candidate conflicts with choose/defer resolution, independent metadata/reading-state outcomes and concurrent-device fault injection.
 - [~] `OPS-001` Implement E Ink reduced-motion/high-contrast profiles, TalkBack EPUB-content traversal, 48dp controls and named-device measurements (G-14). (48dp touch targets + Semantics labels in ReaderPage; full E Ink/TalkBack pending)

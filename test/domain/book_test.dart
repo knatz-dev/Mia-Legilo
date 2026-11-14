@@ -29,6 +29,9 @@ void main() {
           remoteBookId: RemoteBookId('r'),
         ),
         addedAt: DateTime.utc(2026, 1, 1),
+        localAssetPath: '/data/library/abc.epub',
+        localAssetSha256: 'abc',
+        localAssetRevision: 1,
       );
       expect(Book.fromJson(b.toJson()), equals(b));
     });

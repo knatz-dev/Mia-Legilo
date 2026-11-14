@@ -204,6 +204,12 @@ class EpubInspector {
         'The archive has no mimetype entry.',
       );
     }
+    if (mimetype.size > 128) {
+      throw const EpubValidationException(
+        EpubRejection.wrongMimetype,
+        'The mimetype entry is implausibly large.',
+      );
+    }
     final String value = utf8.decode(mimetype.content, allowMalformed: true).trim();
     if (value != _mimetype) {
       throw EpubValidationException(
@@ -216,6 +222,12 @@ class EpubInspector {
   void _rejectDrm(Archive archive) {
     final ArchiveFile? encryption = _findEntry(archive, 'META-INF/encryption.xml');
     if (encryption == null) return;
+    if (encryption.size > maxContainerBytes) {
+      throw const EpubValidationException(
+        EpubRejection.drmProtected,
+        'META-INF/encryption.xml is larger than expected.',
+      );
+    }
     final XmlDocument document;
     try {
       document = XmlDocument.parse(utf8.decode(encryption.content, allowMalformed: true));

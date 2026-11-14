@@ -18,7 +18,8 @@ class DownloadProgress {
 }
 
 class DownloadException implements Exception {
-  const DownloadException(this.message);
+  // ignore: prefer_initializing_formals
+  const DownloadException(String message) : message = message;
 
   final String message;
 
@@ -36,6 +37,7 @@ class StoragePressureException extends DownloadException {
 }
 
 class IntegrityException extends DownloadException {
+  // ignore: use_super_parameters
   const IntegrityException(String message) : super(message);
 }
 

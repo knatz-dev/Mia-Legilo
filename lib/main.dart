@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
-import 'data/book_store.dart';
 import 'domain/book.dart';
+import 'features/reader/reader_page.dart';
 import 'library/epub_inspector.dart';
 import 'library/library_importer.dart';
 import 'library/library_service.dart';
@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _message;
   bool _loading = true;
   bool _importing = false;
-  bool _adopted = false;
   DownloadProgress? _progress;
   CancelToken? _cancelToken;
 
@@ -74,13 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     try {
       final LibraryService library = _library ??= await LibraryService.open();
-      if (!_adopted) {
-        _adopted = true;
-        final int adopted = await library.adoptDeviceShelf();
-        if (adopted > 0) {
-          // ignore: avoid_print
-          print('LibraryService: adopted $adopted file(s) from the device shelf');
-        }
+      final int adopted = await library.adoptDeviceShelf();
+      if (adopted > 0) {
+        // ignore: avoid_print
+        print('LibraryService: adopted $adopted file(s) from the device shelf');
       }
       final List<Book> books = await library.books();
       if (!mounted) return;
@@ -113,13 +109,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _importEpub() async {
     if (_importing) return;
-    final FilePickerResult? picked = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: <String>['epub'],
-      allowMultiple: true,
-      withData: false,
+    const XTypeGroup epubGroup = XTypeGroup(
+      label: 'EPUB',
+      extensions: <String>['epub'],
+      mimeTypes: <String>['application/epub+zip'],
     );
-    if (picked == null || picked.files.isEmpty) return;
+    final XFile? picked =
+        await openFile(acceptedTypeGroups: <XTypeGroup>[epubGroup]);
+    if (picked == null) return;
 
     final LibraryService library = _library ??= await LibraryService.open();
     setState(() {
@@ -127,40 +124,26 @@ class _HomeScreenState extends State<HomeScreen> {
       _error = null;
       _message = null;
     });
-    int imported = 0;
-    int duplicates = 0;
-    final List<String> failures = <String>[];
-    for (final PlatformFile file in picked.files) {
-      final String? path = file.path;
-      if (path == null) {
-        failures.add('${file.name}: the picker returned no readable path');
-        continue;
+    try {
+      final int length = await picked.length();
+      if (length > LibraryImporter.maxImportBytes) {
+        setState(() => _error = 'The file is larger than the 512 MB import limit.');
+      } else {
+        final ImportResult result = await library.importBytes(
+          await picked.readAsBytes(),
+          name: picked.name,
+        );
+        if (!mounted) return;
+        setState(() => _message = result.message);
+        await _loadShelf();
       }
-      try {
-        final ImportResult result =
-            await library.importFile(File(path), originalName: file.name);
-        if (result.outcome == ImportOutcome.imported) {
-          imported++;
-        } else {
-          duplicates++;
-        }
-      } on EpubValidationException catch (e) {
-        failures.add('${file.name}: ${e.message}');
-      } catch (e) {
-        failures.add('${file.name}: $e');
-      }
+    } on EpubValidationException catch (e) {
+      if (mounted) setState(() => _error = 'Not a valid EPUB: ${e.message}');
+    } catch (e) {
+      if (mounted) setState(() => _error = 'Import failed: $e');
+    } finally {
+      if (mounted) setState(() => _importing = false);
     }
-    if (!mounted) return;
-    setState(() {
-      _importing = false;
-      _message = <String>[
-        if (imported > 0) 'Imported $imported book(s)',
-        if (duplicates > 0) '$duplicates already in the library',
-        if (failures.isNotEmpty) 'Skipped: ${failures.join('; ')}',
-      ].join('. ');
-      if (failures.isNotEmpty) _error = failures.join('\n');
-    });
-    await _loadShelf();
   }
 
   Future<void> _importUrl() async {
@@ -355,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 40,
         height: 56,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const Icon(Icons.menu_book_outlined),
+        errorBuilder: (_, _, _) => const Icon(Icons.menu_book_outlined),
       ),
     );
   }

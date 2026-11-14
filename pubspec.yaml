@@ -31,8 +31,7 @@ dependencies:
   webview_flutter: ^4.10.0
   archive: ^4.7.1
   crypto: ^3.0.8
-  file_picker: ^11.0.3
-
+  file_selector: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

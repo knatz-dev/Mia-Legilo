@@ -131,7 +131,7 @@ class LibraryService {
   Future<int> adoptDeviceShelf() async {
     try {
       final BookStore shelf = await BookStore.open();
-      return adoptExistingFiles(shelf.directory);
+      return await adoptExistingFiles(shelf.directory);
     } catch (_) {
       return 0;
     }

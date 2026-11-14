@@ -35,7 +35,7 @@ class DriftLibraryStore implements LibraryStore {
   @override
   Future<domain.Book?> findById(BookId id) async {
     final data.Book? row = await (database.select(database.books)
-          ..where(($BooksTable t) => t.id.equals(id.value)))
+          ..where((t) => t.id.equals(id.value)))
         .getSingleOrNull();
     return row == null ? null : _toDomain(row);
   }
@@ -43,7 +43,7 @@ class DriftLibraryStore implements LibraryStore {
   @override
   Future<domain.Book?> findByFingerprint(String sha256) async {
     final data.Book? row = await (database.select(database.books)
-          ..where(($BooksTable t) => t.localAssetSha256.equals(sha256))
+          ..where((t) => t.localAssetSha256.equals(sha256))
           ..limit(1))
         .getSingleOrNull();
     return row == null ? null : _toDomain(row);
@@ -57,8 +57,8 @@ class DriftLibraryStore implements LibraryStore {
   @override
   Future<List<domain.Book>> list() async {
     final List<data.Book> rows = await (database.select(database.books)
-          ..orderBy(<OrderClauseGenerator<$BooksTable>>[
-            ($BooksTable t) => OrderingTerm.asc(t.title),
+          ..orderBy(<OrderClauseGenerator>[
+            (t) => OrderingTerm.asc(t.title),
           ]))
         .get();
     return rows.map(_toDomain).toList();
@@ -67,7 +67,7 @@ class DriftLibraryStore implements LibraryStore {
   @override
   Future<void> delete(BookId id) async {
     await (database.delete(database.books)
-          ..where(($BooksTable t) => t.id.equals(id.value)))
+          ..where((t) => t.id.equals(id.value)))
         .go();
   }
 
