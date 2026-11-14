@@ -1,0 +1,40 @@
+/// Inventory of CWNG endpoints. All entries default to `verified = false`
+/// until confirmed against a real deployment (INT-003).
+class CwngEndpoint {
+  const CwngEndpoint({
+    required this.operation,
+    required this.method,
+    required this.pathTemplate,
+    this.verified = false,
+    this.notes,
+  });
+
+  final String operation;
+  final String method;
+  final String pathTemplate;
+  final bool verified;
+  final String? notes;
+}
+
+class CwngEndpointInventory {
+  const CwngEndpointInventory(this.endpoints);
+
+  final List<CwngEndpoint> endpoints;
+
+  CwngEndpoint? find(String operation) {
+    for (final e in endpoints) {
+      if (e.operation == operation) return e;
+    }
+    return null;
+  }
+}
+
+/// Default inventory with best-effort paths. None are verified.
+const defaultCwngInventory = CwngEndpointInventory(<CwngEndpoint>[
+  CwngEndpoint(operation: 'auth.login', method: 'POST', pathTemplate: '/api/auth/login', verified: false),
+  CwngEndpoint(operation: 'auth.refresh', method: 'POST', pathTemplate: '/api/auth/refresh', verified: false),
+  CwngEndpoint(operation: 'books.list', method: 'GET', pathTemplate: '/api/books', verified: false),
+  CwngEndpoint(operation: 'books.get', method: 'GET', pathTemplate: '/api/books/{id}', verified: false),
+  CwngEndpoint(operation: 'books.download', method: 'GET', pathTemplate: '/api/books/{id}/download', verified: false),
+  CwngEndpoint(operation: 'opds.catalog', method: 'GET', pathTemplate: '/opds', verified: false),
+]);

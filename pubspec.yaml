@@ -23,8 +23,8 @@ dependencies:
   path: ^1.9.0
   # Secure storage (credentials)
   flutter_secure_storage: ^9.2.4
-  # HTTP client (provisional; final selection by spike)
-  http: ^1.2.2
+  # HTTP client (selected: dio, for interceptors/TLS/auth support)
+  dio: ^5.7.0
 
 dev_dependencies:
   flutter_test:

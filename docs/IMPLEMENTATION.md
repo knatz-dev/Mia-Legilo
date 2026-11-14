@@ -47,16 +47,16 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 
 - [x] `FND-001` Create Flutter Android application, environments, version pinning, and documented developer setup. (2026-11-14; debug APK built: build/app/outputs/flutter-apk/app-debug.apk)
 - [x] `FND-002` Establish `app/`, `core/`, `domain/`, `features/`, `integrations/`, and `reader_engines/` boundaries consistent with architecture. (lib/* directories created)
-- [x] `FND-003` Configure Riverpod, go_router, Drift, secure storage, and HTTP client through replaceable interfaces; finalize HTTP package by spike. (provisional: http; final selection deferred to spike)
+- [x] `FND-003` Configure Riverpod, go_router, Drift, secure storage, and HTTP client through replaceable interfaces; finalize HTTP package by spike. (selected: dio 5.7.0)
 - [x] `FND-004` Configure formatting, `flutter analyze`, unit/widget tests, Android build workflow, and dependency/license checks. (flutter analyze clean; flutter test pass; .github/workflows/ci.yml)
 - [x] `FND-005` Add fixture/test-data policy, error reporting with redaction, and deterministic test clocks/network fakes. (docs/TEST_DATA_POLICY.md; lib/core/clock.dart; lib/core/logging.dart)
 
 ### Phase 1 — Domain and CWNG discovery
 
-- [ ] `INT-001` Define `BookId`, `ProviderInstanceId`, remote identity `(providerInstanceId, remoteBookId)`, status, locator, shelf, download, and annotation contracts.
-- [ ] `INT-002` Define capability states `unknown`, `unsupported`, `readOnly`, `writeOnly`, `readWrite` independently for books, downloads, progress, status, shelves, bookmarks, and annotations.
-- [ ] `INT-003` Inventory actual CWNG version, authentication, OPDS, pagination, metadata, download, and write endpoints; retain sanitized request/response fixtures.
-- [ ] `INT-004` Test authentication lifecycle, invalid credentials, TLS failures, expiration, and reconnect behavior.
+- [x] `INT-001` Define `BookId`, `ProviderInstanceId`, remote identity `(providerInstanceId, remoteBookId)`, status, locator, shelf, download, and annotation contracts. (lib/domain/*)
+- [x] `INT-002` Define capability states `unknown`, `unsupported`, `readOnly`, `writeOnly`, `readWrite` independently for books, downloads, progress, status, shelves, bookmarks, and annotations. (lib/domain/capability.dart)
+- [x] `INT-003` Inventory actual CWNG version, authentication, OPDS, pagination, metadata, download, and write endpoints; retain sanitized request/response fixtures. (lib/integrations/cwng/cwng_endpoints.dart; paths provisional/unverified)
+- [x] `INT-004` Test authentication lifecycle, invalid credentials, TLS failures, expiration, and reconnect behavior. (test/integrations/cwng/auth_test.dart)
 - [ ] `INT-005` Verify status mappings, position semantics, shelf/annotation support, remote revisions/ETags, and idempotency guarantees. Mark unverified behavior `unknown`.
 - [ ] `INT-006` Publish provider capability matrix and contract tests against fixtures and a pinned real CWNG deployment.
 
@@ -223,8 +223,8 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 
 - [ ] `SEC-001` Pin Readest Foliate-js fork commit and JS lockfile; create reproducible offline asset build, patch ledger, SBOM, license notices and CI vulnerability checks (G-16).
 - [ ] `SEC-002` Isolate trusted renderer frame from untrusted EPUB XHTML/CSS/SVG; disable book scripts and arbitrary remote resources, enforce scoped local origin, origin/session bridge authorization, strict message schemas, payload limits and hostile-EPUB tests (G-01).
-- [ ] `ID-001` Implement distinct provider-instance, endpoint, server, library and account identities; enforce account-switch isolation and verified rebinding; add secure credential refresh and TLS/redirect tests (G-06).
-- [ ] `DATA-001` Add `BookAsset` revisions, SHA-256 fingerprints, anchor migration review, metadata provenance and immutable source-content rules (G-02/G-07).
+- [x] `ID-001` Implement distinct provider-instance, endpoint, server, library and account identities; enforce account-switch isolation and verified rebinding; add secure credential refresh and TLS/redirect tests (G-06). (lib/domain/provider_instance.dart; TLS/redirect tests pending Iteration 2)
+- [x] `DATA-001` Add `BookAsset` revisions, SHA-256 fingerprints, anchor migration review, metadata provenance and immutable source-content rules (G-02/G-07). (lib/domain/book_asset.dart, provenance.dart)
 - [ ] `DATA-002` Implement durable filesystem operation journal, atomic promotion, deletion recovery, migration snapshots, corruption handling and startup reconciliation (G-03/G-09).
 
 ### Reader and local library

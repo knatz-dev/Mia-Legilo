@@ -29,5 +29,5 @@ flutter build apk --debug
 ## Notes
 
 - Android SDK must reside in a path without spaces (Flutter/NDK limitation).
-- HTTP client selection (`http` vs `dio`) is provisional pending a spike (FND-003).
+- HTTP client selected: `dio` (FND-003 finalized).
 - See `TEST_DATA_POLICY.md` for fixture handling.
