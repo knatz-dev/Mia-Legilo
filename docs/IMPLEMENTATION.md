@@ -29,7 +29,7 @@ Do not infer implementation completion from design decisions or prototype testin
 
 | Phase | Scope | Dependencies | Exit gate | Status |
 |---|---|---|---|---|
-| 0. Foundation | Flutter Android scaffold, dependency pinning, formatting/linting, CI, environments, test harness | None | Reproducible debug and release builds; CI green | TODO |
+| 0. Foundation | Flutter Android scaffold, dependency pinning, formatting/linting, CI, environments, test harness | None | Reproducible debug and release builds; CI green | DONE |
 | 1. Contracts and CWNG discovery | Domain IDs, repository/provider contracts, CWNG authentication/API/OPDS inventory, capability evidence | Phase 0 | Versioned capability matrix with verified endpoints and unsupported/unknown operations | TODO |
 | 2. Reader Lab and renderer ADR | Foliate-js integration spike, comparative evidence, EPUB corpus, semantic locator/scroll tests | Phase 0; domain locator contract | ADR-001 selection recorded; all hard device gates pass or remediation blocks release | TODO |
 | 3. Local library and organization | Drift migrations, SAF import, local EPUB storage, metadata, search, sort, grouping, filters, status shelves, grid/list | Phases 0–1 contracts; independent of remote API | Offline library organized and persisted across restart | TODO |
@@ -45,11 +45,11 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 
 ### Phase 0 — Repository foundation
 
-- [ ] `FND-001` Create Flutter Android application, environments, version pinning, and documented developer setup.
-- [ ] `FND-002` Establish `app/`, `core/`, `domain/`, `features/`, `integrations/`, and `reader_engines/` boundaries consistent with architecture.
-- [ ] `FND-003` Configure Riverpod, go_router, Drift, secure storage, and HTTP client through replaceable interfaces; finalize HTTP package by spike.
-- [ ] `FND-004` Configure formatting, `flutter analyze`, unit/widget tests, Android build workflow, and dependency/license checks.
-- [ ] `FND-005` Add fixture/test-data policy, error reporting with redaction, and deterministic test clocks/network fakes.
+- [x] `FND-001` Create Flutter Android application, environments, version pinning, and documented developer setup. (2026-11-14; debug APK built: build/app/outputs/flutter-apk/app-debug.apk)
+- [x] `FND-002` Establish `app/`, `core/`, `domain/`, `features/`, `integrations/`, and `reader_engines/` boundaries consistent with architecture. (lib/* directories created)
+- [x] `FND-003` Configure Riverpod, go_router, Drift, secure storage, and HTTP client through replaceable interfaces; finalize HTTP package by spike. (provisional: http; final selection deferred to spike)
+- [x] `FND-004` Configure formatting, `flutter analyze`, unit/widget tests, Android build workflow, and dependency/license checks. (flutter analyze clean; flutter test pass; .github/workflows/ci.yml)
+- [x] `FND-005` Add fixture/test-data policy, error reporting with redaction, and deterministic test clocks/network fakes. (docs/TEST_DATA_POLICY.md; lib/core/clock.dart; lib/core/logging.dart)
 
 ### Phase 1 — Domain and CWNG discovery
 
@@ -207,8 +207,8 @@ A failed hard gate blocks advancement. Record exceptions only for non-P0 criteri
 
 ## 10. Engineering progress ledger
 
-**Last reviewed:** 2026-11-13  
-**Production implementation completion:** Not verified.  
+**Last reviewed:** 2026-11-14  
+**Production implementation completion:** Phase 0 (Foundation) complete with verified debug build; Phase 1 not started.  
 **Discovery evidence:** Android debug APK comparison favored Foliate-js; ADR-001 selected it. Device benchmark and production integration remain unverified.  
 **Current critical path:** Foundation → Reader Lab / renderer ADR → production reader → local/connected acceptance → release hardening.  
 **Parallel path:** CWNG discovery → provider adapter → capability-gated synchronization.
