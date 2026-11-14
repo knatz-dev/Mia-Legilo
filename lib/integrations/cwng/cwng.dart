@@ -4,3 +4,5 @@ export 'cwng_errors.dart';
 export 'cwng_auth.dart';
 export 'cwng_endpoints.dart';
 export 'cwng_client.dart';
+export 'cwng_capability_probe.dart';
+export 'cwng_provider.dart';

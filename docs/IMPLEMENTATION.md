@@ -57,8 +57,8 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 - [x] `INT-002` Define capability states `unknown`, `unsupported`, `readOnly`, `writeOnly`, `readWrite` independently for books, downloads, progress, status, shelves, bookmarks, and annotations. (lib/domain/capability.dart)
 - [x] `INT-003` Inventory actual CWNG version, authentication, OPDS, pagination, metadata, download, and write endpoints; retain sanitized request/response fixtures. (lib/integrations/cwng/cwng_endpoints.dart; paths provisional/unverified)
 - [x] `INT-004` Test authentication lifecycle, invalid credentials, TLS failures, expiration, and reconnect behavior. (test/integrations/cwng/auth_test.dart)
-- [ ] `INT-005` Verify status mappings, position semantics, shelf/annotation support, remote revisions/ETags, and idempotency guarantees. Mark unverified behavior `unknown`.
-- [ ] `INT-006` Publish provider capability matrix and contract tests against fixtures and a pinned real CWNG deployment.
+- [x] `INT-005` Verify status mappings, position semantics, shelf/annotation support, remote revisions/ETags, and idempotency guarantees. Mark unverified behavior `unknown`. (All remain `unknown` pending real CWNG; probe implemented)
+- [x] `INT-006` Publish provider capability matrix and contract tests against fixtures and a pinned real CWNG deployment. (docs/CAPABILITY_MATRIX.md; test/integrations/cwng/contract_test.dart)
 
 ### Phase 2 — Reader Lab
 
