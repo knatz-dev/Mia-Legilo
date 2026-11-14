@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../reader_engine.dart';
@@ -26,12 +25,12 @@ class FoliateEngine implements ReaderEngine {
 
   WebViewController get controller => _controller;
 
+  static const String _assetBase = 'http://10.0.2.2:8080/foliate';
+
   Future<void> initialize() async {
     final sw = Stopwatch()..start();
-    // Load the vendored reader.html from assets.
-    final html = await rootBundle.loadString('reader_engines/foliate/foliate-js/reader.html');
-    await _controller.loadHtmlString(html, baseUrl: 'asset://');
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await _controller.loadRequest(Uri.parse('$_assetBase/reader.html'));
+    await Future<void>.delayed(const Duration(seconds: 2));
     sw.stop();
     // ignore: avoid_print
     print('FoliateEngine.initialize: ${sw.elapsedMilliseconds}ms');
@@ -39,11 +38,12 @@ class FoliateEngine implements ReaderEngine {
 
   @override
   Future<void> load(String source) async {
-    final uri = Uri.parse(
-      'file:///android_asset/flutter_assets/reader_engines/foliate/foliate-js/reader.html'
-      '?url=${Uri.encodeComponent(source)}',
-    );
+    final uri = Uri.parse('$_assetBase/reader.html?url=${Uri.encodeComponent(source)}');
     await _controller.loadRequest(uri);
+    await Future<void>.delayed(const Duration(seconds: 3));
+    await _controller.runJavaScript('''
+      fetch(${jsonEncode(source)}).then(r => console.log('FETCH_TEST status=' + r.status + ' type=' + (r.headers.get('content-type')||'none'))).catch(e => console.log('FETCH_TEST err=' + e));
+    ''');
   }
 
   @override
