@@ -120,3 +120,13 @@ app.*.symbols
 docs/PHASE_1_PLAN.md
 
 .idea/
+
+# Large EPUB test fixtures (download via scripts/download_fixtures.ps1)
+test/fixtures/epub/*.epub
+
+# Local CWNG integration config (never commit)
+.env
+.env.local
+integration_test/config.local.json
+test/fixtures/cwng/live/
+docs/PHASE_2_PLAN.md

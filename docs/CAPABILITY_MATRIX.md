@@ -4,10 +4,10 @@ Status values: `unknown` (default, unverified), `unsupported`, `readOnly`, `writ
 
 | Resource | Operation | State | Evidence |
 |---|---|---|---|
-| books | browse (paged) | unknown (provisional readOnly if /api/books reachable) | CwngCapabilityProbe |
+| books | browse (OPDS) | readOnly (verified: /opds/books returns Atom feed on library.knatz.dev) | live probe 2026-11-14 |
 | books | fetch single | unknown | not verified |
 | books | create/update metadata | unknown | not verified (never assumed writable) |
-| downloads | fetch file | unknown (provisional readOnly if download endpoint reachable) | CwngCapabilityProbe |
+| downloads | fetch file (OPDS acquisition) | readOnly (verified: /opds/books reachable; acquisition links present) | live probe 2026-11-14 |
 | progress | read | unknown | not verified |
 | progress | write | unknown | not verified |
 | status | read | unknown | not verified |

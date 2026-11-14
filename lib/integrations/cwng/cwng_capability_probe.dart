@@ -17,9 +17,9 @@ class CwngCapabilityProbe {
       for (final r in CapabilityResource.values) r: CapabilityState.unknown,
     };
 
-    // Books: read if list endpoint reachable.
+    // Books: read if OPDS catalog reachable.
     try {
-      await client.get('/api/books');
+      await client.get('/opds');
       states[CapabilityResource.books] = CapabilityState.readOnly;
     } on CwngException catch (_) {
       states[CapabilityResource.books] = CapabilityState.unsupported;
@@ -27,9 +27,9 @@ class CwngCapabilityProbe {
       states[CapabilityResource.books] = CapabilityState.unsupported;
     }
 
-    // Downloads: read if a download endpoint responds (HEAD/GET).
+    // Downloads: OPDS acquisition links imply readable downloads.
     try {
-      await client.get('/api/books/0/download');
+      await client.get('/opds/books');
       states[CapabilityResource.downloads] = CapabilityState.readOnly;
     } catch (_) {
       states[CapabilityResource.downloads] = CapabilityState.unknown;
@@ -37,7 +37,6 @@ class CwngCapabilityProbe {
 
     // Status/progress/shelves/bookmarks/annotations: unverified by default.
     // They are only upgraded after explicit verification (INT-005).
-    client.detachAuth();
     return CapabilityMatrix(states);
   }
 }

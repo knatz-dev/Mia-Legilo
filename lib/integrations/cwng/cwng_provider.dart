@@ -1,3 +1,5 @@
+import 'package:xml/xml.dart';
+
 import '../../domain/domain.dart';
 import 'cwng_auth.dart';
 import 'cwng_client.dart';
@@ -42,13 +44,39 @@ class CwngLibraryProvider implements LibraryProvider {
 
   @override
   Future<List<Book>> browseBooks({int page = 0, int pageSize = 50}) async {
-    final resp = await client.get<Map<String, dynamic>>('/api/books', query: <String, dynamic>{
-      'page': page,
-      'page_size': pageSize,
-    });
-    final data = resp.data ?? <String, dynamic>{};
-    final items = (data['items'] ?? data['books'] ?? <dynamic>[]) as List<dynamic>;
-    return items.map((e) => _mapBook(e as Map<String, dynamic>)).toList();
+    // CWNG exposes OPDS (Atom). Browse the alphabetical books feed.
+    final resp = await client.get<String>('/opds/books');
+    final body = resp.data ?? '';
+    final doc = XmlDocument.parse(body);
+    final entries = doc.findAllElements('entry');
+    final books = <Book>[];
+    for (final entry in entries) {
+      final title = entry.getElement('title')?.innerText ?? 'Unknown';
+      final id = entry.getElement('id')?.innerText ?? '';
+      final author = entry.findAllElements('name').map((e) => e.innerText).toList();
+      // acquisition link
+      String? downloadHref;
+      for (final link in entry.findAllElements('link')) {
+        final rel = link.getAttribute('rel') ?? '';
+        if (rel.contains('acquisition')) {
+          downloadHref = link.getAttribute('href');
+        }
+      }
+      books.add(Book(
+        id: BookId(id.isEmpty ? title : id),
+        title: title,
+        authors: author.isEmpty ? const <String>[] : author,
+        remoteIdentity: RemoteIdentity(
+          providerInstanceId: instanceId,
+          remoteBookId: RemoteBookId(id.isEmpty ? title : id),
+        ),
+      ));
+      // stash download href in coverPath? no; ignore for now
+      if (downloadHref != null) {
+        // no field; could store later
+      }
+    }
+    return books;
   }
 
   @override

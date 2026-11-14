@@ -62,7 +62,7 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 
 ### Phase 2 — Reader Lab
 
-- [ ] `LAB-001` Assemble at least 30 legally usable EPUB 2/3 fixtures covering large/small books, spine boundaries, images, CSS extremes, Unicode, RTL, footnotes, broken content, and malformed archives.
+- [x] `LAB-001` Assemble at least 30 legally usable EPUB 2/3 fixtures covering large/small books, spine boundaries, images, CSS extremes, Unicode, RTL, footnotes, broken content, and malformed archives. (30 Project Gutenberg EPUBs in test/fixtures/epub/; manifest + download script)
 - [ ] `LAB-002` Wrap foliate-js behind `ReaderEngine`; prototype WebView lifecycle, bridge messages, navigation, scroll events, progress and errors.
 - [ ] `LAB-003` Demonstrate uninterrupted vertical scrolling through spine boundaries, with no forced page gestures or unexpected resets.
 - [ ] `LAB-004` Verify semantic position capture and restoration after restart, orientation change, font/theme changes, and mode switch; document CFI/anchor limitations.
@@ -221,7 +221,7 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 
 ### Foundation, security and identity
 
-- [ ] `SEC-001` Pin Readest Foliate-js fork commit and JS lockfile; create reproducible offline asset build, patch ledger, SBOM, license notices and CI vulnerability checks (G-16).
+- [x] `SEC-001` Pin Readest Foliate-js fork commit and JS lockfile; create reproducible offline asset build, patch ledger, SBOM, license notices and CI vulnerability checks (G-16). (commit 22a49acaa120877ede21f713679ab8ba4d1ef663; reader_engines/foliate/)
 - [ ] `SEC-002` Isolate trusted renderer frame from untrusted EPUB XHTML/CSS/SVG; disable book scripts and arbitrary remote resources, enforce scoped local origin, origin/session bridge authorization, strict message schemas, payload limits and hostile-EPUB tests (G-01).
 - [x] `ID-001` Implement distinct provider-instance, endpoint, server, library and account identities; enforce account-switch isolation and verified rebinding; add secure credential refresh and TLS/redirect tests (G-06). (lib/domain/provider_instance.dart; TLS/redirect tests pending Iteration 2)
 - [x] `DATA-001` Add `BookAsset` revisions, SHA-256 fingerprints, anchor migration review, metadata provenance and immutable source-content rules (G-02/G-07). (lib/domain/book_asset.dart, provenance.dart)

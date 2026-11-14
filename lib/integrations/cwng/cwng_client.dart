@@ -22,7 +22,11 @@ class CwngClient {
 
   /// Attach bearer token from current auth state.
   void attachAuth(CwngAuthState state) {
-    _dio.options.headers['Authorization'] = 'Bearer ${state.accessToken}';
+    if (state.isBasic) {
+      _dio.options.headers['Authorization'] = 'Basic ${state.accessToken}';
+    } else {
+      _dio.options.headers['Authorization'] = 'Bearer ${state.accessToken}';
+    }
   }
 
   void detachAuth() {

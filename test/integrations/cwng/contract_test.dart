@@ -55,11 +55,19 @@ void main() {
   group('CwngLibraryProvider', () {
     test('browseBooks maps items', () async {
       final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
-      dio.httpClientAdapter = _FakeAdapter((opts) async => _json(200, <String, dynamic>{
-            'items': <dynamic>[
-              <String, dynamic>{'id': '1', 'title': 'Book One', 'authors': <dynamic>['Alice']},
-            ],
-          }));
+      dio.httpClientAdapter = _FakeAdapter((opts) async {
+        const xml = '''<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <id>1</id>
+    <title>Book One</title>
+    <author><name>Alice</name></author>
+  </entry>
+</feed>''';
+        return ResponseBody.fromString(xml, 200, headers: <String, List<String>>{
+          'content-type': <String>['application/atom+xml'],
+        });
+      });
       final auth = CwngAuthenticator(dio: dio, tokenStore: InMemoryTokenStore(), baseUrl: 'https://example.com');
       final client = CwngClient(baseUrl: 'https://example.com', authenticator: auth, dio: dio);
       final provider = CwngLibraryProvider(

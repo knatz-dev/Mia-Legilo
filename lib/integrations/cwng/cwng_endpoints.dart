@@ -31,10 +31,12 @@ class CwngEndpointInventory {
 
 /// Default inventory with best-effort paths. None are verified.
 const defaultCwngInventory = CwngEndpointInventory(<CwngEndpoint>[
-  CwngEndpoint(operation: 'auth.login', method: 'POST', pathTemplate: '/api/auth/login', verified: false),
+  CwngEndpoint(operation: 'auth.basic', method: 'GET', pathTemplate: '/opds', verified: true, notes: 'HTTP Basic Auth; verified against library.knatz.dev'),
+  CwngEndpoint(operation: 'opds.catalog', method: 'GET', pathTemplate: '/opds', verified: true),
+  CwngEndpoint(operation: 'opds.books', method: 'GET', pathTemplate: '/opds/books', verified: true),
+  CwngEndpoint(operation: 'auth.login', method: 'POST', pathTemplate: '/api/auth/login', verified: false, notes: 'Not used by CWNG; OPDS basic auth instead'),
   CwngEndpoint(operation: 'auth.refresh', method: 'POST', pathTemplate: '/api/auth/refresh', verified: false),
-  CwngEndpoint(operation: 'books.list', method: 'GET', pathTemplate: '/api/books', verified: false),
+  CwngEndpoint(operation: 'books.list', method: 'GET', pathTemplate: '/api/books', verified: false, notes: 'Returns login page; not a JSON API'),
   CwngEndpoint(operation: 'books.get', method: 'GET', pathTemplate: '/api/books/{id}', verified: false),
-  CwngEndpoint(operation: 'books.download', method: 'GET', pathTemplate: '/api/books/{id}/download', verified: false),
-  CwngEndpoint(operation: 'opds.catalog', method: 'GET', pathTemplate: '/opds', verified: false),
+  CwngEndpoint(operation: 'books.download', method: 'GET', pathTemplate: '/opds/.../acquisition', verified: false, notes: 'href from OPDS entry link'),
 ]);

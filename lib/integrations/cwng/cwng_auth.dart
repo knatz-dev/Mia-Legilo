@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import 'token_store.dart';
@@ -17,11 +19,13 @@ class CwngAuthState {
     required this.accessToken,
     this.refreshToken,
     this.expiresAt,
+    this.scheme = 'bearer',
   });
 
   final String accessToken;
   final String? refreshToken;
   final DateTime? expiresAt;
+  final String scheme; // 'bearer' or 'basic'
 
   bool get isExpired {
     final e = expiresAt;
@@ -29,10 +33,13 @@ class CwngAuthState {
     return DateTime.now().isAfter(e);
   }
 
+  bool get isBasic => scheme == 'basic';
+
   Map<String, dynamic> toJson() => <String, dynamic>{
         'accessToken': accessToken,
         'refreshToken': refreshToken,
         'expiresAt': expiresAt?.toIso8601String(),
+        'scheme': scheme,
       };
 
   factory CwngAuthState.fromJson(Map<String, dynamic> json) => CwngAuthState(
@@ -41,6 +48,7 @@ class CwngAuthState {
         expiresAt: json['expiresAt'] == null
             ? null
             : DateTime.parse(json['expiresAt'] as String),
+        scheme: json['scheme'] as String? ?? 'bearer',
       );
 }
 
@@ -86,13 +94,34 @@ class CwngAuthenticator {
     }
   }
 
+  /// HTTP Basic Auth (used by CWNG OPDS). Validates against /opds.
+  Future<CwngAuthState> loginBasic(String username, String password) async {
+    final creds = base64Encode(utf8.encode('$username:$password'));
+    try {
+      final response = await dio.get<dynamic>(
+        '/opds',
+        options: Options(headers: <String, dynamic>{'Authorization': 'Basic $creds'}),
+      );
+      if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
+        final state = CwngAuthState(accessToken: creds, scheme: 'basic');
+        await tokenStore.write(_tokenKey, creds);
+        await tokenStore.write('cwng_auth_scheme', 'basic');
+        return state;
+      }
+      throw const CwngException(CwngErrorKind.authentication, 'Invalid credentials');
+    } on DioException catch (e) {
+      throw _mapError(e);
+    }
+  }
+
   Future<CwngAuthState?> restore() async {
     final token = await tokenStore.read(_tokenKey);
     if (token == null || token.isEmpty) return null;
     final refresh = await tokenStore.read(_refreshKey);
     final expiryRaw = await tokenStore.read(_expiryKey);
     final expiry = expiryRaw == null ? null : DateTime.tryParse(expiryRaw);
-    return CwngAuthState(accessToken: token, refreshToken: refresh, expiresAt: expiry);
+    final scheme = await tokenStore.read('cwng_auth_scheme') ?? 'bearer';
+    return CwngAuthState(accessToken: token, refreshToken: refresh, expiresAt: expiry, scheme: scheme);
   }
 
   Future<CwngAuthState> refresh(CwngAuthState current) async {
