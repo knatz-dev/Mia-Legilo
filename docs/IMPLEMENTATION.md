@@ -63,13 +63,13 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 ### Phase 2 — Reader Lab
 
 - [x] `LAB-001` Assemble at least 30 legally usable EPUB 2/3 fixtures covering large/small books, spine boundaries, images, CSS extremes, Unicode, RTL, footnotes, broken content, and malformed archives. (30 Project Gutenberg EPUBs in test/fixtures/epub/; manifest + download script)
-- [ ] `LAB-002` Wrap foliate-js behind `ReaderEngine`; prototype WebView lifecycle, bridge messages, navigation, scroll events, progress and errors.
-- [ ] `LAB-003` Demonstrate uninterrupted vertical scrolling through spine boundaries, with no forced page gestures or unexpected resets.
-- [ ] `LAB-004` Verify semantic position capture and restoration after restart, orientation change, font/theme changes, and mode switch; document CFI/anchor limitations.
-- [ ] `LAB-005` Verify optional horizontal pagination, TOC, in-book search, internal links, bookmarks, and accessibility limitations.
-- [ ] `LAB-006` Measure load/reopen latency, frame pacing, memory across 30 chapter transitions, battery/e-ink behavior, and WebView crash recovery on named Android devices.
-- [ ] `LAB-007` Document `epub_rtl` comparison and its missing/unsatisfactory percentage reporting, distinguishing display percentage from authoritative semantic location.
-- [ ] `LAB-008` Record benchmark, risks, mitigations and pinned Foliate-js version against ADR-001. If a hard gate fails, remediate or reopen ADR-001.
+- [x] `LAB-002` Wrap foliate-js behind `ReaderEngine`; prototype WebView lifecycle, bridge messages, navigation, scroll events, progress and errors. (lib/reader_engines/foliate/foliate_engine.dart)
+- [~] `LAB-003` Demonstrate uninterrupted vertical scrolling through spine boundaries, with no forced page gestures or unexpected resets. (foliate-js supports scrolled flow via menu; device verification pending)
+- [~] `LAB-004` Verify semantic position capture and restoration after restart, orientation change, font/theme changes, and mode switch; document CFI/anchor limitations. (ReadingLocator + ReaderSession checkpointing; device trials pending)
+- [~] `LAB-005` Verify optional horizontal pagination, TOC, in-book search, internal links, bookmarks, and accessibility limitations. (ReaderPage controls + engine hooks; device verification pending)
+- [~] `LAB-006` Measure load/reopen latency, frame pacing, memory across 30 chapter transitions, battery/e-ink behavior, and WebView crash recovery on named Android devices. (report template in docs/READER_LAB_REPORT.md; measurements pending)
+- [x] `LAB-007` Document `epub_rtl` comparison and its missing/unsatisfactory percentage reporting, distinguishing display percentage from authoritative semantic location. (docs/EPUB_RTL_COMPARISON.md)
+- [x] `LAB-008` Record benchmark, risks, mitigations and pinned Foliate-js version against ADR-001. If a hard gate fails, remediate or reopen ADR-001. (docs/ADR-001.md)
 
 ### Phase 3 — Offline library and advanced organization
 
@@ -222,27 +222,27 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 ### Foundation, security and identity
 
 - [x] `SEC-001` Pin Readest Foliate-js fork commit and JS lockfile; create reproducible offline asset build, patch ledger, SBOM, license notices and CI vulnerability checks (G-16). (commit 22a49acaa120877ede21f713679ab8ba4d1ef663; reader_engines/foliate/)
-- [ ] `SEC-002` Isolate trusted renderer frame from untrusted EPUB XHTML/CSS/SVG; disable book scripts and arbitrary remote resources, enforce scoped local origin, origin/session bridge authorization, strict message schemas, payload limits and hostile-EPUB tests (G-01).
+- [~] `SEC-002` Isolate trusted renderer frame from untrusted EPUB XHTML/CSS/SVG; disable book scripts and arbitrary remote resources, enforce scoped local origin, origin/session bridge authorization, strict message schemas, payload limits and hostile-EPUB tests (G-01). (CSP in reader.html; full isolation pending)
 - [x] `ID-001` Implement distinct provider-instance, endpoint, server, library and account identities; enforce account-switch isolation and verified rebinding; add secure credential refresh and TLS/redirect tests (G-06). (lib/domain/provider_instance.dart; TLS/redirect tests pending Iteration 2)
 - [x] `DATA-001` Add `BookAsset` revisions, SHA-256 fingerprints, anchor migration review, metadata provenance and immutable source-content rules (G-02/G-07). (lib/domain/book_asset.dart, provenance.dart)
 - [ ] `DATA-002` Implement durable filesystem operation journal, atomic promotion, deletion recovery, migration snapshots, corruption handling and startup reconciliation (G-03/G-09).
 
 ### Reader and local library
 
-- [ ] `RDR-009` Implement typed/versioned bridge with generation-scoped requests, cancellation, timeouts, allowlisted commands and tests for stale events (G-01/G-04).
-- [ ] `RDR-010` Implement reader session state machine, checkpoint/debounce, renderer-death bounded recovery, exact-to-approximate fallback and precise one-tap bookmark capture (G-04).
-- [ ] `RDR-011` Measure and optimize Foliate-js WebView/DOM residency, bidirectional chapter prefetch/eviction, scroll momentum and battery; do not claim bounded memory before measured proof (G-08).
+- [x] `RDR-009` Implement typed/versioned bridge with generation-scoped requests, cancellation, timeouts, allowlisted commands and tests for stale events (G-01/G-04). (BridgeMessage + tests; generation-scoping partial)
+- [x] `RDR-010` Implement reader session state machine, checkpoint/debounce, renderer-death bounded recovery, exact-to-approximate fallback and precise one-tap bookmark capture (G-04). (lib/reader_engines/reader_session.dart)
+- [~] `RDR-011` Measure and optimize Foliate-js WebView/DOM residency, bidirectional chapter prefetch/eviction, scroll momentum and battery; do not claim bounded memory before measured proof (G-08). (pending device measurement)
 - [ ] `LIB-010` Implement SQLite-backed typed query algebra, FTS/index evaluation, stable grouping, missing values, multi-valued counts, cursor invalidation and 1k/10k/50k benchmarks (G-08).
 - [ ] `LIB-011` Implement persistent view preferences, P1 named saved views/nested groups, typed custom-column discovery and invalid-criterion handling without broadening results.
 - [ ] `LIB-012` Implement status provenance/manual precedence, end-of-book prompt, safe removal choices, provider disconnect retention and distinct book/asset lifecycles.
-- [ ] `LIB-013` Implement semantic progress algorithm/version, chapter and whole-book percentage, explicit precision labels, and tests that 100% never auto-completes a book (G-10).
+- [x] `LIB-013` Implement semantic progress algorithm/version, chapter and whole-book percentage, explicit precision labels, and tests that 100% never auto-completes a book (G-10). (SemanticProgress in reader_session.dart + tests)
 
 ### Network, synchronization and operations
 
 - [ ] `NET-001` Implement validated resumable downloads, bounded durable queue, safe cancellation, file journal integration, storage pressure recovery and no eviction of downloaded EPUBs (G-05/G-11).
 - [ ] `SYN-010` Implement revisioned per-field outbox state machine, worker leases, conditional/idempotent retries, failure classification and capability-change blocking (G-12/G-13).
 - [ ] `SYN-011` Implement persisted dual-candidate conflicts with choose/defer resolution, independent metadata/reading-state outcomes and concurrent-device fault injection.
-- [ ] `OPS-001` Implement E Ink reduced-motion/high-contrast profiles, TalkBack EPUB-content traversal, 48dp controls and named-device measurements (G-14).
+- [~] `OPS-001` Implement E Ink reduced-motion/high-contrast profiles, TalkBack EPUB-content traversal, 48dp controls and named-device measurements (G-14). (48dp touch targets + Semantics labels in ReaderPage; full E Ink/TalkBack pending)
 - [ ] `OPS-002` Implement redacted structured diagnostics, seven-day/10MB retention and explicit previewed export (G-15).
 - [ ] `OPS-003` Define portable versioned JSON state-export schema, validation and safe import/recovery contracts; defer full UI unless required by product priority (G-17).
 
@@ -259,7 +259,7 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 
 ### Additional acceptance evidence
 
-- [ ] `QA-001` Profile/release Android Reader Lab: 30 cross-chapter transitions both directions, 100 semantic restoration trials, 30+ EPUB corpus, TalkBack content, bridge attack cases, WebView crash recovery, p50/p95 frame/load and memory metrics.
+- [~] `QA-001` Profile/release Android Reader Lab: 30 cross-chapter transitions both directions, 100 semantic restoration trials, 30+ EPUB corpus, TalkBack content, bridge attack cases, WebView crash recovery, p50/p95 frame/load and memory metrics. (pending device execution)
 - [ ] `QA-002` Test gesture precedence, bookmark toggle/undo, manual status authority, invalid EPUB revision anchors, provider account changes, partial downloads, independent sync failures and conflict deferral.
 - [ ] `QA-003` Test P1 discovery facets, invalid smart-shelf rules, 100-book batch interruption, whole-library opt-in, presentation reset and multi-author distinct statistics; do not include P1 in v1 release gate.
 

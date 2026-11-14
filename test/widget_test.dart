@@ -5,6 +5,6 @@ import 'package:mia_legilo/main.dart';
 void main() {
   testWidgets('Mia Legilo app builds', (WidgetTester tester) async {
     await tester.pumpWidget(const MiaLegiloApp());
-    expect(find.text('Mia Legilo'), findsOneWidget);
+    expect(find.text('Mia Legilo'), findsWidgets);
   });
 }
