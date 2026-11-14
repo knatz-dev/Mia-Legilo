@@ -15,14 +15,14 @@ class FoliateEngine implements ReaderEngine {
       ..addJavaScriptChannel('FoliateBridge', onMessageReceived: _onJsMessage)
       ..setNavigationDelegate(NavigationDelegate(
         onPageFinished: (url) {
-          _pageReady.complete();
+          // ignore: avoid_print
+          print('FoliateEngine page finished: $url');
         },
       ));
   }
 
   late final WebViewController _controller;
   final _locationController = StreamController<ReadingLocator>.broadcast();
-  final Completer<void> _pageReady = Completer<void>();
 
   WebViewController get controller => _controller;
 
@@ -31,7 +31,7 @@ class FoliateEngine implements ReaderEngine {
     // Load the vendored reader.html from assets.
     final html = await rootBundle.loadString('reader_engines/foliate/foliate-js/reader.html');
     await _controller.loadHtmlString(html, baseUrl: 'asset://');
-    await _pageReady.future;
+    await Future<void>.delayed(const Duration(seconds: 1));
     sw.stop();
     // ignore: avoid_print
     print('FoliateEngine.initialize: ${sw.elapsedMilliseconds}ms');
@@ -39,19 +39,11 @@ class FoliateEngine implements ReaderEngine {
 
   @override
   Future<void> load(String source) async {
-    await _pageReady.future;
-    // Inject a JS snippet to open the book via foliate-js (best-effort).
-    await _controller.runJavaScript('''
-      (function() {
-        try {
-          if (window.reader && typeof window.reader.open === 'function') {
-            window.reader.open('$source');
-          }
-        } catch (e) {
-          FoliateBridge.postMessage(JSON.stringify({type:'error', payload:{message: String(e)}}));
-        }
-      })();
-    ''');
+    final uri = Uri.parse(
+      'file:///android_asset/flutter_assets/reader_engines/foliate/foliate-js/reader.html'
+      '?url=${Uri.encodeComponent(source)}',
+    );
+    await _controller.loadRequest(uri);
   }
 
   @override

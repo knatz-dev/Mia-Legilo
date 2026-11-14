@@ -23,23 +23,49 @@ class MiaLegiloApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _urlController = TextEditingController(
+    text: 'http://10.0.2.2:8080/book.epub',
+  );
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Mia Legilo')),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('Mia Legilo'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _urlController,
+              decoration: const InputDecoration(
+                labelText: 'EPUB URL',
+                border: OutlineInputBorder(),
+              ),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const ReaderPage()),
+                  MaterialPageRoute<void>(
+                    builder: (_) => ReaderPage(source: _urlController.text),
+                  ),
                 );
               },
               child: const Text('Open Reader'),
