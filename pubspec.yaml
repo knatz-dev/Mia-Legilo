@@ -1,0 +1,38 @@
+name: mia_legilo
+description: "Mia Legilo — offline-first Flutter EPUB reader for Android, integrated with Calibre-Web NextGen."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  material_ui: ^1.1.0
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  # Navigation
+  go_router: ^14.6.2
+  # Persistence
+  drift: ^2.20.3
+  sqlite3_flutter_libs: ^0.5.28
+  path_provider: ^2.1.5
+  path: ^1.9.0
+  # Secure storage (credentials)
+  flutter_secure_storage: ^9.2.4
+  # HTTP client (provisional; final selection by spike)
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # Code generation for Drift
+  build_runner: ^2.4.13
+  drift_dev: ^2.20.3
+
+flutter:
+  uses-material-design: true
