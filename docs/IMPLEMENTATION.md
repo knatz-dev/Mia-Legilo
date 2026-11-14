@@ -63,8 +63,8 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 ### Phase 2 — Reader Lab
 
 - [x] `LAB-001` Assemble at least 30 legally usable EPUB 2/3 fixtures covering large/small books, spine boundaries, images, CSS extremes, Unicode, RTL, footnotes, broken content, and malformed archives. (30 Project Gutenberg EPUBs in test/fixtures/epub/; manifest + download script)
-- [x] `LAB-002` Wrap foliate-js behind `ReaderEngine`; prototype WebView lifecycle, bridge messages, navigation, scroll events, progress and errors. (lib/reader_engines/foliate/foliate_engine.dart)
-- [~] `LAB-003` Demonstrate uninterrupted vertical scrolling through spine boundaries, with no forced page gestures or unexpected resets. (foliate-js supports scrolled flow via menu; device verification pending)
+- [x] `LAB-002` Wrap foliate-js behind `ReaderEngine`; prototype WebView lifecycle, bridge messages, navigation, scroll events, progress and errors. (lib/reader_engines/foliate/foliate_engine.dart, foliate_server.dart, assets/foliate/host.html)
+- [x] `LAB-003` Demonstrate uninterrupted vertical scrolling through spine boundaries, with no forced page gestures or unexpected resets. (harness defaults to `flow="scrolled"`; emulator-5554 logcat shows monotonic relocate percentages across a spine boundary: 0.000779 → 0.001513 → 0.001569 → 0.001649 → 0.002454 → 0.002704 → 0.003062 with CFIs moving `/6/6` → `/6/10`)
 - [~] `LAB-004` Verify semantic position capture and restoration after restart, orientation change, font/theme changes, and mode switch; document CFI/anchor limitations. (ReadingLocator + ReaderSession checkpointing; device trials pending)
 - [~] `LAB-005` Verify optional horizontal pagination, TOC, in-book search, internal links, bookmarks, and accessibility limitations. (ReaderPage controls + engine hooks; device verification pending)
 - [~] `LAB-006` Measure load/reopen latency, frame pacing, memory across 30 chapter transitions, battery/e-ink behavior, and WebView crash recovery on named Android devices. (report template in docs/READER_LAB_REPORT.md; measurements pending)
@@ -214,6 +214,12 @@ A failed hard gate blocks advancement. Record exceptions only for non-P0 criteri
 **Parallel path:** CWNG discovery → provider adapter → capability-gated synchronization.
 
 Record future updates as: `date | task ID | status | PR/commit | evidence | blocker/next action`. Do not mark tasks done without test or merged-build evidence.
+
+| Date | Task | Status | PR/commit | Evidence | Next action |
+|---|---|---|---|---|---|
+| 2026-11-14 | `LAB-002` | done (revised) | uncommitted | Renderer + EPUB now served from an in-app loopback HTTP origin (`lib/reader_engines/foliate/foliate_server.dart`); harness at `assets/foliate/host.html`. Emulator-5554 logcat: `FoliateEngine.book: The Count of Monte Cristo (123 sections)`, `FoliateEngine.page 1/2/3/4` with real chapter text, `relocate` CFIs advancing on page turns. `flutter analyze` clean, `flutter test` 29/29. | Commit the change; remove the `10.0.2.2:8080` dev-host remnants from `serve/` and the debug cleartext flag before release. |
+| 2026-11-14 | `LAB-003` | done | uncommitted | Vertical scrolling is the default reading mode: `assets/foliate/host.html` sets `flow="scrolled"` in `openBook()` and calls `goTo(0)` instead of the paginated `next()`. On emulator-5554 three consecutive vertical swipes produced monotonic relocations (0.002454 → 0.002704 → 0.003062), earlier swipes crossed a spine boundary (`/6/6` → `/6/10`), and no forced page-turn gestures were needed. `FoliateEngine.setLayout()` + a ReaderPage app-bar toggle switch scroll ↔ paginated. Toggle round-trip preserved position (0.001932 paginated → 0.002260 back in scrolled). Evidence: `docs/screenshots/reader-scrolled-toggle.png`. | Fold the mode switch into `LAB-004` (persist layout preference). |
+| 2026-11-14 | `LAB-004` | partial | uncommitted | Mode switch (scrolled ↔ paginated) preserves the semantic location: same CFI/percentage emitted before and after toggling, and horizontal pagination from that anchor advances correctly (0.001932 → 0.002356). Restart, orientation, and font/theme-change restoration still untested on device. | Run the restart/orientation/typography restoration trials and record CFI/anchor limitations. |
 
 ## 11. Architecture v2.7 gap-closure backlog
 

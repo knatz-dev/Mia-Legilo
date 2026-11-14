@@ -21,6 +21,9 @@ class Book {
     this.remoteIdentity,
     this.downloadState = DownloadState.notDownloaded,
     this.localAssetId,
+    this.localAssetPath,
+    this.localAssetSha256,
+    this.localAssetRevision,
     this.shelfIds = const <ShelfId>[],
     this.addedAt,
     this.lastReadAt,
@@ -40,6 +43,15 @@ class Book {
   final RemoteIdentity? remoteIdentity;
   final DownloadState downloadState;
   final BookId? localAssetId;
+
+  /// Absolute path to the immutable EPUB bytes, when downloaded/imported.
+  final String? localAssetPath;
+
+  /// SHA-256 of [localAssetPath]; the local duplicate-identity signal.
+  final String? localAssetSha256;
+
+  /// Monotonic revision of the asset. Source bytes never change in place.
+  final int? localAssetRevision;
   final List<ShelfId> shelfIds;
   final DateTime? addedAt;
   final DateTime? lastReadAt;
@@ -58,6 +70,9 @@ class Book {
     RemoteIdentity? remoteIdentity,
     DownloadState? downloadState,
     BookId? localAssetId,
+    String? localAssetPath,
+    String? localAssetSha256,
+    int? localAssetRevision,
     List<ShelfId>? shelfIds,
     DateTime? addedAt,
     DateTime? lastReadAt,
@@ -77,6 +92,9 @@ class Book {
         remoteIdentity: remoteIdentity ?? this.remoteIdentity,
         downloadState: downloadState ?? this.downloadState,
         localAssetId: localAssetId ?? this.localAssetId,
+        localAssetPath: localAssetPath ?? this.localAssetPath,
+        localAssetSha256: localAssetSha256 ?? this.localAssetSha256,
+        localAssetRevision: localAssetRevision ?? this.localAssetRevision,
         shelfIds: shelfIds ?? this.shelfIds,
         addedAt: addedAt ?? this.addedAt,
         lastReadAt: lastReadAt ?? this.lastReadAt,
@@ -97,6 +115,9 @@ class Book {
         'remoteIdentity': remoteIdentity?.toJson(),
         'downloadState': downloadState.name,
         'localAssetId': localAssetId?.toJson(),
+        'localAssetPath': localAssetPath,
+        'localAssetSha256': localAssetSha256,
+        'localAssetRevision': localAssetRevision,
         'shelfIds': shelfIds.map((s) => s.toJson()).toList(),
         'addedAt': addedAt?.toIso8601String(),
         'lastReadAt': lastReadAt?.toIso8601String(),
@@ -132,6 +153,9 @@ class Book {
         localAssetId: json['localAssetId'] == null
             ? null
             : BookId.fromJson(json['localAssetId'] as Map<String, dynamic>),
+        localAssetPath: json['localAssetPath'] as String?,
+        localAssetSha256: json['localAssetSha256'] as String?,
+        localAssetRevision: (json['localAssetRevision'] as num?)?.toInt(),
         shelfIds: (json['shelfIds'] as List<dynamic>? ?? <dynamic>[])
             .map((e) => ShelfId.fromJson(e as Map<String, dynamic>))
             .toList(),

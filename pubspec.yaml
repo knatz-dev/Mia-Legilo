@@ -29,6 +29,9 @@ dependencies:
   xml: ^6.5.0
   # WebView for Foliate-js renderer
   webview_flutter: ^4.10.0
+  archive: ^4.7.1
+  crypto: ^3.0.8
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
@@ -43,4 +46,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/foliate/
     - reader_engines/foliate/foliate-js/
+    - reader_engines/foliate/foliate-js/vendor/

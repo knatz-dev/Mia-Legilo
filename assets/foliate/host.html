@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mia Legilo</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #fdfbf7;
+    color: #1b1b1b;
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+  }
+  foliate-view { display: block; width: 100vw; height: 100vh; }
+  #status {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    font-size: 14px;
+    color: #6b6b6b;
+  }
+</style>
+</head>
+<body>
+<div id="status">Loading book…</div>
+<script type="module">
+  import { makeBook } from './view.js';
+
+  const statusElement = document.getElementById('status');
+  const setStatus = (text) => {
+    if (statusElement) statusElement.textContent = text;
+  };
+
+  const bridge = (message) => {
+    const json = JSON.stringify(message);
+    try {
+      if (globalThis.FoliateBridge) FoliateBridge.postMessage(json);
+    } catch (_) {
+      // Bridge is optional when running in a plain browser.
+    }
+    console.log('HOST_BRIDGE ' + json);
+  };
+
+  const titleOf = (metadata) => {
+    const title = metadata?.title;
+    if (!title) return 'Untitled';
+    if (typeof title === 'string') return title;
+    return Object.values(title)[0] ?? 'Untitled';
+  };
+
+  const BOOK_CSS = `
+    @namespace epub "http://www.idpf.org/2007/ops";
+    html {
+      color-scheme: light dark;
+      background: #fdfbf7;
+      color: #1b1b1b;
+    }
+    p, li, blockquote, dd {
+      line-height: 1.5;
+      text-align: justify;
+      hanging-punctuation: allow-end last;
+      widows: 2;
+    }
+    [align="left"] { text-align: left; }
+    [align="right"] { text-align: right; }
+    [align="center"] { text-align: center; }
+    [align="justify"] { text-align: justify; }
+    img, svg, video { max-width: 100% !important; height: auto !important; }
+    pre { white-space: pre-wrap !important; }
+    aside[epub|type~="endnote"],
+    aside[epub|type~="footnote"],
+    aside[epub|type~="note"],
+    aside[epub|type~="rearnote"] { display: none; }
+  `;
+
+  const bookUrl = new URLSearchParams(location.search).get('book');
+  const DEFAULT_LAYOUT = 'scrolled';
+
+  async function openBook(url) {
+    if (!url) throw new Error('No book URL was supplied');
+    const book = await makeBook(url);
+    bridge({
+      type: 'book',
+      payload: {
+        title: titleOf(book.metadata),
+        sections: book.sections?.length ?? 0,
+      },
+    });
+
+    const view = document.createElement('foliate-view');
+    document.body.append(view);
+
+    view.addEventListener('relocate', ({ detail }) => {
+      bridge({
+        type: 'location',
+        payload: {
+          cfi: detail.cfi,
+          percentage: detail.fraction,
+          precision: 'cfi',
+        },
+      });
+    });
+    view.addEventListener('load', ({ detail }) => {
+      try {
+        const text = (detail.doc?.body?.innerText ?? '')
+          .replace(/\s+/g, ' ').trim().slice(0, 160);
+        bridge({ type: 'page', payload: { index: detail.index, text } });
+      } catch (_) {
+        // Diagnostics only.
+      }
+    });
+    view.addEventListener('error', ({ detail }) => {
+      bridge({ type: 'error', payload: { message: String(detail?.message ?? detail) } });
+    });
+
+    await view.open(book);
+    // Vertical continuous scrolling is the default reading mode (SPEC P0).
+    view.renderer.setAttribute('flow', DEFAULT_LAYOUT);
+    view.renderer.setAttribute('margin-top', '16px');
+    view.renderer.setAttribute('margin-bottom', '16px');
+    view.renderer.setAttribute('margin-left', '20px');
+    view.renderer.setAttribute('margin-right', '20px');
+    view.renderer.setStyles?.(BOOK_CSS);
+    // In scrolled flow the first section is already laid out at its top, so
+    // only paginated mode needs the extra "next" to paint page one.
+    if (view.renderer.scrolled) await view.goTo(0);
+    else await view.next();
+
+    // Commands issued by FoliateEngine run against window.reader.
+    globalThis.view = view;
+    globalThis.reader = {
+      view,
+      book,
+      goTo: (locator) => {
+        const target = locator?.cfi ?? locator?.percentage ?? 0;
+        return view.goTo(target);
+      },
+      setLayout: (mode) => {
+        view.renderer.setAttribute('flow', mode === 'paginated' ? 'paginated' : 'scrolled');
+      },
+      next: () => view.renderer.next(),
+      prev: () => view.renderer.prev(),
+      setTypography: ({ fontSize, lineHeight }) => {
+        view.renderer.setStyles?.(`${BOOK_CSS}
+          body { font-size: ${fontSize ?? 1}em; }
+          p, li, blockquote, dd { line-height: ${lineHeight ?? 1.5}; }
+        `);
+      },
+      setTheme: (theme) => {
+        const dark = theme === 'dark';
+        document.documentElement.style.background = dark ? '#121212' : '#fdfbf7';
+        document.body.style.background = dark ? '#121212' : '#fdfbf7';
+      },
+    };
+
+    statusElement?.remove();
+    bridge({ type: 'ready', payload: { sections: book.sections?.length ?? 0 } });
+  }
+
+  openBook(bookUrl ?? new URL('../books/current', location.href).href)
+    .catch((error) => {
+      const message = error?.message ?? String(error);
+      setStatus('Could not open this book.\n' + message);
+      bridge({ type: 'error', payload: { message } });
+      console.error('HOST open failed: ' + message, error?.stack ?? '');
+    });
+</script>
+</body>
+</html>
