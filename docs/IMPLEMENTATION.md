@@ -1,10 +1,10 @@
 # Mia Legilo — Implementation Plan
 
-**Version:** 1.1  
-**Date:** 2026-11-10  
+**Version:** 1.2  
+**Date:** 2026-11-13  
 **Status:** Planning baseline; implementation progress unverified  
-**Product contract:** `SPEC.md`  
-**Technical contract:** `ARCHITECTURE.md`  
+**Product contract:** `SPEC.md` v1.5  
+**Technical contract:** `ARCHITECTURE.md` v2.7  
 **Platform:** Android / Flutter · **Format:** EPUB · **License:** MIT
 
 ## 1. Scope and delivery principles
@@ -13,7 +13,7 @@ Deliver thin, demonstrable, offline-first vertical slices. Every phase has execu
 
 Continuous cross-chapter vertical scrolling is mandatory. Reading status, reading position, and download state are independent. Unsupported remote features remain fully functional locally and are never represented as synchronized. Goodreads integration, non-EPUB formats, DRM bypass, and iOS/desktop builds are outside v1.
 
-**Renderer decision status:** User testing of Android debug APKs favors **foliate-js**; `epub_rtl` was promising but did not report percentage progress satisfactorily. Prioritize foliate-js as the primary integration candidate. Keep the formal Reader Lab validation and renderer-selection ADR open until documented acceptance results are complete. The source documents currently identify renderer selection as ADR-004; prior conversation references ADR-001. Resolve the identifier discrepancy in the architecture decision index before merging an ADR, without renumbering silently.
+**Renderer decision status:** **Foliate-js (MIT-licensed Readest fork) is selected as primary renderer under ADR-001.** Renderer selection is complete; device-measured acceptance is not. Pin the fork commit, audit all bundled licenses, and validate hardened WebView isolation, bounded-memory continuous scrolling, locator fidelity, accessibility and lifecycle recovery on Android profile/release builds. If a hard gate fails, remediate or explicitly reopen ADR-001. `epub_rtl` remains comparative evidence, not the selected production renderer.
 
 ## 2. Status conventions
 
@@ -31,7 +31,7 @@ Do not infer implementation completion from design decisions or prototype testin
 |---|---|---|---|---|
 | 0. Foundation | Flutter Android scaffold, dependency pinning, formatting/linting, CI, environments, test harness | None | Reproducible debug and release builds; CI green | TODO |
 | 1. Contracts and CWNG discovery | Domain IDs, repository/provider contracts, CWNG authentication/API/OPDS inventory, capability evidence | Phase 0 | Versioned capability matrix with verified endpoints and unsupported/unknown operations | TODO |
-| 2. Reader Lab and renderer ADR | Foliate-js integration spike, comparative evidence, EPUB corpus, semantic locator/scroll tests | Phase 0; domain locator contract | All hard reader gates pass; ADR accepted or remediation documented | TODO |
+| 2. Reader Lab and renderer ADR | Foliate-js integration spike, comparative evidence, EPUB corpus, semantic locator/scroll tests | Phase 0; domain locator contract | ADR-001 selection recorded; all hard device gates pass or remediation blocks release | TODO |
 | 3. Local library and organization | Drift migrations, SAF import, local EPUB storage, metadata, search, sort, grouping, filters, status shelves, grid/list | Phases 0–1 contracts; independent of remote API | Offline library organized and persisted across restart | TODO |
 | 4. Reader MVP | Production reader adapter, vertical scroll, pagination, typography, themes, TOC, search, bookmarks, resume | Phase 2 ADR; Phase 3 persistence | Full reader corpus and position-restoration gate pass | BLOCKED |
 | 5. CWNG integration | Secure profiles, metadata paging, cover cache, download/remove, connection diagnostics | Phase 1 capability matrix; Phase 3 local library | Real CWNG server browsed; downloaded books open offline | TODO |
@@ -69,7 +69,7 @@ Phases 1, 2, and the local-only portions of 3 can proceed concurrently after Pha
 - [ ] `LAB-005` Verify optional horizontal pagination, TOC, in-book search, internal links, bookmarks, and accessibility limitations.
 - [ ] `LAB-006` Measure load/reopen latency, frame pacing, memory across 30 chapter transitions, battery/e-ink behavior, and WebView crash recovery on named Android devices.
 - [ ] `LAB-007` Document `epub_rtl` comparison and its missing/unsatisfactory percentage reporting, distinguishing display percentage from authoritative semantic location.
-- [ ] `LAB-008` Record benchmark, risks, mitigations, selected engine/version, and accepted ADR. If a hard gate fails, remediate or reopen selection.
+- [ ] `LAB-008` Record benchmark, risks, mitigations and pinned Foliate-js version against ADR-001. If a hard gate fails, remediate or reopen ADR-001.
 
 ### Phase 3 — Offline library and advanced organization
 
@@ -179,7 +179,7 @@ On release tag: repeat full checks, validate version/changelog, build signed rel
 
 **G1 — Contracts:** CWNG capability matrix and stable domain/provider interfaces reviewed.
 
-**G2 — Reader selection:** Foliate-js (or documented alternative) passes continuous cross-chapter vertical scroll, locator restoration, navigation, and performance gates; accepted renderer ADR.
+**G2 — Reader validation:** Selected Foliate-js implementation passes continuous cross-chapter vertical scroll, locator restoration, navigation, security, accessibility and performance gates on Android; ADR-001 remains selected unless formally reopened.
 
 **G3 — Local MVP:** Offline EPUB import, search, sorting, grouping, filtering, status shelves, reader resume, and bookmarks all pass.
 
@@ -203,22 +203,66 @@ A failed hard gate blocks advancement. Record exceptions only for non-P0 criteri
 | Large library UI/query slowdown | Indexed Drift queries, paging, combined filter tests and performance budgets |
 | EPUB security and storage failures | Safe extraction, immutable source files, app-private storage, SAF |
 | E-ink platform fragmentation | Portable reduced-motion baseline; vendor-specific refresh optional |
-| Architecture ADR numbering conflict | Reconcile ADR-001 vs ADR-004 reference before decision record merge |
+| Renderer acceptance evidence missing | ADR-001 is selected; block release until device validation and security gates pass |
 
 ## 10. Engineering progress ledger
 
-**Last reviewed:** 2026-11-10  
+**Last reviewed:** 2026-11-13  
 **Production implementation completion:** Not verified.  
-**Discovery evidence:** Android debug APK comparison favored foliate-js; `epub_rtl` had deficient percentage reporting.  
+**Discovery evidence:** Android debug APK comparison favored Foliate-js; ADR-001 selected it. Device benchmark and production integration remain unverified.  
 **Current critical path:** Foundation → Reader Lab / renderer ADR → production reader → local/connected acceptance → release hardening.  
 **Parallel path:** CWNG discovery → provider adapter → capability-gated synchronization.
 
 Record future updates as: `date | task ID | status | PR/commit | evidence | blocker/next action`. Do not mark tasks done without test or merged-build evidence.
 
-## 11. Cross-document change requests (do not edit here)
+## 11. Architecture v2.7 gap-closure backlog
 
-**`ARCHITECTURE.md`:** Record foliate-js as preferred candidate or selected renderer only after formal ADR acceptance; clarify WebView bridge and asset isolation; reconcile renderer ADR numbering (`ADR-001` versus `ADR-004`); ensure library grouping/filtering query strategy and persistence are covered.
+These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TODO** unless verified evidence is subsequently recorded; architecture decisions do not imply implementation completion.
 
-**`SPEC.md`:** Verify that grouping, multi-filter combinations, persisted organization preferences, and stable sort behavior have explicit requirement IDs and acceptance tests. If newer approved requirements already cover them, use those IDs instead of adding duplicates. Preserve the distinction between approximate percentage and semantic locator, and between local-only and remotely synchronized state.
+### Foundation, security and identity
 
-These are impact notices only. `SPEC.md` and `ARCHITECTURE.md` remain separate authoritative documents.
+- [ ] `SEC-001` Pin Readest Foliate-js fork commit and JS lockfile; create reproducible offline asset build, patch ledger, SBOM, license notices and CI vulnerability checks (G-16).
+- [ ] `SEC-002` Isolate trusted renderer frame from untrusted EPUB XHTML/CSS/SVG; disable book scripts and arbitrary remote resources, enforce scoped local origin, origin/session bridge authorization, strict message schemas, payload limits and hostile-EPUB tests (G-01).
+- [ ] `ID-001` Implement distinct provider-instance, endpoint, server, library and account identities; enforce account-switch isolation and verified rebinding; add secure credential refresh and TLS/redirect tests (G-06).
+- [ ] `DATA-001` Add `BookAsset` revisions, SHA-256 fingerprints, anchor migration review, metadata provenance and immutable source-content rules (G-02/G-07).
+- [ ] `DATA-002` Implement durable filesystem operation journal, atomic promotion, deletion recovery, migration snapshots, corruption handling and startup reconciliation (G-03/G-09).
+
+### Reader and local library
+
+- [ ] `RDR-009` Implement typed/versioned bridge with generation-scoped requests, cancellation, timeouts, allowlisted commands and tests for stale events (G-01/G-04).
+- [ ] `RDR-010` Implement reader session state machine, checkpoint/debounce, renderer-death bounded recovery, exact-to-approximate fallback and precise one-tap bookmark capture (G-04).
+- [ ] `RDR-011` Measure and optimize Foliate-js WebView/DOM residency, bidirectional chapter prefetch/eviction, scroll momentum and battery; do not claim bounded memory before measured proof (G-08).
+- [ ] `LIB-010` Implement SQLite-backed typed query algebra, FTS/index evaluation, stable grouping, missing values, multi-valued counts, cursor invalidation and 1k/10k/50k benchmarks (G-08).
+- [ ] `LIB-011` Implement persistent view preferences, P1 named saved views/nested groups, typed custom-column discovery and invalid-criterion handling without broadening results.
+- [ ] `LIB-012` Implement status provenance/manual precedence, end-of-book prompt, safe removal choices, provider disconnect retention and distinct book/asset lifecycles.
+- [ ] `LIB-013` Implement semantic progress algorithm/version, chapter and whole-book percentage, explicit precision labels, and tests that 100% never auto-completes a book (G-10).
+
+### Network, synchronization and operations
+
+- [ ] `NET-001` Implement validated resumable downloads, bounded durable queue, safe cancellation, file journal integration, storage pressure recovery and no eviction of downloaded EPUBs (G-05/G-11).
+- [ ] `SYN-010` Implement revisioned per-field outbox state machine, worker leases, conditional/idempotent retries, failure classification and capability-change blocking (G-12/G-13).
+- [ ] `SYN-011` Implement persisted dual-candidate conflicts with choose/defer resolution, independent metadata/reading-state outcomes and concurrent-device fault injection.
+- [ ] `OPS-001` Implement E Ink reduced-motion/high-contrast profiles, TalkBack EPUB-content traversal, 48dp controls and named-device measurements (G-14).
+- [ ] `OPS-002` Implement redacted structured diagnostics, seven-day/10MB retention and explicit previewed export (G-15).
+- [ ] `OPS-003` Define portable versioned JSON state-export schema, validation and safe import/recovery contracts; defer full UI unless required by product priority (G-17).
+
+### SPEC.md v1.5 P1 discovery and offline collection features
+
+- [ ] `P1-006` Implement typed local discovery facets for author, series, publisher, category/tag and rating, with distinct-book counts, unknown values and offline navigation (`LIB-039`).
+- [ ] `P1-007` Implement local rule-based smart shelves separately from manual shelves and saved views; persist versioned rule AST, recalculate membership, and flag invalid rules without widening results (`LIB-040`).
+- [ ] `P1-008` Discover provider-backed smart shelves only with verified remote rule/membership capabilities; never infer write access (`LIB-041`).
+- [ ] `P1-009` Implement explicitly confirmed selective/shelf/filter batch downloads with frozen membership, size uncertainty, durable jobs, pause/cancel/retry and bounded concurrency (`LIB-042`).
+- [ ] `P1-010` Implement separately confirmed whole-library offline download with storage checks and safe interruption (`LIB-043`).
+- [ ] `P1-011` Implement persisted presentation section/quick-action ordering and visibility, restore defaults, and accessibility-safe essential action access (`LIB-044`).
+- [ ] `P1-012` Implement offline collection statistics with explicit scope, unique-book counting, stale/partial indicators and refresh metadata (`LIB-045`).
+- [ ] `P2-002` Evaluate provider metadata editing, ISBN scan, EPUB upload, external eReader/email delivery and WebDAV sync only behind separately verified capabilities (`LIB-046`–`LIB-048`, `INT-001`, `SYN-020`).
+
+### Additional acceptance evidence
+
+- [ ] `QA-001` Profile/release Android Reader Lab: 30 cross-chapter transitions both directions, 100 semantic restoration trials, 30+ EPUB corpus, TalkBack content, bridge attack cases, WebView crash recovery, p50/p95 frame/load and memory metrics.
+- [ ] `QA-002` Test gesture precedence, bookmark toggle/undo, manual status authority, invalid EPUB revision anchors, provider account changes, partial downloads, independent sync failures and conflict deferral.
+- [ ] `QA-003` Test P1 discovery facets, invalid smart-shelf rules, 100-book batch interruption, whole-library opt-in, presentation reset and multi-author distinct statistics; do not include P1 in v1 release gate.
+
+## 12. Cross-document alignment
+
+`SPEC.md` v1.5 is authoritative for product priorities: horizontal pagination remains **P0 if offered**, while mandatory vertical mode may never be weakened. P1 discovery/smart-shelf/batch-download functionality does not enter the v1 P0 gate. `ARCHITECTURE.md` v2.7 is authoritative for technical contracts and ADR-001. This plan tracks engineering work and evidence only; no edits to either source document are implied.

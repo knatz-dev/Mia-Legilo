@@ -1,11 +1,11 @@
 # Mia Legilo — Product and Functional Specification
 
-**Version:** 1.4  
+**Version:** 1.5  
 **Status:** Product specification freeze candidate; primary renderer selected, production validation pending  
-**Date:** 2026-11-10  
+**Date:** 2026-11-13  
 **Repository:** https://github.com/knatz-dev/Mia-Legilo  
 **License:** MIT  
-**Alignment:** Architecture v2.2 baseline plus subsequent Foliate-js primary-renderer decision
+**Alignment:** Architecture v2.6; Foliate-js selected, validation pending; Calibre Web Companion feature comparison
 
 ## 1. Product vision
 
@@ -286,7 +286,68 @@ The following requirements refine existing product behavior. Existing IDs and pr
 
 **Deferred scope:** Session history, estimates, duplicate edition linking and read-aloud are P1. They are not prerequisites for the first usable release. Vendor-specific e-ink controls, advanced EPUB and complex query expressions retain their previous priorities.
 
-## 9. Cross-document impacts (not edits)
+## 9. Calibre Web Companion feature comparison and roadmap (v1.5)
+
+### 9.1 Reference and adoption policy
+
+Calibre Web Companion (`https://github.com/doen1el/calibre-web-companion`) is a **product/UX reference** for library management and Calibre-family provider integration, **not** the Mia Legilo reader engine or implementation base. Its publicly documented features include category/author/series/publisher/rating discovery, read/unread/archive/shelves, Calibre-Web Automated Magic Shelves, offline whole/selected library synchronization, configurable sections/actions, collection statistics, metadata editing/cover upload, ISBN scanning, book upload, external eReader delivery, and WebDAV progress synchronization. These are upstream claims, not verified CWNG endpoint capabilities.
+
+Mia Legilo remains an independent MIT-licensed Flutter application with Foliate-js behind `ReaderEngine`. Calibre Web Companion's GPL-3.0 licensing precludes assuming its implementation can be copied into Mia Legilo under MIT-only terms. Independently specify and implement product behavior; obtain legal/license review before any GPL code reuse. No third-party feature may bypass provider capability checks, local-first persistence, book identity rules, or the P0 reader release gates.
+
+### 9.2 Feature disposition
+
+| Capability from reference project | Mia Legilo status | Priority | Decision rationale |
+|---|---|---|---|
+| Author, series, publisher, rating, category discovery | Expand | P1 | Enrich discovery beyond existing P0 search/sort/group/filter; metadata-dependent |
+| Read/unread, shelves, archive | Already partially covered | P0/P1 existing | Preserve six-status model and existing custom shelves; do not equate archive with Completed |
+| Rule-based Magic Shelves | New | P1 | Valuable reusable dynamic library views; local rules first, remote integration only when verified |
+| Whole/selected-library offline synchronization | New | P1 | Extend existing P0 individual download management with explicit batch scope and storage controls |
+| Configurable discovery sections, book details and action ordering | New | P1 | Personalized library UX; accessible defaults |
+| Collection statistics | New | P1 | Local cached statistics without requiring remote analytics |
+| Metadata editing / cover upload | Evaluation | P2 | Conflicts with current v1 non-goal; requires permissions, provenance and verified write APIs |
+| ISBN barcode scanning | Evaluation | P2 | Optional camera workflow; never a prerequisite for catalog access |
+| Send to Kindle/Kobo / email | Evaluation | P2 | External account, delivery and privacy concerns; not part of reader core |
+| Upload EPUB to server | Evaluation | P2 | Provider-specific authorization, duplicate and validation policies |
+| WebDAV progress synchronization | Investigation | P2 | Separate provider/transport contract; no assumption of compatible semantic anchors |
+| Built-in EPUB reading | Not adopted | — | Foliate-js remains the primary renderer; existing RDR-* requirements are authoritative |
+
+### 9.3 New functional requirements
+
+| ID | Priority | Requirement | Acceptance criteria |
+|---|---|---|---|
+| LIB-039 | P1 | Rich discovery dimensions | Browse cached books by author, series, publisher, category/tag and rating when metadata exists; all dimensions support navigation to matching books, deterministic ordering and an explicit unknown-value policy. Absent provider fields are not presented as complete. |
+| LIB-040 | P1 | Smart shelves | Create, rename, edit and delete local dynamic shelves defined by composable rules over supported local metadata, reading status, availability and supported custom columns. Results recalculate after relevant local/provider changes and work offline. Rules follow LIB-014 semantics and preserve invalid field references visibly rather than silently broadening results. |
+| LIB-041 | P1 | Provider-backed smart-shelf compatibility | Discover and optionally display remote dynamic shelves only when a provider exposes verified list/rule/membership semantics. Editing remote rules requires separately verified write capability. A local smart shelf must never be mislabeled as synchronized. |
+| LIB-042 | P1 | Selective offline collections | Download a user-selected set, shelf or currently filtered result set with a confirmation summary of book count, estimated storage when known and connection policy. Queue progress, per-book failures, pause/cancel and retry remain visible; existing downloaded EPUBs and reading state survive interrupted batches. |
+| LIB-043 | P1 | Whole-library offline download | Offer explicit whole-library download only after showing estimated size or an unknown-size warning, free-space implications and a confirmation. Never initiate bulk downloads automatically on connecting to a server. Allow stopping without deleting already validated books. |
+| LIB-044 | P1 | Library presentation customization | Allow reordering/hiding supported discovery sections, book-detail sections and quick actions, with persistent settings, a restore-defaults action, and no loss of access to essential book actions or accessibility labels. |
+| LIB-045 | P1 | Collection statistics | Display locally computed book counts by reading status, source, availability and supported metadata dimensions. Clearly label scope (all cached books vs active filters), unique-book counting and last catalog refresh; no network required for cached statistics. |
+| LIB-046 | P2 | Provider metadata editing evaluation | Evaluate editing selected metadata and uploading covers only where verified provider permissions and API semantics exist. Preserve provider/local provenance and conflict safety; no silent write-back or loss of local overrides. |
+| LIB-047 | P2 | ISBN scan evaluation | Evaluate opt-in barcode scanning with camera permission requested only on use, explicit match review, and no automatic merge or download. |
+| LIB-048 | P2 | EPUB upload evaluation | Evaluate upload to a verified writable provider, with authorization, validation, progress, duplicate handling and safe retry semantics. Local reading remains independent. |
+| INT-001 | P2 | External eReader delivery evaluation | Evaluate send-to-device/email integrations only with explicit destination consent, clear disclosure of third-party data transfer and verified success/failure reporting. |
+| SYN-020 | P2 | WebDAV reading-state interoperability evaluation | Investigate WebDAV as an optional sync transport. Do not enable until remote identity, anchor precision, revision/conflict and authentication semantics pass the same SYN-* safeguards as CWNG. |
+
+### 9.4 Acceptance and compatibility scenarios
+
+1. **Discovery:** Browse publisher/category/rating facets with partially missing metadata, then combine with existing search, filters and sorting; cached results remain available offline.
+2. **Smart shelves:** Create a rule for unread downloaded books in a selected series; change reading status offline and verify immediate membership changes, then restart and verify persistence.
+3. **Invalid rules:** Remove a custom column or disconnect a provider referenced by a smart shelf; show an unresolved rule and avoid silently returning a broader collection.
+4. **Selective offline:** Queue 100 books from a filtered result, interrupt connectivity and exhaust temporary storage; previously validated downloads remain readable, failures are individually retryable, and cancellation is safe.
+5. **Whole library:** Verify explicit confirmation, size uncertainty handling and ability to stop; no automatic download on first connection.
+6. **Personalization:** Reorder and hide optional sections/actions, restart, restore defaults, and verify essential controls remain accessible.
+7. **Statistics:** Confirm unique-book counts when multi-author books appear in multiple groups and when offline catalog data is stale.
+8. **Provider limitations:** A server without Magic Shelves, metadata-write or WebDAV support never shows those remote capabilities as active; local smart shelves remain usable.
+
+### 9.5 Product boundaries
+
+- This addition does **not** alter P0 priorities or weaken book-wide vertical scrolling, offline durability, semantic locators, accessibility, security, or Reader Lab release gates.
+- Existing P1 custom shelves (LIB-008), saved views (LIB-019) and smart shelves (LIB-040) are distinct: manual membership, saved query/presentation configuration, and automatically recomputed rule membership respectively. Implementations may share a query engine without conflating user-facing semantics.
+- Archive is a distinct provider feature, not automatically mapped to any Mia Legilo reading status. Map only if semantics are verified and the user can distinguish it.
+- Calibre Web Companion's advertised feature set is evidence of product possibilities, not proof that CWNG exposes equivalent APIs. Record actual CWNG capabilities separately.
+- No direct GPL-covered source reuse is authorized by this specification; preserve MIT licensing and conduct a dependency/license review before any implementation reuse.
+
+## 10. Cross-document impacts (not edits)
 
 
 ### ARCHITECTURE.md
@@ -311,3 +372,10 @@ The following requirements refine existing product behavior. Existing IDs and pr
 - Test on Android phone/tablet and available E Ink hardware; record device-specific performance baselines.
 
 **Document ownership:** This file specifies product behavior and acceptance criteria. Implementation details and engineering tasks belong exclusively in ARCHITECTURE.md and IMPLEMENTATION.md, respectively.
+
+### v1.5 cross-document follow-up (informational)
+
+- **ARCHITECTURE.md:** Model local smart-shelf rule definitions separately from manually managed shelves and saved views; use the existing typed library query engine and capability-gated provider adapter. Design bounded, resumable batch download orchestration and aggregate statistics against local indexes. Add no GPL dependency without a license decision. No architecture edits were made here.
+- **IMPLEMENTATION.md:** Schedule LIB-039 through LIB-045 as P1 work, and LIB-046 through LIB-048, INT-001 and SYN-020 as P2 evaluations; add the eight v1.5 acceptance scenarios. Preserve all P0 reader and release gates. No implementation-plan edits were made here.
+
+**v1.5 change summary:** Calibre Web Companion used as an external feature benchmark; P1 library enhancements and P2 investigations added without adopting its reader or GPL implementation.

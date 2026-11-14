@@ -1,9 +1,9 @@
 # Mia Legilo — Technical Architecture
 
-**Version:** 2.6  
+**Version:** 2.7  
 **Status:** Architecture baseline; operational contracts specified; Foliate-js device validation and CWNG API verification pending  
-**Date:** 2026-11-10  
-**Product contract:** `SPEC.md` v1.3  
+**Date:** 2026-11-13  
+**Product contract:** `SPEC.md` v1.5  
 **Implementation plan:** maintained separately
 
 ## 1. Scope and architectural invariants
@@ -19,7 +19,7 @@ Mia Legilo is an Android-first, offline-first Flutter EPUB reader. CWNG is the f
 7. EPUB content is immutable; reading data resides outside the book file.
 8. Foliate-js is the primary renderer per ADR-001. Its Flutter/WebView integration must satisfy the Reader Lab release gates; selecting it does not establish unmeasured device performance.
 9. Provider-specific DTOs and authentication cannot leak into application, domain, or reader interfaces.
-10. P0/P1 priorities are governed by SPEC.md v1.3, not by older architecture drafts.
+10. P0/P1/P2 priorities are governed by SPEC.md v1.5, not by older architecture drafts.
 
 ## 2. Technology baseline
 
@@ -53,7 +53,9 @@ lib/
     diagnostics/               # redacted logs and measurements
   domain/
     books/                     # book, editions, bindings, metadata
-    library_queries/           # typed sort/filter/group/view models
+    library_queries/           # typed sort/filter/group/view and facet models
+    smart_shelves/             # persisted rule AST, validation and evaluation
+    collection_statistics/     # local aggregate projections
     reading/                   # locator, progress, status, bookmarks
     synchronization/           # revisions, conflicts, outbox
     providers/                 # capabilities and provider contracts
@@ -63,6 +65,9 @@ lib/
     reader/
     shelves/
     downloads/
+    offline_collections/        # persistent batch-download plans and queues
+    discovery/                  # indexed metadata facets and sections
+    statistics/                 # local collection insights
     bookmarks/
     synchronization/
     settings/
@@ -90,7 +95,11 @@ Avoid ceremonial per-feature layers. Use application/presentation/data subdivisi
 
 **Bookmark** is a first-class entity with UUID, BookId, semantic locator, optional label, creation time, tombstone/deletion revision, and sync provenance. P0 bookmark operations do not depend on P1 highlight/note support. **Annotation** is a separate extensible model for P1 highlights/notes.
 
+**DownloadBatch** represents a user-confirmed snapshot of selected book identities, scope and connection policy, with durable per-book job states and aggregate progress. A batch is not a synchronization authority and does not modify reading state.
+
 **Download** tracks source URL identity, local private path, state, expected/actual size, checksum where available, ETag/Last-Modified, partial bytes, retry metadata, and validation result. **Shelf** represents system status views or custom shelves, with optional verified remote binding. Download state is never used as reading status.
+
+**SmartShelfDefinition** stores an immutable identifier, user label, versioned predicate AST, validation state and optional verified remote binding. Its membership is derived from the current local catalog, never maintained as a manual membership list. **LibraryPresentationPreference** stores ordered/visible discovery sections, book-detail sections and quick actions, with versioned defaults and accessibility-safe required actions.
 
 **LibraryViewDefinition** stores query, filters, ordered sort keys, grouping keys, view mode, and scope. **LibraryViewPreference** stores per-view collapsed groups, display choices and last-used configuration. P0 persists standard views and selections; P1 adds user-named saved views, nested grouping, multi-key sorting and discovered custom-column operations.
 
@@ -207,6 +216,8 @@ enum ProviderAccess { unknown, unsupported, readOnly, writeOnly, readWrite }
 enum ProviderFeature {
   catalog, downloads, progress, readingStatus,
   shelves, bookmarks, annotations, customColumns,
+  remoteSmartShelves, remoteSmartShelfRules, archive,
+  metadataWrite, coverUpload, bookUpload,
 }
 
 abstract interface class LibraryProvider {
@@ -371,6 +382,55 @@ Treat local user-owned data as exportable independently of CWNG. Define a versio
 
 ## 18. Cross-document impacts (informational only)
 
-**SPEC.md:** No changes made. The implementation must honor v1.3 query composition, persistence, lifecycle, bookmark, conflict and accessibility acceptance criteria. Verify horizontal pagination priority against its latest text.
+**SPEC.md:** No changes made. The implementation must honor v1.5 query composition, persistence, lifecycle, bookmark, conflict and accessibility acceptance criteria. Verify horizontal pagination priority against its latest text.
 
 **IMPLEMENTATION.md:** No changes made. Add implementation/test work for G-01–G-17, including hostile EPUB security tests, asset revisions and journal recovery, renderer session generations, sync state-machine fault injection, large-library performance, storage pressure, E Ink measurements, diagnostics retention and export schema.  Its task breakdown should add library query engine/indexes, saved view persistence, custom-column discovery, status provenance, deletion flows, resumable downloads, conflict deferral and TalkBack EPUB tests. Align ADR references to ADR-001 (older plans mention ADR-004), mark renderer selection complete, and retain Reader Lab as the device-validation and release gate. Add Readest fork revision pinning and license/notice audit, Foliate-js asset build, bridge contract tests, WebView security and lifecycle tests, and memory/windowing investigations.
+
+
+## 19. SPEC.md v1.5 alignment — library discovery, smart shelves and offline collections
+
+This section extends the v2.6 baseline without changing the renderer, P0 requirements or release gates. All capabilities introduced by SPEC.md v1.5 are **P1** unless explicitly designated **P2 evaluation**. Calibre Web Companion is an external product/UX reference, not a codebase or verified CWNG API specification. Its GPL-3.0 code must not be copied or linked into the MIT application without a separately reviewed licensing decision.
+
+### 19.1 Typed discovery facets (LIB-039)
+
+Extend provider-neutral `MetadataFieldDescriptor` and local metadata storage with publisher, categories/tags and ratings, alongside existing author and series fields. A descriptor declares stable field identity, value type, provenance, multiplicity, supported local operators and provider availability; provider-specific raw field names are translated at the adapter boundary. Normalize publisher and tag associations into indexed relation tables; store rating scale and provenance explicitly so incompatible provider scales are not silently compared. A local `DiscoveryFacetRepository` supplies typed values, unique-book counts and stable navigation queries using the existing `LibraryQueryRepository`. A missing field is shown as unavailable or unknown, not represented as an exhaustive facet. Cached facets work offline; invalidate aggregates transactionally or by dataset revision on metadata/status changes.
+
+### 19.2 Smart-shelf model and evaluation (LIB-040, LIB-041)
+
+Preserve three distinct entities: `Shelf` with explicit manual membership; `LibraryViewDefinition` with saved query and presentation configuration; and `SmartShelfDefinition` with a versioned rule AST and **derived** membership. Reuse the typed local query engine and LIB-014 Boolean semantics: AND across dimensions and OR across values within a dimension. A rule contains stable field IDs, typed operators and values, a scope and schema version; validate on creation and every relevant metadata schema/capability change. Never deserialize arbitrary SQL or JavaScript from a rule. Evaluate rules locally through parameterized Drift queries, with indexed predicates and lazy paging. A smart shelf updates on local reading-status, availability, metadata and provider changes and remains usable offline.
+
+A missing custom column, unavailable provider binding or invalid operator puts the affected rule in `needsReview`/`unresolved` state. Preserve the original rule definition, display the unresolved clause and **do not silently drop that clause or broaden results**; an unresolved rule yields no authoritative membership until repaired (a separately labeled last-known snapshot may be displayed). Smart-shelf rules and cached membership projections are independently versioned; projections are rebuildable, not the source of truth. Do not confuse multi-valued facet membership with unique-book totals.
+
+Remote dynamic shelves are represented as separate provider-scoped bindings with explicit capabilities for listing definitions, reading membership and editing rules. Never infer remote write access from local support, nor translate a remote rule into an editable local AST unless its semantics are verified. Local smart shelves remain local unless a verified, compatible remote mapping exists. Archive is a separate provider concept; it is not mapped to `completed`, `abandoned` or another reading status without documented semantic equivalence.
+
+### 19.3 Batch and whole-library downloads (LIB-042, LIB-043)
+
+Build P1 batch acquisition on the existing validated `Download`/`BookAsset` lifecycle and bounded download queue. A `DownloadBatch` has an immutable UUID, creation time, selection origin (`explicit`, `shelf`, `filtered`, `wholeLibrary`), frozen ordered `(ProviderInstanceId, RemoteBookId)` identities, network policy, estimated size and uncertainty, lifecycle state and individual `DownloadJob` references. Snapshot membership at confirmation so subsequent filter/shelf changes do not silently expand a running batch. Duplicate jobs coalesce with existing downloads; previously validated assets are not re-fetched unless explicitly requested.
+
+Before queueing, display book count, estimated total bytes where known, an unknown-size warning where necessary, current free-space implications and the selected connection policy. Whole-library acquisition is **never** automatic upon provider connection and requires separate explicit confirmation. Use bounded concurrent transfers (existing default two), per-host fairness and durable per-item states (`queued`, `running`, `paused`, `completed`, `failed`, `cancelled`). Pause stops new scheduling and safely suspends active transfers; cancellation stops remaining jobs without deleting already validated EPUBs or reading state. Resume/retry checks content validators and file journal integrity before continuing. Storage exhaustion blocks affected jobs with actionable errors and preserves all readable assets. Aggregate progress must distinguish known-byte totals from indeterminate jobs; do not claim an exact percent when sizes are unknown. Background execution is opportunistic and must recover safely after process death; do not assume Android guarantees uninterrupted bulk transfer.
+
+### 19.4 Library presentation customization (LIB-044)
+
+Persist `LibraryPresentationPreference` per user/local profile with ordered section IDs, visibility flags, quick-action order and a versioned default-layout identifier. Apply customization to discovery and book-detail surfaces without changing underlying query or domain state. Essential operations (open/read, download state, reading status and accessible navigation) cannot become unreachable: hidden optional sections must not remove the only accessible route to a required action. On upgrades, merge newly introduced optional sections with existing preferences deterministically; retain unknown identifiers for possible later recovery. `RestoreDefaults` is a single local transactional operation and must not reset reading state, saved views or shelf rules. Maintain semantic labels, focus order and 48dp touch targets.
+
+### 19.5 Collection statistics (LIB-045)
+
+Implement `CollectionStatisticsRepository` over canonical local tables, not remote analytics endpoints. Expose typed aggregate queries for status, source, offline availability and available metadata facets, parameterized by explicit scope (`allCached` or a `LibraryQuery` snapshot). Count distinct `BookId` across multi-author/tag joins; do not sum overlapping group counts as if they were unique books. Return a dataset revision, last successful catalog refresh per provider and an `isPartial`/stale-data indicator where coverage is incomplete. Maintain or cache aggregates only when profiling demonstrates a need; invalidate on relevant catalog, download and reading-state transactions. Statistics remain available offline and must not imply the provider catalog is complete when only a subset was fetched.
+
+### 19.6 P2 extension boundaries (LIB-046–048, INT-001, SYN-020)
+
+Do not implement or promise these features as part of P0/P1 architecture commitments. Retain extension seams only:
+
+- **Metadata editing/cover upload:** future provider write contracts must negotiate permissions, per-field provenance, concurrency preconditions, payload validation and rollback/error disclosure; local metadata overrides are not implicit server edits.
+- **ISBN barcode scanning:** a future opt-in camera adapter yields a candidate identifier and requires explicit user confirmation before matching; no automatic merge or download.
+- **EPUB upload:** a future provider capability must validate authorization, duplicate identity, upload size/content and retry/idempotency semantics independently of the local file store.
+- **External eReader/email delivery:** a future explicit-consent delivery adapter must disclose external transfer of book content, credentials and privacy implications, and distinguish submitted from verified delivery.
+- **WebDAV state interoperability:** a future sync transport must implement the same provider-scoped identity, exact/approximate locator, durable outbox, revision/conflict and secure authentication contracts as CWNG. A WebDAV endpoint is not automatically a compatible reading-state provider.
+
+None of these seams authorizes GPL source reuse, mandatory third-party accounts, unverified remote writes or weakening offline-first behavior.
+
+### 19.7 Validation and cross-document impacts
+
+Architecture-level verification for P1 includes: mixed/unknown publisher/tag/rating facets; deterministic facet navigation offline; smart-shelf recomputation after status changes and process restart; missing-field rules that remain visible without broadening results; capability-gated remote smart shelves; a 100-book filtered batch with network interruption, low storage, safe pause/cancel and per-item retry; explicit whole-library confirmation; persistence/reset of customized sections; and distinct-book statistics across multi-valued metadata and stale cached catalogs.
+
+**SPEC.md:** No edits; v1.5 remains authoritative. **IMPLEMENTATION.md:** No edits; schedule LIB-039–LIB-045 as P1 work and LIB-046–LIB-048, INT-001 and SYN-020 as P2 evaluations, with the eight v1.5 scenarios. Retain all P0 Reader Lab, security, accessibility and offline-durability release gates. Resolve any existing implementation-plan ADR numbering and renderer-status drift separately.
