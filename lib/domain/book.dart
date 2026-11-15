@@ -18,6 +18,7 @@ class Book {
     this.coverPath,
     this.readingStatus = ReadingStatus.unread,
     this.readingStatusManual = false,
+    this.hiddenFromLibrary = false,
     this.locator,
     this.remoteIdentity,
     this.downloadState = DownloadState.notDownloaded,
@@ -41,6 +42,7 @@ class Book {
   final String? coverPath;
   final ReadingStatus readingStatus;
   final bool readingStatusManual;
+  final bool hiddenFromLibrary;
   final ReadingLocator? locator;
   final RemoteIdentity? remoteIdentity;
   final DownloadState downloadState;
@@ -69,6 +71,9 @@ class Book {
     String? coverPath,
     ReadingStatus? readingStatus,
     bool? readingStatusManual,
+    bool? hiddenFromLibrary,
+    bool clearLocalAsset = false,
+    bool clearReadingData = false,
     ReadingLocator? locator,
     RemoteIdentity? remoteIdentity,
     DownloadState? downloadState,
@@ -81,102 +86,113 @@ class Book {
     DateTime? lastReadAt,
     double? progressPercentage,
     MetadataProvenance? metadataProvenance,
-  }) =>
-      Book(
-        id: id,
-        title: title ?? this.title,
-        authors: authors ?? this.authors,
-        series: series ?? this.series,
-        seriesIndex: seriesIndex ?? this.seriesIndex,
-        description: description ?? this.description,
-        coverPath: coverPath ?? this.coverPath,
-        readingStatus: readingStatus ?? this.readingStatus,
-        readingStatusManual: readingStatusManual ?? this.readingStatusManual,
-        locator: locator ?? this.locator,
-        remoteIdentity: remoteIdentity ?? this.remoteIdentity,
-        downloadState: downloadState ?? this.downloadState,
-        localAssetId: localAssetId ?? this.localAssetId,
-        localAssetPath: localAssetPath ?? this.localAssetPath,
-        localAssetSha256: localAssetSha256 ?? this.localAssetSha256,
-        localAssetRevision: localAssetRevision ?? this.localAssetRevision,
-        shelfIds: shelfIds ?? this.shelfIds,
-        addedAt: addedAt ?? this.addedAt,
-        lastReadAt: lastReadAt ?? this.lastReadAt,
-        progressPercentage: progressPercentage ?? this.progressPercentage,
-        metadataProvenance: metadataProvenance ?? this.metadataProvenance,
-      );
+  }) => Book(
+    id: id,
+    title: title ?? this.title,
+    authors: authors ?? this.authors,
+    series: series ?? this.series,
+    seriesIndex: seriesIndex ?? this.seriesIndex,
+    description: description ?? this.description,
+    coverPath: coverPath ?? this.coverPath,
+    readingStatus: clearReadingData
+        ? ReadingStatus.unread
+        : (readingStatus ?? this.readingStatus),
+    readingStatusManual: clearReadingData
+        ? false
+        : (readingStatusManual ?? this.readingStatusManual),
+    hiddenFromLibrary: hiddenFromLibrary ?? this.hiddenFromLibrary,
+    locator: clearReadingData ? null : (locator ?? this.locator),
+    remoteIdentity: remoteIdentity ?? this.remoteIdentity,
+    downloadState: downloadState ?? this.downloadState,
+    localAssetId: clearLocalAsset ? null : (localAssetId ?? this.localAssetId),
+    localAssetPath: clearLocalAsset
+        ? null
+        : (localAssetPath ?? this.localAssetPath),
+    localAssetSha256: localAssetSha256 ?? this.localAssetSha256,
+    localAssetRevision: localAssetRevision ?? this.localAssetRevision,
+    shelfIds: shelfIds ?? this.shelfIds,
+    addedAt: addedAt ?? this.addedAt,
+    lastReadAt: clearReadingData ? null : (lastReadAt ?? this.lastReadAt),
+    progressPercentage: clearReadingData
+        ? null
+        : (progressPercentage ?? this.progressPercentage),
+    metadataProvenance: metadataProvenance ?? this.metadataProvenance,
+  );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id.toJson(),
-        'title': title,
-        'authors': authors,
-        'series': series,
-        'seriesIndex': seriesIndex,
-        'description': description,
-        'coverPath': coverPath,
-        'readingStatus': readingStatus.name,
-        'readingStatusManual': readingStatusManual,
-        'locator': locator?.toJson(),
-        'remoteIdentity': remoteIdentity?.toJson(),
-        'downloadState': downloadState.name,
-        'localAssetId': localAssetId?.toJson(),
-        'localAssetPath': localAssetPath,
-        'localAssetSha256': localAssetSha256,
-        'localAssetRevision': localAssetRevision,
-        'shelfIds': shelfIds.map((s) => s.toJson()).toList(),
-        'addedAt': addedAt?.toIso8601String(),
-        'lastReadAt': lastReadAt?.toIso8601String(),
-        'progressPercentage': progressPercentage,
-        'metadataProvenance': metadataProvenance.name,
-      };
+    'id': id.toJson(),
+    'title': title,
+    'authors': authors,
+    'series': series,
+    'seriesIndex': seriesIndex,
+    'description': description,
+    'coverPath': coverPath,
+    'readingStatus': readingStatus.name,
+    'readingStatusManual': readingStatusManual,
+    'hiddenFromLibrary': hiddenFromLibrary,
+    'locator': locator?.toJson(),
+    'remoteIdentity': remoteIdentity?.toJson(),
+    'downloadState': downloadState.name,
+    'localAssetId': localAssetId?.toJson(),
+    'localAssetPath': localAssetPath,
+    'localAssetSha256': localAssetSha256,
+    'localAssetRevision': localAssetRevision,
+    'shelfIds': shelfIds.map((s) => s.toJson()).toList(),
+    'addedAt': addedAt?.toIso8601String(),
+    'lastReadAt': lastReadAt?.toIso8601String(),
+    'progressPercentage': progressPercentage,
+    'metadataProvenance': metadataProvenance.name,
+  };
 
   factory Book.fromJson(Map<String, dynamic> json) => Book(
-        id: BookId.fromJson(json['id'] as Map<String, dynamic>),
-        title: json['title'] as String,
-        authors: (json['authors'] as List<dynamic>? ?? <dynamic>[])
-            .map((e) => e as String)
-            .toList(),
-        series: json['series'] as String?,
-        seriesIndex: (json['seriesIndex'] as num?)?.toDouble(),
-        description: json['description'] as String?,
-        coverPath: json['coverPath'] as String?,
-        readingStatus: ReadingStatus.values.firstWhere(
-          (s) => s.name == json['readingStatus'],
-          orElse: () => ReadingStatus.unread,
-        ),
-        readingStatusManual: json['readingStatusManual'] as bool? ?? false,
-        locator: json['locator'] == null
-            ? null
-            : ReadingLocator.fromJson(json['locator'] as Map<String, dynamic>),
-        remoteIdentity: json['remoteIdentity'] == null
-            ? null
-            : RemoteIdentity.fromJson(
-                json['remoteIdentity'] as Map<String, dynamic>),
-        downloadState: DownloadState.values.firstWhere(
-          (s) => s.name == json['downloadState'],
-          orElse: () => DownloadState.notDownloaded,
-        ),
-        localAssetId: json['localAssetId'] == null
-            ? null
-            : BookId.fromJson(json['localAssetId'] as Map<String, dynamic>),
-        localAssetPath: json['localAssetPath'] as String?,
-        localAssetSha256: json['localAssetSha256'] as String?,
-        localAssetRevision: (json['localAssetRevision'] as num?)?.toInt(),
-        shelfIds: (json['shelfIds'] as List<dynamic>? ?? <dynamic>[])
-            .map((e) => ShelfId.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        addedAt: json['addedAt'] == null
-            ? null
-            : DateTime.parse(json['addedAt'] as String),
-        lastReadAt: json['lastReadAt'] == null
-            ? null
-            : DateTime.parse(json['lastReadAt'] as String),
-        progressPercentage: (json['progressPercentage'] as num?)?.toDouble(),
-        metadataProvenance: MetadataProvenance.values.firstWhere(
-          (p) => p.name == json['metadataProvenance'],
-          orElse: () => MetadataProvenance.standard,
-        ),
-      );
+    id: BookId.fromJson(json['id'] as Map<String, dynamic>),
+    title: json['title'] as String,
+    authors: (json['authors'] as List<dynamic>? ?? <dynamic>[])
+        .map((e) => e as String)
+        .toList(),
+    series: json['series'] as String?,
+    seriesIndex: (json['seriesIndex'] as num?)?.toDouble(),
+    description: json['description'] as String?,
+    coverPath: json['coverPath'] as String?,
+    readingStatus: ReadingStatus.values.firstWhere(
+      (s) => s.name == json['readingStatus'],
+      orElse: () => ReadingStatus.unread,
+    ),
+    readingStatusManual: json['readingStatusManual'] as bool? ?? false,
+    hiddenFromLibrary: json['hiddenFromLibrary'] as bool? ?? false,
+    locator: json['locator'] == null
+        ? null
+        : ReadingLocator.fromJson(json['locator'] as Map<String, dynamic>),
+    remoteIdentity: json['remoteIdentity'] == null
+        ? null
+        : RemoteIdentity.fromJson(
+            json['remoteIdentity'] as Map<String, dynamic>,
+          ),
+    downloadState: DownloadState.values.firstWhere(
+      (s) => s.name == json['downloadState'],
+      orElse: () => DownloadState.notDownloaded,
+    ),
+    localAssetId: json['localAssetId'] == null
+        ? null
+        : BookId.fromJson(json['localAssetId'] as Map<String, dynamic>),
+    localAssetPath: json['localAssetPath'] as String?,
+    localAssetSha256: json['localAssetSha256'] as String?,
+    localAssetRevision: (json['localAssetRevision'] as num?)?.toInt(),
+    shelfIds: (json['shelfIds'] as List<dynamic>? ?? <dynamic>[])
+        .map((e) => ShelfId.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    addedAt: json['addedAt'] == null
+        ? null
+        : DateTime.parse(json['addedAt'] as String),
+    lastReadAt: json['lastReadAt'] == null
+        ? null
+        : DateTime.parse(json['lastReadAt'] as String),
+    progressPercentage: (json['progressPercentage'] as num?)?.toDouble(),
+    metadataProvenance: MetadataProvenance.values.firstWhere(
+      (p) => p.name == json['metadataProvenance'],
+      orElse: () => MetadataProvenance.standard,
+    ),
+  );
 
   @override
   bool operator ==(Object other) => other is Book && other.id == id;

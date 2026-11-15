@@ -10,6 +10,7 @@ import '../../domain/status.dart';
 import '../../library/epub_inspector.dart';
 import '../../library/library_service.dart';
 import '../reader/reader_page.dart';
+import 'book_removal.dart';
 
 class BookDetailsPage extends StatefulWidget {
   const BookDetailsPage({
@@ -62,14 +63,14 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   Future<void> _setStatus(ReadingStatus status) async {
     setState(() => _busy = true);
     try {
-      final Book updated = _book.copyWith(
-        readingStatus: status,
-        readingStatusManual: true,
-      );
-      await widget.library.store.save(updated);
-      await widget.library.store.upsertSearchIndex(updated);
+      final Book updated = await widget.library.setStatus(_book.id, status);
       if (mounted) setState(() => _book = updated);
       widget.onChanged?.call();
+    } catch (error) {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save status: $error')),
+        );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -81,8 +82,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       extensions: <String>['epub'],
       mimeTypes: <String>['application/epub+zip'],
     );
-    final XFile? picked =
-        await openFile(acceptedTypeGroups: <XTypeGroup>[epubGroup]);
+    final XFile? picked = await openFile(
+      acceptedTypeGroups: <XTypeGroup>[epubGroup],
+    );
     if (picked == null) return;
     setState(() => _busy = true);
     try {
@@ -93,9 +95,8 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       if (mounted) {
         setState(() => _book = updated);
         widget.onChanged?.call();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File relinked.')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('File relinked.')));
       }
     } on EpubValidationException catch (e) {
       if (mounted) {
@@ -105,70 +106,78 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Relink failed: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Relink failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
-  Future<void> _remove({required bool deleteAsset}) async {
-    final bool? ok = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Remove book?'),
-        content: Text(deleteAsset
-            ? 'Delete the book and its local file.'
-            : 'Remove the book from the library, keeping the file.'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
+  Future<void> _remove({required bool downloadOnly}) async {
     setState(() => _busy = true);
     try {
-      if (deleteAsset) {
-        for (final String? path in <String?>[_book.localAssetPath, _book.coverPath]) {
-          if (path == null) continue;
-          try {
-            final File f = File(path);
-            if (await f.exists()) await f.delete();
-          } catch (_) {}
-        }
+      if (!await confirmBookRemoval(
+        context,
+        widget.library,
+        _book,
+        downloadOnly: downloadOnly,
+      ))
+        return;
+      final updated = await widget.library.bookById(_book.id.value);
+      widget.onChanged?.call();
+      if (!mounted) return;
+      if (downloadOnly && updated != null) {
+        setState(() => _book = updated);
+      } else {
+        Navigator.of(context).pop();
       }
-      await widget.library.store.delete(_book.id);
-      if (mounted) Navigator.of(context).pop(true);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _open({ReadingLocator? locator}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReaderPage(
+          source: _book.localAssetPath!,
+          title: _book.title,
+          initialStatus: _book.readingStatus,
+          initialStatusManual: _book.readingStatusManual,
+          initialLocator: locator ?? _book.locator,
+          bookId: _book.id.value,
+          library: widget.library,
+          onFinished: () => _setStatus(ReadingStatus.completed),
+          onAddBookmark: (location) =>
+              widget.library.addBookmark(_book.id, location),
+        ),
+      ),
+    );
+    final updated = await widget.library.bookById(_book.id.value);
+    if (mounted && updated != null) setState(() => _book = updated);
+    await _loadBookmarks();
+    widget.onChanged?.call();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool missing = _book.localAssetPath != null &&
+    final bool missing =
+        _book.localAssetPath != null &&
         !File(_book.localAssetPath!).existsSync();
     return Scaffold(
       appBar: AppBar(
         title: Text(_book.title, overflow: TextOverflow.ellipsis),
         actions: <Widget>[
-          if (_busy) const Padding(
-            padding: EdgeInsets.all(12),
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+          if (_busy)
+            const Padding(
+              padding: EdgeInsets.all(12),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
-          ),
         ],
       ),
       body: ListView(
@@ -185,8 +194,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           const SizedBox(height: 12),
           Text(_book.title, style: Theme.of(context).textTheme.headlineSmall),
           if (_book.authors.isNotEmpty)
-            Text(_book.authors.join(', '),
-                style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              _book.authors.join(', '),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           if (_book.series != null)
             Text(
               _book.seriesIndex == null
@@ -195,16 +206,28 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
             ),
           const SizedBox(height: 12),
           _row('Status', _book.readingStatus.label),
+          _row(
+            'Status source',
+            _book.readingStatusManual
+                ? 'Manual · local only'
+                : 'Automatic/default · local only',
+          ),
           _row('Download', _book.downloadState.name),
-          _row('Source',
-              _book.remoteIdentity == null ? 'Local' : 'Remote (CWNG)'),
+          _row(
+            'Source',
+            _book.remoteIdentity == null ? 'Local' : 'Remote (CWNG)',
+          ),
           if (_book.progressPercentage != null)
             _row('Progress', '${(_book.progressPercentage! * 100).round()}%'),
           if (_book.addedAt != null)
             _row('Added', _book.addedAt!.toLocal().toString().split('.').first),
           if (_book.lastReadAt != null)
-            _row('Last read', _book.lastReadAt!.toLocal().toString().split('.').first),
-          if (_book.description != null && _book.description!.isNotEmpty) ...<Widget>[
+            _row(
+              'Last read',
+              _book.lastReadAt!.toLocal().toString().split('.').first,
+            ),
+          if (_book.description != null &&
+              _book.description!.isNotEmpty) ...<Widget>[
             const SizedBox(height: 12),
             Text('Description', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 4),
@@ -220,7 +243,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
           Text('Bookmarks', style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: 4),
           if (_bookmarks.isEmpty)
-            const Text('No bookmarks yet. Use the bookmark icon while reading.'),
+            const Text(
+              'No bookmarks yet. Use the bookmark icon while reading.',
+            ),
           for (final Bookmark bm in _bookmarks)
             ListTile(
               dense: true,
@@ -236,29 +261,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                   IconButton(
                     icon: const Icon(Icons.menu_book),
                     tooltip: 'Open at bookmark',
-                    onPressed: _book.localAssetPath == null
+                    onPressed: missing || _book.localAssetPath == null
                         ? null
-                        : () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => ReaderPage(
-                                  source: _book.localAssetPath!,
-                                  title: _book.title,
-                                  initialStatus: _book.readingStatus,
-                                  initialStatusManual: _book.readingStatusManual,
-                                  onFinished: () =>
-                                      _setStatus(ReadingStatus.completed),
-                                  onAddBookmark: (ReadingLocator locator) async {
-                                    await widget.library
-                                        .addBookmark(_book.id, locator);
-                                    await _loadBookmarks();
-                                  },
-                                  onProgress: (ReadingLocator locator) async {},
-                                  library: widget.library,
-                                ),
-                              ),
-                            );
-                          },
+                        : () => _open(locator: bm.locator),
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
@@ -278,27 +283,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.menu_book),
                 label: const Text('Open'),
-                onPressed: missing || _book.localAssetPath == null
+                onPressed: _busy || missing || _book.localAssetPath == null
                     ? null
-                    : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => ReaderPage(
-                              source: _book.localAssetPath!,
-                              title: _book.title,
-                              initialStatus: _book.readingStatus,
-                              initialStatusManual: _book.readingStatusManual,
-                              onFinished: () => _setStatus(ReadingStatus.completed),
-                              onAddBookmark: (ReadingLocator locator) async {
-                                await widget.library.addBookmark(_book.id, locator);
-                                await _loadBookmarks();
-                              },
-                            ),
-                          ),
-                        );
-                      },
+                    : () => _open(),
               ),
-              if (missing)
+              if (missing || _book.localAssetPath == null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.link),
                   label: const Text('Relink file'),
@@ -309,12 +298,12 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 onSelected: _setStatus,
                 itemBuilder: (BuildContext ctx) =>
                     <PopupMenuEntry<ReadingStatus>>[
-                  for (final ReadingStatus s in ReadingStatus.values)
-                    PopupMenuItem<ReadingStatus>(
-                      value: s,
-                      child: Text(s.label),
-                    ),
-                ],
+                      for (final ReadingStatus s in ReadingStatus.values)
+                        PopupMenuItem<ReadingStatus>(
+                          value: s,
+                          child: Text(s.label),
+                        ),
+                    ],
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Chip(label: Text('Change status')),
@@ -322,14 +311,16 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
               ),
               OutlinedButton.icon(
                 icon: const Icon(Icons.delete_outline),
-                label: const Text('Remove'),
-                onPressed: _busy ? null : () => _remove(deleteAsset: false),
+                label: const Text('Remove local import'),
+                onPressed: _busy || _book.remoteIdentity != null
+                    ? null
+                    : () => _remove(downloadOnly: false),
               ),
               if (_book.localAssetPath != null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.delete_forever),
-                  label: const Text('Delete file too'),
-                  onPressed: _busy ? null : () => _remove(deleteAsset: true),
+                  label: const Text('Remove download'),
+                  onPressed: _busy ? null : () => _remove(downloadOnly: true),
                 ),
             ],
           ),
@@ -346,8 +337,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         children: <Widget>[
           SizedBox(
             width: 96,
-            child: Text(label,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           Expanded(child: Text(value)),
         ],

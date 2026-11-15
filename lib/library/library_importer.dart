@@ -57,7 +57,11 @@ class LibraryImporter {
   static const int maxImportBytes = EpubInspector.maxArchiveBytes;
 
   /// Imports a file chosen through the system picker (SAF) or found on disk.
-  Future<ImportResult> importFile(File file, {String? originalName}) async {
+  Future<ImportResult> importFile(
+    File file, {
+    String? originalName,
+    bool restoreHidden = true,
+  }) async {
     final int length = await file.length();
     if (length > maxImportBytes) {
       throw const EpubValidationException(
@@ -69,16 +73,32 @@ class LibraryImporter {
     return importBytes(
       bytes,
       originalName: originalName ?? p.basename(file.path),
+      restoreHidden: restoreHidden,
     );
   }
 
   Future<ImportResult> importBytes(
     Uint8List bytes, {
     required String originalName,
+    bool restoreHidden = true,
   }) async {
     final String sha256 = _fingerprint(bytes);
-    final domain.Book? existing = await store.findByFingerprint(sha256);
+    domain.Book? existing = await store.findByFingerprint(sha256);
     if (existing != null) {
+      if (existing.hiddenFromLibrary && restoreHidden) {
+        existing = await store.update(
+          existing.id,
+          (b) => b.copyWith(hiddenFromLibrary: false),
+        );
+      }
+      if (existing.hiddenFromLibrary) {
+        return ImportResult(
+          outcome: ImportOutcome.duplicate,
+          book: existing,
+          metadata: await _inspectQuietly(existing, bytes),
+          message: 'Previously removed import.',
+        );
+      }
       final ImportResult? repaired = await _repairIfMissing(existing, bytes);
       if (repaired != null) return repaired;
       return ImportResult(
@@ -262,12 +282,16 @@ class LibraryImporter {
 
   String _fallbackTitle(String originalName) {
     final String withoutExtension = p.basenameWithoutExtension(originalName);
-    final String cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
+    final String cleaned = withoutExtension
+        .replaceAll(RegExp(r'[_-]+'), ' ')
+        .trim();
     return cleaned.isEmpty ? 'Untitled' : cleaned;
   }
 
   /// Replaces the on-disk asset of an existing book without changing its id.
-  Future<domain.Book> relink(domain.Book existing, Uint8List bytes, {
+  Future<domain.Book> relink(
+    domain.Book existing,
+    Uint8List bytes, {
     String originalName = 'book.epub',
   }) async {
     final EpubMetadata metadata = inspector.inspectBytes(bytes);
@@ -290,7 +314,9 @@ class LibraryImporter {
     }
 
     final domain.Book updated = existing.copyWith(
-      title: metadata.title.trim().isEmpty ? existing.title : metadata.title.trim(),
+      title: metadata.title.trim().isEmpty
+          ? existing.title
+          : metadata.title.trim(),
       authors: metadata.authors.isEmpty ? existing.authors : metadata.authors,
       series: metadata.series ?? existing.series,
       seriesIndex: metadata.seriesIndex ?? existing.seriesIndex,

@@ -5,25 +5,33 @@ import 'package:drift/drift.dart';
 class Books extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
-  TextColumn get authors => text().withDefault(const Constant('[]'))(); // JSON array
+  TextColumn get authors =>
+      text().withDefault(const Constant('[]'))(); // JSON array
   TextColumn get series => text().nullable()();
   RealColumn get seriesIndex => real().nullable()();
   TextColumn get description => text().nullable()();
   TextColumn get coverPath => text().nullable()();
-  TextColumn get readingStatus => text().withDefault(const Constant('unread'))();
-  BoolColumn get readingStatusManual => boolean().withDefault(const Constant(false))();
+  TextColumn get readingStatus =>
+      text().withDefault(const Constant('unread'))();
+  BoolColumn get readingStatusManual =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get hiddenFromLibrary =>
+      boolean().withDefault(const Constant(false))();
   TextColumn get locator => text().nullable()(); // JSON
   TextColumn get remoteProviderInstanceId => text().nullable()();
   TextColumn get remoteBookId => text().nullable()();
-  TextColumn get downloadState => text().withDefault(const Constant('notDownloaded'))();
+  TextColumn get downloadState =>
+      text().withDefault(const Constant('notDownloaded'))();
   TextColumn get localAssetPath => text().nullable()();
   TextColumn get localAssetSha256 => text().nullable()();
   IntColumn get localAssetRevision => integer().nullable()();
-  TextColumn get shelfIds => text().withDefault(const Constant('[]'))(); // JSON array
+  TextColumn get shelfIds =>
+      text().withDefault(const Constant('[]'))(); // JSON array
   DateTimeColumn get addedAt => dateTime().nullable()();
   DateTimeColumn get lastReadAt => dateTime().nullable()();
   RealColumn get progressPercentage => real().nullable()();
-  TextColumn get metadataProvenance => text().withDefault(const Constant('standard'))();
+  TextColumn get metadataProvenance =>
+      text().withDefault(const Constant('standard'))();
 
   @override
   Set<Column> get primaryKey => {id};

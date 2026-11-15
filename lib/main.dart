@@ -12,6 +12,8 @@ import 'domain/book.dart';
 import 'domain/locator.dart';
 import 'domain/status.dart';
 import 'features/library/book_details_page.dart';
+import 'features/library/book_removal.dart';
+import 'features/library/library_filters.dart';
 import 'features/reader/reader_page.dart';
 import 'library/epub_inspector.dart';
 import 'library/library_importer.dart';
@@ -40,7 +42,9 @@ class MiaLegiloApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.library});
+
+  final LibraryService? library;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -60,9 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
   DownloadProgress? _progress;
   List<Map<String, dynamic>> _savedViews = <Map<String, dynamic>>[];
   CancelToken? _cancelToken;
-  Timer? _progressTimer;
-  Book? _progressBook;
-  ReadingLocator? _pendingLocator;
+  int _queryGeneration = 0;
+  Future<void> _queryWrites = Future<void>.value();
+  bool _autoStartReading = true;
   bool _prefsLoaded = false;
 
   @override
@@ -74,36 +78,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _progressTimer?.cancel();
-    // Flush pending progress.
-    final LibraryService? library = _library;
-    final Book? b = _progressBook;
-    final ReadingLocator? loc = _pendingLocator;
-    if (library != null && b != null && loc != null) {
-      final Book updated = b.copyWith(
-        locator: loc,
-        progressPercentage: loc.percentage,
-        lastReadAt: DateTime.now(),
-      );
-      library.store.save(updated);
-      library.store.upsertSearchIndex(updated);
-    }
     _searchDebounce?.cancel();
     _searchController.dispose();
     _cancelToken?.cancel();
-    _library?.close();
+    if (widget.library == null) _library?.close();
     super.dispose();
   }
 
   void _onSearchChanged() {
     _searchDebounce?.cancel();
     _searchDebounce = Timer(const Duration(milliseconds: 250), () {
-      _updateQuery(_query.copyWith(
-        search: _searchController.text.trim().isEmpty
-            ? null
-            : _searchController.text.trim(),
-        clearSearch: _searchController.text.trim().isEmpty,
-      ));
+      _updateQuery(
+        _query.copyWith(
+          search: _searchController.text.trim().isEmpty
+              ? null
+              : _searchController.text.trim(),
+          clearSearch: _searchController.text.trim().isEmpty,
+        ),
+      );
     });
   }
 
@@ -113,10 +105,13 @@ class _HomeScreenState extends State<HomeScreen> {
       _error = null;
     });
     try {
-      final LibraryService library = _library ??= await LibraryService.open();
+      final LibraryService library = _library ??=
+          widget.library ?? await LibraryService.open();
       if (!_prefsLoaded) {
         _prefsLoaded = true;
-        final String? view = await library.store.readSetting('library.viewMode');
+        final String? view = await library.store.readSetting(
+          'library.viewMode',
+        );
         final String? sort = await library.store.readSetting('library.sort');
         final String? dir = await library.store.readSetting('library.sortDir');
         LibraryQuery q = _query;
@@ -138,10 +133,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 : LibrarySortDirection.ascending,
           );
         }
+        final raw = await library.store.readSetting('library.query');
+        if (raw != null)
+          q = LibraryQuery.fromJson(jsonDecode(raw) as Map<String, dynamic>);
         _query = q;
+        _searchController.removeListener(_onSearchChanged);
+        _searchController.text = q.search ?? '';
+        _searchController.addListener(_onSearchChanged);
+        _autoStartReading = await library.autoStartEnabled();
       }
       await _loadSavedViews();
-      final int adopted = await library.adoptDeviceShelf();
+      final int adopted = widget.library == null
+          ? await library.adoptDeviceShelf()
+          : 0;
       if (adopted > 0) {
         // ignore: avoid_print
         print('LibraryService: adopted $adopted file(s) from the device shelf');
@@ -162,29 +166,58 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _updateQuery(LibraryQuery next) async {
-    final LibraryService? library = _library;
+    final library = _library;
     setState(() => _query = next);
-    if (library != null) {
-      await library.store.writeSetting(
-        'library.viewMode',
-        next.viewMode == LibraryViewMode.grid ? 'grid' : 'list',
-      );
-      await library.store.writeSetting('library.sort', next.sort.name);
-      await library.store.writeSetting(
-        'library.sortDir',
-        next.direction == LibrarySortDirection.descending ? 'desc' : 'asc',
-      );
+    try {
+      if (library != null) {
+        _queryWrites = _queryWrites
+            .catchError((Object _) {})
+            .then(
+              (_) => library.store.writeSetting(
+                'library.query',
+                jsonEncode(next.toJson()),
+              ),
+            );
+        await _queryWrites;
+      }
+      if (mounted) await _runQuery();
+    } catch (error) {
+      if (mounted)
+        setState(() => _error = 'Could not save library preferences: $error');
     }
-    await _runQuery();
+  }
+
+  void _clearFilters() {
+    _searchDebounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.clear();
+    _searchController.addListener(_onSearchChanged);
+    _updateQuery(_query.clearFilters());
+  }
+
+  Future<void> _showFilters() async {
+    final library = _library;
+    if (library == null) return;
+    final books = await library.books();
+    if (!mounted) return;
+    final next = await showDialog<LibraryQuery>(
+      context: context,
+      builder: (_) => LibraryFilters(query: _query, books: books),
+    );
+    if (next != null && mounted) await _updateQuery(next);
   }
 
   Future<void> _runQuery() async {
     final LibraryService? library = _library;
     if (library == null) return;
-    setState(() => _loading = true);
+    final generation = ++_queryGeneration;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final List<Book> books = await library.store.query(_query);
-      if (!mounted) return;
+      if (!mounted || generation != _queryGeneration) return;
       setState(() {
         _books = books;
         _loading = false;
@@ -214,8 +247,6 @@ class _HomeScreenState extends State<HomeScreen> {
           initialLocator: book.locator,
           bookId: book.id.value,
           onFinished: () => _setStatus(book, ReadingStatus.completed),
-          onProgress: (ReadingLocator locator) async =>
-              _scheduleProgressSave(book, locator),
           onAddBookmark: (ReadingLocator locator) =>
               _library!.addBookmark(book.id, locator),
           library: _library,
@@ -225,142 +256,78 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) await _loadShelf();
   }
 
-  void _scheduleProgressSave(Book book, ReadingLocator locator) {
-    _progressBook = book;
-    _pendingLocator = locator;
-    _progressTimer?.cancel();
-    _progressTimer = Timer(const Duration(seconds: 2), () async {
-      final LibraryService? library = _library;
-      final Book? b = _progressBook;
-      final ReadingLocator? loc = _pendingLocator;
-      if (library == null || b == null || loc == null) return;
-      final Book updated = b.copyWith(
-        locator: loc,
-        progressPercentage: loc.percentage,
-        lastReadAt: DateTime.now(),
-        readingStatus: b.readingStatus == ReadingStatus.unread
-            ? ReadingStatus.reading
-            : b.readingStatus,
-        readingStatusManual: b.readingStatusManual,
-      );
-      // Do not override manual status.
-      final Book finalBook = b.readingStatusManual
-          ? updated.copyWith(readingStatus: b.readingStatus)
-          : updated;
-      await library.store.save(finalBook);
-      await library.store.upsertSearchIndex(finalBook);
-    });
-  }
-
   Future<void> _setStatus(Book book, ReadingStatus status) async {
-    final LibraryService? library = _library;
+    final library = _library;
     if (library == null) return;
-    final Book updated = book.copyWith(
-      readingStatus: status,
-      readingStatusManual: true,
-    );
-    await library.store.save(updated);
-    await library.store.upsertSearchIndex(updated);
-    if (mounted) await _loadShelf();
-  }
-
-  Future<void> _removeBook(Book book, {required bool deleteAsset}) async {
-    final LibraryService? library = _library;
-    if (library == null) return;
-    if (deleteAsset) {
-      for (final String? path in <String?>[book.localAssetPath, book.coverPath]) {
-        if (path == null) continue;
-        try {
-          final File f = File(path);
-          if (await f.exists()) await f.delete();
-        } catch (_) {
-          // Best effort; the DB row is removed regardless.
-        }
-      }
-    }
-    await library.store.delete(book.id);
-    if (mounted) {
-      setState(() => _message = 'Removed "${book.title}".');
-      await _loadShelf();
+    try {
+      await library.setStatus(book.id, status);
+      if (mounted) await _loadShelf();
+    } catch (error) {
+      if (mounted) setState(() => _error = 'Could not save status: $error');
     }
   }
 
   Future<void> _showBookActions(Book book) async {
-    final ReadingStatus? chosen = await showModalBottomSheet<ReadingStatus>(
+    final chosen = await showModalBottomSheet<String>(
       context: context,
-      builder: (BuildContext ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('View details'),
-              onTap: () {
-                Navigator.pop(ctx);
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BookDetailsPage(
-                      book: book,
-                      library: _library!,
-                      onChanged: _loadShelf,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const Divider(),
-            for (final ReadingStatus s in ReadingStatus.values)
+      builder: (ctx) => SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               ListTile(
-                leading: Icon(
-                  book.readingStatus == s ? Icons.check : Icons.circle_outlined,
-                ),
-                title: Text(s.label),
-                onTap: () => Navigator.pop(ctx, s),
+                leading: const Icon(Icons.info_outline),
+                title: const Text('View details'),
+                onTap: () => Navigator.pop(ctx, 'details'),
               ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: const Text('Remove from library…'),
-              onTap: () => Navigator.pop(ctx, null),
-            ),
-          ],
+              const Divider(),
+              for (final status in ReadingStatus.values)
+                ListTile(
+                  leading: Icon(
+                    book.readingStatus == status
+                        ? Icons.check
+                        : Icons.circle_outlined,
+                  ),
+                  title: Text(status.label),
+                  onTap: () => Navigator.pop(ctx, status.name),
+                ),
+              const Divider(),
+              if (book.localAssetPath != null)
+                ListTile(
+                  leading: const Icon(Icons.download_done),
+                  title: const Text('Remove download…'),
+                  onTap: () => Navigator.pop(ctx, 'download'),
+                ),
+              if (book.remoteIdentity == null)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline),
+                  title: const Text('Remove local import…'),
+                  onTap: () => Navigator.pop(ctx, 'import'),
+                ),
+            ],
+          ),
         ),
       ),
     );
-    if (!mounted) return;
-    if (chosen != null) {
-      await _setStatus(book, chosen);
-      return;
-    }
-    // Removal chosen.
-    final int? choice = await showDialog<int>(
-      context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Remove book?'),
-        content: const Text(
-          'Choose what to delete. The source file is never removed unless '
-          'you pick "Delete file too".',
+    if (!mounted || chosen == null) return;
+    if (chosen == 'details') {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => BookDetailsPage(book: book, library: _library!),
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 0),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 1),
-            child: const Text('Keep file'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 2),
-            child: const Text('Delete file too'),
-          ),
-        ],
-      ),
-    );
-    if (choice == 1) {
-      await _removeBook(book, deleteAsset: false);
-    } else if (choice == 2) {
-      await _removeBook(book, deleteAsset: true);
+      );
+      if (mounted) await _loadShelf();
+    } else if (chosen == 'download' || chosen == 'import') {
+      if (await confirmBookRemoval(
+        context,
+        _library!,
+        book,
+        downloadOnly: chosen == 'download',
+      )) {
+        if (mounted) await _loadShelf();
+      }
+    } else {
+      await _setStatus(book, ReadingStatus.values.byName(chosen));
     }
   }
 
@@ -371,8 +338,9 @@ class _HomeScreenState extends State<HomeScreen> {
       extensions: <String>['epub'],
       mimeTypes: <String>['application/epub+zip'],
     );
-    final XFile? picked =
-        await openFile(acceptedTypeGroups: <XTypeGroup>[epubGroup]);
+    final XFile? picked = await openFile(
+      acceptedTypeGroups: <XTypeGroup>[epubGroup],
+    );
     if (picked == null) return;
 
     final LibraryService library = _library ??= await LibraryService.open();
@@ -384,7 +352,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final int length = await picked.length();
       if (length > LibraryImporter.maxImportBytes) {
-        setState(() => _error = 'The file is larger than the 512 MB import limit.');
+        setState(
+          () => _error = 'The file is larger than the 512 MB import limit.',
+        );
       } else {
         final ImportResult result = await library.importBytes(
           await picked.readAsBytes(),
@@ -543,66 +513,18 @@ class _HomeScreenState extends State<HomeScreen> {
     c.dispose();
     if (name == null || name.isEmpty) return;
     _savedViews.removeWhere((Map<String, dynamic> v) => v['name'] == name);
-    _savedViews.add(<String, dynamic>{
-      'name': name,
-      'search': _query.search,
-      'sort': _query.sort.name,
-      'direction': _query.direction.name,
-      'viewMode': _query.viewMode.name,
-      'groupBy': _query.groupBy.name,
-      'sourceFilter': _query.sourceFilter.name,
-      'availabilityFilter': _query.availabilityFilter.name,
-      'statuses': _query.statuses.map((ReadingStatus s) => s.name).toList(),
-    });
+    _savedViews.add(<String, dynamic>{'name': name, ..._query.toJson()});
     await _persistSavedViews();
     if (mounted) setState(() {});
   }
 
-  void _applySavedView(Map<String, dynamic> v) {
-    LibrarySortKey sort = LibrarySortKey.title;
-    for (final LibrarySortKey k in LibrarySortKey.values) {
-      if (k.name == v['sort']) sort = k;
-    }
-    LibrarySortDirection dir = LibrarySortDirection.ascending;
-    if (v['direction'] == 'descending') dir = LibrarySortDirection.descending;
-    LibraryViewMode view = LibraryViewMode.list;
-    if (v['viewMode'] == 'grid') view = LibraryViewMode.grid;
-    LibraryGroupBy group = LibraryGroupBy.none;
-    for (final LibraryGroupBy g in LibraryGroupBy.values) {
-      if (g.name == v['groupBy']) group = g;
-    }
-    LibrarySourceFilter source = LibrarySourceFilter.all;
-    for (final LibrarySourceFilter f in LibrarySourceFilter.values) {
-      if (f.name == v['sourceFilter']) source = f;
-    }
-    LibraryAvailabilityFilter avail = LibraryAvailabilityFilter.all;
-    for (final LibraryAvailabilityFilter f in LibraryAvailabilityFilter.values) {
-      if (f.name == v['availabilityFilter']) avail = f;
-    }
-    final Set<ReadingStatus> statuses = <ReadingStatus>{};
-    final dynamic rawStatuses = v['statuses'];
-    if (rawStatuses is List) {
-      for (final dynamic s in rawStatuses) {
-        for (final ReadingStatus rs in ReadingStatus.values) {
-          if (rs.name == s) statuses.add(rs);
-        }
-      }
-    }
-    _updateQuery(LibraryQuery(
-      search: v['search'] as String?,
-      sort: sort,
-      direction: dir,
-      viewMode: view,
-      groupBy: group,
-      sourceFilter: source,
-      availabilityFilter: avail,
-      statuses: statuses,
-    ));
-    if (v['search'] != null) {
-      _searchController.text = v['search'] as String;
-    } else {
-      _searchController.clear();
-    }
+  void _applySavedView(Map<String, dynamic> value) {
+    final next = LibraryQuery.fromJson(value);
+    _searchDebounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.text = next.search ?? '';
+    _searchController.addListener(_onSearchChanged);
+    _updateQuery(next);
   }
 
   Future<void> _deleteSavedView(String name) async {
@@ -612,25 +534,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _groupLabel(LibraryGroupBy g) => switch (g) {
-        LibraryGroupBy.none => 'None',
-        LibraryGroupBy.author => 'Author',
-        LibraryGroupBy.series => 'Series',
-        LibraryGroupBy.status => 'Status',
-        LibraryGroupBy.source => 'Source',
-        LibraryGroupBy.availability => 'Availability',
-      };
+    LibraryGroupBy.none => 'None',
+    LibraryGroupBy.author => 'Author',
+    LibraryGroupBy.series => 'Series',
+    LibraryGroupBy.status => 'Status',
+    LibraryGroupBy.source => 'Source',
+    LibraryGroupBy.availability => 'Availability',
+  };
 
   String _sourceLabel(LibrarySourceFilter f) => switch (f) {
-        LibrarySourceFilter.all => 'All',
-        LibrarySourceFilter.local => 'Local',
-        LibrarySourceFilter.remote => 'Remote',
-      };
+    LibrarySourceFilter.all => 'All',
+    LibrarySourceFilter.local => 'Local',
+    LibrarySourceFilter.remote => 'Remote',
+  };
 
   String _availLabel(LibraryAvailabilityFilter f) => switch (f) {
-        LibraryAvailabilityFilter.all => 'All',
-        LibraryAvailabilityFilter.available => 'Available',
-        LibraryAvailabilityFilter.missing => 'Missing',
-      };
+    LibraryAvailabilityFilter.all => 'All',
+    LibraryAvailabilityFilter.available => 'Available',
+    LibraryAvailabilityFilter.missing => 'Missing',
+  };
 
   LibrarySortKey? _sortKeyByName(String name) {
     for (final LibrarySortKey k in LibrarySortKey.values) {
@@ -700,6 +622,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(_message!),
                 ),
               ),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.filter_list),
+                  label: Text(
+                    'Filters (${_query.authors.length + _query.series.length + _query.shelfIds.length})',
+                  ),
+                  onPressed: _showFilters,
+                ),
+                if (_query.hasFilters)
+                  TextButton(
+                    onPressed: _clearFilters,
+                    child: const Text('Clear filters'),
+                  ),
+              ],
+            ),
+            SwitchListTile(
+              title: const Text('Automatically mark as Reading'),
+              subtitle: const Text(
+                'On reading activity; manual statuses always take precedence.',
+              ),
+              value: _autoStartReading,
+              onChanged: (value) async {
+                try {
+                  await _library?.store.writeSetting(
+                    'library.autoStartReading',
+                    value.toString(),
+                  );
+                  if (mounted) setState(() => _autoStartReading = value);
+                } catch (error) {
+                  if (mounted)
+                    setState(
+                      () => _error = 'Could not save preference: $error',
+                    );
+                }
+              },
+            ),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -722,18 +681,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   ChoiceChip(
                     label: const Text('All'),
                     selected: _query.statuses.isEmpty,
-                    onSelected: (_) =>
-                        _updateQuery(_query.copyWith(statuses: <ReadingStatus>{})),
+                    onSelected: (_) => _updateQuery(
+                      _query.copyWith(statuses: <ReadingStatus>{}),
+                    ),
                   ),
                   for (final ReadingStatus s in ReadingStatus.values)
                     Padding(
                       padding: const EdgeInsets.only(left: 8),
-                      child: ChoiceChip(
+                      child: FilterChip(
                         label: Text(s.label),
                         selected: _query.statuses.contains(s),
-                        onSelected: (bool v) => _updateQuery(_query.copyWith(
-                          statuses: v ? <ReadingStatus>{s} : <ReadingStatus>{},
-                        )),
+                        onSelected: (bool v) => _updateQuery(
+                          _query.copyWith(
+                            statuses: v
+                                ? {..._query.statuses, s}
+                                : ({..._query.statuses}..remove(s)),
+                          ),
+                        ),
                       ),
                     ),
                 ],
@@ -764,14 +728,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: _query.sourceFilter,
                     isExpanded: true,
                     items: <DropdownMenuItem<LibrarySourceFilter>>[
-                      for (final LibrarySourceFilter f in LibrarySourceFilter.values)
+                      for (final LibrarySourceFilter f
+                          in LibrarySourceFilter.values)
                         DropdownMenuItem<LibrarySourceFilter>(
                           value: f,
                           child: Text('Source: ${_sourceLabel(f)}'),
                         ),
                     ],
                     onChanged: (LibrarySourceFilter? f) {
-                      if (f != null) _updateQuery(_query.copyWith(sourceFilter: f));
+                      if (f != null)
+                        _updateQuery(_query.copyWith(sourceFilter: f));
                     },
                   ),
                 ),
@@ -781,14 +747,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: _query.availabilityFilter,
                     isExpanded: true,
                     items: <DropdownMenuItem<LibraryAvailabilityFilter>>[
-                      for (final LibraryAvailabilityFilter f in LibraryAvailabilityFilter.values)
+                      for (final LibraryAvailabilityFilter f
+                          in LibraryAvailabilityFilter.values)
                         DropdownMenuItem<LibraryAvailabilityFilter>(
                           value: f,
                           child: Text('Files: ${_availLabel(f)}'),
                         ),
                     ],
                     onChanged: (LibraryAvailabilityFilter? f) {
-                      if (f != null) _updateQuery(_query.copyWith(availabilityFilter: f));
+                      if (f != null)
+                        _updateQuery(_query.copyWith(availabilityFilter: f));
                     },
                   ),
                 ),
@@ -803,11 +771,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     value: null,
                     isExpanded: true,
                     items: _savedViews
-                        .map((Map<String, dynamic> v) =>
-                            DropdownMenuItem<String>(
-                              value: v['name'] as String,
-                              child: Text(v['name'] as String),
-                            ))
+                        .map(
+                          (Map<String, dynamic> v) => DropdownMenuItem<String>(
+                            value: v['name'] as String,
+                            child: Text(v['name'] as String),
+                          ),
+                        )
                         .toList(),
                     onChanged: (String? name) {
                       if (name == null) return;
@@ -831,8 +800,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     tooltip: 'Delete a saved view',
                     icon: const Icon(Icons.delete_outline),
                     onSelected: _deleteSavedView,
-                    itemBuilder: (BuildContext ctx) =>
-                        <PopupMenuEntry<String>>[
+                    itemBuilder: (BuildContext ctx) => <PopupMenuEntry<String>>[
                       for (final Map<String, dynamic> v in _savedViews)
                         PopupMenuItem<String>(
                           value: v['name'] as String,
@@ -847,7 +815,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    'On this device · ${_books.length} book(s)',
+                    'Library · ${_books.length} book(s)',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
@@ -856,33 +824,45 @@ class _HomeScreenState extends State<HomeScreen> {
                   direction: _query.direction,
                   onChanged: (LibrarySortKey key) =>
                       _updateQuery(_query.copyWith(sort: key)),
-                  onToggleDirection: () => _updateQuery(_query.copyWith(
-                    direction: _query.direction == LibrarySortDirection.ascending
-                        ? LibrarySortDirection.descending
-                        : LibrarySortDirection.ascending,
-                  )),
+                  onToggleDirection: () => _updateQuery(
+                    _query.copyWith(
+                      direction:
+                          _query.direction == LibrarySortDirection.ascending
+                          ? LibrarySortDirection.descending
+                          : LibrarySortDirection.ascending,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 4),
                 IconButton(
-                  icon: Icon(_query.viewMode == LibraryViewMode.grid
-                      ? Icons.view_list
-                      : Icons.grid_view),
+                  icon: Icon(
+                    _query.viewMode == LibraryViewMode.grid
+                        ? Icons.view_list
+                        : Icons.grid_view,
+                  ),
                   tooltip: _query.viewMode == LibraryViewMode.grid
                       ? 'Switch to list'
                       : 'Switch to grid',
-                  onPressed: () => _updateQuery(_query.copyWith(
-                    viewMode: _query.viewMode == LibraryViewMode.grid
-                        ? LibraryViewMode.list
-                        : LibraryViewMode.grid,
-                  )),
+                  onPressed: () => _updateQuery(
+                    _query.copyWith(
+                      viewMode: _query.viewMode == LibraryViewMode.grid
+                          ? LibraryViewMode.list
+                          : LibraryViewMode.grid,
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            if (!_loading && _books.isEmpty)
-              _EmptyState(
-                path: _library?.importer.booksDirectory.path ?? '',
+            if (!_loading && _books.isEmpty && _query.hasFilters)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'No books match these filters. Clear filters to see your library.',
+                ),
               ),
+            if (!_loading && _books.isEmpty && !_query.hasFilters)
+              _EmptyState(path: _library?.importer.booksDirectory.path ?? ''),
             if (_books.isNotEmpty)
               _GroupedBooks(
                 books: _books,
@@ -931,20 +911,22 @@ class _SortMenu extends StatelessWidget {
           onSelected: onChanged,
           itemBuilder: (BuildContext ctx) => <PopupMenuEntry<LibrarySortKey>>[
             for (final LibrarySortKey k in LibrarySortKey.values)
-              PopupMenuItem<LibrarySortKey>(
-                value: k,
-                child: Text(_label(k)),
-              ),
+              PopupMenuItem<LibrarySortKey>(value: k, child: Text(_label(k))),
           ],
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(_label(value), style: Theme.of(context).textTheme.labelLarge),
+            child: Text(
+              _label(value),
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
         ),
         IconButton(
-          icon: Icon(direction == LibrarySortDirection.ascending
-              ? Icons.arrow_upward
-              : Icons.arrow_downward),
+          icon: Icon(
+            direction == LibrarySortDirection.ascending
+                ? Icons.arrow_upward
+                : Icons.arrow_downward,
+          ),
           tooltip: 'Toggle sort direction',
           onPressed: onToggleDirection,
         ),
@@ -953,13 +935,14 @@ class _SortMenu extends StatelessWidget {
   }
 
   String _label(LibrarySortKey key) => switch (key) {
-        LibrarySortKey.title => 'Title',
-        LibrarySortKey.author => 'Author',
-        LibrarySortKey.added => 'Added',
-        LibrarySortKey.lastRead => 'Last read',
-        LibrarySortKey.series => 'Series',
-        LibrarySortKey.progress => 'Progress',
-      };
+    LibrarySortKey.title => 'Title',
+    LibrarySortKey.author => 'Author',
+    LibrarySortKey.added => 'Added',
+    LibrarySortKey.lastRead => 'Last read',
+    LibrarySortKey.series => 'Series',
+    LibrarySortKey.progress => 'Progress',
+    LibrarySortKey.status => 'Status',
+  };
 }
 
 class _EmptyState extends StatelessWidget {
@@ -1003,39 +986,36 @@ class _GroupedBooks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<MapEntry<String, List<Book>>> sections =
-        groupBooks(books, groupBy);
+    final List<MapEntry<String, List<Book>>> sections = groupBooks(
+      books,
+      groupBy,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: sections.map((MapEntry<String, List<Book>> section) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (groupBy != LibraryGroupBy.none)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  '${section.key} (${section.value.length})',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-            viewMode == LibraryViewMode.grid
-                ? _BookGrid(
-                    books: section.value,
-                    onOpen: onOpen,
-                    onLongPress: onLongPress,
-                  )
-                : _BookList(
-                    books: section.value,
-                    onOpen: onOpen,
-                    onLongPress: onLongPress,
-                  ),
-          ],
+        final content = viewMode == LibraryViewMode.grid
+            ? _BookGrid(
+                books: section.value,
+                onOpen: onOpen,
+                onLongPress: onLongPress,
+              )
+            : _BookList(
+                books: section.value,
+                onOpen: onOpen,
+                onLongPress: onLongPress,
+              );
+        if (groupBy == LibraryGroupBy.none) return content;
+        return ExpansionTile(
+          key: PageStorageKey('${groupBy.name}:${section.key}'),
+          initiallyExpanded: true,
+          title: Text('${section.key} (${section.value.length})'),
+          children: [content],
         );
       }).toList(),
     );
   }
 }
+
 class _BookList extends StatelessWidget {
   const _BookList({
     required this.books,
@@ -1051,27 +1031,29 @@ class _BookList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: books
-          .map((Book book) => Card(
-                child: ListTile(
-                  leading: _cover(book),
-                  title: Text(book.title),
-                  subtitle: Text(_subtitle(book)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      if (book.progressPercentage != null)
-                        Text('${(book.progressPercentage! * 100).round()}%'),
-                      IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        tooltip: 'Book actions',
-                        onPressed: () => onLongPress(book),
-                      ),
-                    ],
-                  ),
-                  onTap: () => onOpen(book),
-                  onLongPress: () => onLongPress(book),
+          .map(
+            (Book book) => Card(
+              child: ListTile(
+                leading: _cover(book),
+                title: Text(book.title),
+                subtitle: Text(_subtitle(book)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (book.progressPercentage != null)
+                      Text('${(book.progressPercentage! * 100).round()}%'),
+                    IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      tooltip: 'Book actions',
+                      onPressed: () => onLongPress(book),
+                    ),
+                  ],
                 ),
-              ))
+                onTap: () => onOpen(book),
+                onLongPress: () => onLongPress(book),
+              ),
+            ),
+          )
           .toList(),
     );
   }
@@ -1154,16 +1136,12 @@ class _BookGrid extends StatelessWidget {
 Widget _cover(Book book, {bool fill = false}) {
   final String? cover = book.coverPath;
   if (cover == null) {
-    final Widget icon = Icon(Icons.menu_book_outlined,
-        size: fill ? 48 : null);
-    return fill
-        ? Center(child: icon)
-        : icon;
+    final Widget icon = Icon(Icons.menu_book_outlined, size: fill ? 48 : null);
+    return fill ? Center(child: icon) : icon;
   }
   final File file = File(cover);
   if (!file.existsSync()) {
-    final Widget icon = Icon(Icons.menu_book_outlined,
-        size: fill ? 48 : null);
+    final Widget icon = Icon(Icons.menu_book_outlined, size: fill ? 48 : null);
     return fill ? Center(child: icon) : icon;
   }
   return Image.file(
@@ -1178,9 +1156,11 @@ String _subtitle(Book book) {
   final List<String> parts = <String>[];
   if (book.authors.isNotEmpty) parts.add(book.authors.join(', '));
   if (book.series != null) {
-    parts.add(book.seriesIndex == null
-        ? book.series!
-        : '${book.series!} #${book.seriesIndex}');
+    parts.add(
+      book.seriesIndex == null
+          ? book.series!
+          : '${book.series!} #${book.seriesIndex}',
+    );
   }
   if (parts.isEmpty) {
     final String? path = book.localAssetPath;
