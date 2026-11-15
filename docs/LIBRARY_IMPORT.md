@@ -110,7 +110,7 @@ Emulator-5554, debug APK built from this tree:
   `application/epub+zip`.
 - **Add from URL** → validated resumable download with progress and cancel.
 - Shelf reads from the Drift database; cover thumbnails are shown when present.
-- Files dropped into `Android/data/com.knatz.mia_legilo/files/books` are adopted
+- Files dropped into `Android/data/dev.knatz.mia_legilo/files/books` are adopted
   on refresh. This is a development convenience, not the production path.
 
 ## Known limits
@@ -121,3 +121,4 @@ Emulator-5554, debug APK built from this tree:
 - Shelf adoption re-hashes every file on refresh; large development shelves
   will be slow until the `DATA-002` journal records path + size + mtime.
 - Reading position is not yet persisted per book (`LIB-008`).
+

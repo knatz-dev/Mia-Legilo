@@ -254,6 +254,7 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                                     await _loadBookmarks();
                                   },
                                   onProgress: (ReadingLocator locator) async {},
+                                  library: widget.library,
                                 ),
                               ),
                             );

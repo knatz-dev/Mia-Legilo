@@ -146,16 +146,27 @@
       },
       next: () => view.renderer.next(),
       prev: () => view.renderer.prev(),
-      setTypography: ({ fontSize, lineHeight }) => {
+      setTypography: ({ fontSize, lineHeight, margin }) => {
+        if (margin != null) {
+          view.renderer.setAttribute('margin-top', margin + 'px');
+          view.renderer.setAttribute('margin-bottom', margin + 'px');
+          view.renderer.setAttribute('margin-left', margin + 'px');
+          view.renderer.setAttribute('margin-right', margin + 'px');
+        }
         view.renderer.setStyles?.(`${BOOK_CSS}
-          body { font-size: ${fontSize ?? 1}em; }
-          p, li, blockquote, dd { line-height: ${lineHeight ?? 1.5}; }
+          body { font-size: ${fontSize ?? 18}px; }
+          p, li, blockquote, dd { line-height: ${lineHeight ?? 1.6}; }
         `);
       },
       setTheme: (theme) => {
         const dark = theme === 'dark';
-        document.documentElement.style.background = dark ? '#121212' : '#fdfbf7';
-        document.body.style.background = dark ? '#121212' : '#fdfbf7';
+        const sepia = theme === 'sepia';
+        const bg = dark ? '#121212' : (sepia ? '#f4ecd8' : '#fdfbf7');
+        const fg = dark ? '#e8e8e8' : (sepia ? '#5b4636' : '#1b1b1b');
+        document.documentElement.style.background = bg;
+        document.documentElement.style.color = fg;
+        document.body.style.background = bg;
+        document.body.style.color = fg;
       },
     };
 

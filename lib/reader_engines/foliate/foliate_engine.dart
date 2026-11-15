@@ -136,6 +136,39 @@ class FoliateEngine implements ReaderEngine {
     );
   }
 
+  /// Returns the table of contents exposed by foliate's book model.
+  Future<List<Map<String, dynamic>>> getToc() async {
+    try {
+      final Object result = await _controller.runJavaScriptReturningResult(
+        'JSON.stringify((globalThis.reader && globalThis.reader.book && globalThis.reader.book.toc) || [])',
+      );
+      final String raw = result is String ? result : result.toString();
+      final dynamic decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((Map m) => Map<String, dynamic>.from(m))
+            .toList();
+      }
+    } catch (_) {}
+    return <Map<String, dynamic>>[];
+  }
+
+  /// Navigates to an EPUB href (used by TOC entries and internal links).
+  Future<void> goToHref(String href) async {
+    await _controller.runJavaScript('''
+      (function() {
+        try {
+          if (globalThis.view && typeof globalThis.view.goTo === 'function') {
+            globalThis.view.goTo(${jsonEncode(href)});
+          } else if (globalThis.reader && typeof globalThis.reader.goTo === 'function') {
+            globalThis.reader.goTo(${jsonEncode(href)});
+          }
+        } catch (e) {}
+      })();
+    ''');
+  }
+
   @override
   Future<void> addBookmark() async {
     await _controller.runJavaScript(

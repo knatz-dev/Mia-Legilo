@@ -211,11 +211,14 @@ class _HomeScreenState extends State<HomeScreen> {
           title: book.title,
           initialStatus: book.readingStatus,
           initialStatusManual: book.readingStatusManual,
+          initialLocator: book.locator,
+          bookId: book.id.value,
           onFinished: () => _setStatus(book, ReadingStatus.completed),
           onProgress: (ReadingLocator locator) async =>
               _scheduleProgressSave(book, locator),
           onAddBookmark: (ReadingLocator locator) =>
               _library!.addBookmark(book.id, locator),
+          library: _library,
         ),
       ),
     );

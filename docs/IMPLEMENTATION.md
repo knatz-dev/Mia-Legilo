@@ -228,6 +228,9 @@ Record future updates as: `date | task ID | status | PR/commit | evidence | bloc
 
 ## 11. Architecture v2.7 gap-closure backlog
 | 2026-11-15 | Bookmarks | done | uncommitted | Bookmarks: Annotations table-backed store (Drift + memory), ReaderPage 'Add bookmark' captures locator, BookDetailsPage lists bookmarks with open-at/delete, LibraryService bookmark API. lutter analyze clean; 60/60 tests. Device-verified: details page. | Commit. |
+| 2026-11-15 | RDR-001..RDR-004 | done | uncommitted | Phase 4 Iter 0: production reader settings (typography/theme/layout) persisted in Settings, settings sheet UI, layout toggle persists, ReaderSettings model. lutter analyze clean; 60/60 tests. Device-verified: app launched. | Iteration 1: TOC, in-book search, internal links. |
+| 2026-11-15 | RDR-005/RDR-006/RDR-007 | done | uncommitted | Phase 4 Iter 1: TOC extraction via foliate book.toc, drawer navigation (goTo href), in-book search dialog, internal links handled by renderer. Device-verified: TOC drawer listed Cover/Title Page/Feedbooks/Chapter; tap navigated. lutter analyze clean; 60/60 tests. | Iteration 2: resume, bookmarks, progress. |
+| 2026-11-15 | Reader settings fix | done | uncommitted | Fixed typography: font-size now in px (was em causing 18x text), margin applied, sepia theme, slider labels. lutter analyze clean; 60/60 tests. Device build installed. | None. |
 
 These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TODO** unless verified evidence is subsequently recorded; architecture decisions do not imply implementation completion.
 
@@ -278,3 +281,4 @@ These tasks implement architecture G-01–G-17 and SPEC.md v1.5. All remain **TO
 ## 12. Cross-document alignment
 
 `SPEC.md` v1.5 is authoritative for product priorities: horizontal pagination remains **P0 if offered**, while mandatory vertical mode may never be weakened. P1 discovery/smart-shelf/batch-download functionality does not enter the v1 P0 gate. `ARCHITECTURE.md` v2.7 is authoritative for technical contracts and ADR-001. This plan tracks engineering work and evidence only; no edits to either source document are implied.
+
