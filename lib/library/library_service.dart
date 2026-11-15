@@ -10,8 +10,10 @@ import '../core/clock.dart';
 import '../data/app_database.dart' as data;
 import '../data/book_store.dart';
 import '../data/database_factory.dart';
+import '../domain/annotation.dart';
 import '../domain/book.dart';
 import '../domain/ids.dart';
+import '../domain/locator.dart';
 import 'library_importer.dart';
 import 'library_store.dart';
 import 'resumable_downloader.dart';
@@ -63,6 +65,24 @@ class LibraryService {
 
   Future<ImportResult> importFile(File file, {String? originalName}) async =>
       importer.importFile(file, originalName: originalName);
+
+  Future<Book> relinkBook(Book book, File file) async =>
+      importer.relink(book, await file.readAsBytes(), originalName: p.basename(file.path));
+
+  Future<Book> ensureCover(Book book) => importer.ensureCover(book);
+
+  Future<List<Bookmark>> bookmarksFor(BookId id) => store.bookmarksFor(id);
+
+  Future<void> addBookmark(BookId bookId, ReadingLocator locator, {String? label}) =>
+      store.saveBookmark(Bookmark(
+        id: AnnotationId('bm-${DateTime.now().microsecondsSinceEpoch}'),
+        bookId: bookId,
+        locator: locator,
+        label: label,
+        createdAt: DateTime.now(),
+      ));
+
+  Future<void> deleteBookmark(AnnotationId id) => store.deleteBookmark(id);
 
   Future<ImportResult> importBytes(List<int> bytes, {required String name}) async =>
       importer.importBytes(

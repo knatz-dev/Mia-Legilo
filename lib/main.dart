@@ -1,15 +1,21 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
 import 'domain/book.dart';
+import 'domain/locator.dart';
+import 'domain/status.dart';
+import 'features/library/book_details_page.dart';
 import 'features/reader/reader_page.dart';
 import 'library/epub_inspector.dart';
 import 'library/library_importer.dart';
+import 'library/library_query.dart';
 import 'library/library_service.dart';
 import 'library/resumable_downloader.dart';
 
@@ -41,29 +47,64 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
 
   LibraryService? _library;
   List<Book> _books = <Book>[];
+  LibraryQuery _query = const LibraryQuery();
   String? _error;
   String? _message;
   bool _loading = true;
   bool _importing = false;
   DownloadProgress? _progress;
+  List<Map<String, dynamic>> _savedViews = <Map<String, dynamic>>[];
   CancelToken? _cancelToken;
+  Timer? _progressTimer;
+  Book? _progressBook;
+  ReadingLocator? _pendingLocator;
+  bool _prefsLoaded = false;
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_onSearchChanged);
     _loadShelf();
   }
 
   @override
   void dispose() {
-    _urlController.dispose();
+    _progressTimer?.cancel();
+    // Flush pending progress.
+    final LibraryService? library = _library;
+    final Book? b = _progressBook;
+    final ReadingLocator? loc = _pendingLocator;
+    if (library != null && b != null && loc != null) {
+      final Book updated = b.copyWith(
+        locator: loc,
+        progressPercentage: loc.percentage,
+        lastReadAt: DateTime.now(),
+      );
+      library.store.save(updated);
+      library.store.upsertSearchIndex(updated);
+    }
+    _searchDebounce?.cancel();
+    _searchController.dispose();
     _cancelToken?.cancel();
     _library?.close();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      _updateQuery(_query.copyWith(
+        search: _searchController.text.trim().isEmpty
+            ? null
+            : _searchController.text.trim(),
+        clearSearch: _searchController.text.trim().isEmpty,
+      ));
+    });
   }
 
   Future<void> _loadShelf() async {
@@ -73,12 +114,76 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     try {
       final LibraryService library = _library ??= await LibraryService.open();
+      if (!_prefsLoaded) {
+        _prefsLoaded = true;
+        final String? view = await library.store.readSetting('library.viewMode');
+        final String? sort = await library.store.readSetting('library.sort');
+        final String? dir = await library.store.readSetting('library.sortDir');
+        LibraryQuery q = _query;
+        if (view != null) {
+          q = q.copyWith(
+            viewMode: view == 'grid'
+                ? LibraryViewMode.grid
+                : LibraryViewMode.list,
+          );
+        }
+        if (sort != null) {
+          final LibrarySortKey? key = _sortKeyByName(sort);
+          if (key != null) q = q.copyWith(sort: key);
+        }
+        if (dir != null) {
+          q = q.copyWith(
+            direction: dir == 'desc'
+                ? LibrarySortDirection.descending
+                : LibrarySortDirection.ascending,
+          );
+        }
+        _query = q;
+      }
+      await _loadSavedViews();
       final int adopted = await library.adoptDeviceShelf();
       if (adopted > 0) {
         // ignore: avoid_print
         print('LibraryService: adopted $adopted file(s) from the device shelf');
       }
-      final List<Book> books = await library.books();
+      final List<Book> books = await library.store.query(_query);
+      if (!mounted) return;
+      setState(() {
+        _books = books;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = '$e';
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _updateQuery(LibraryQuery next) async {
+    final LibraryService? library = _library;
+    setState(() => _query = next);
+    if (library != null) {
+      await library.store.writeSetting(
+        'library.viewMode',
+        next.viewMode == LibraryViewMode.grid ? 'grid' : 'list',
+      );
+      await library.store.writeSetting('library.sort', next.sort.name);
+      await library.store.writeSetting(
+        'library.sortDir',
+        next.direction == LibrarySortDirection.descending ? 'desc' : 'asc',
+      );
+    }
+    await _runQuery();
+  }
+
+  Future<void> _runQuery() async {
+    final LibraryService? library = _library;
+    if (library == null) return;
+    setState(() => _loading = true);
+    try {
+      final List<Book> books = await library.store.query(_query);
       if (!mounted) return;
       setState(() {
         _books = books;
@@ -101,10 +206,159 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ReaderPage(source: source, title: book.title),
+        builder: (_) => ReaderPage(
+          source: source,
+          title: book.title,
+          initialStatus: book.readingStatus,
+          initialStatusManual: book.readingStatusManual,
+          onFinished: () => _setStatus(book, ReadingStatus.completed),
+          onProgress: (ReadingLocator locator) async =>
+              _scheduleProgressSave(book, locator),
+          onAddBookmark: (ReadingLocator locator) =>
+              _library!.addBookmark(book.id, locator),
+        ),
       ),
     );
     if (mounted) await _loadShelf();
+  }
+
+  void _scheduleProgressSave(Book book, ReadingLocator locator) {
+    _progressBook = book;
+    _pendingLocator = locator;
+    _progressTimer?.cancel();
+    _progressTimer = Timer(const Duration(seconds: 2), () async {
+      final LibraryService? library = _library;
+      final Book? b = _progressBook;
+      final ReadingLocator? loc = _pendingLocator;
+      if (library == null || b == null || loc == null) return;
+      final Book updated = b.copyWith(
+        locator: loc,
+        progressPercentage: loc.percentage,
+        lastReadAt: DateTime.now(),
+        readingStatus: b.readingStatus == ReadingStatus.unread
+            ? ReadingStatus.reading
+            : b.readingStatus,
+        readingStatusManual: b.readingStatusManual,
+      );
+      // Do not override manual status.
+      final Book finalBook = b.readingStatusManual
+          ? updated.copyWith(readingStatus: b.readingStatus)
+          : updated;
+      await library.store.save(finalBook);
+      await library.store.upsertSearchIndex(finalBook);
+    });
+  }
+
+  Future<void> _setStatus(Book book, ReadingStatus status) async {
+    final LibraryService? library = _library;
+    if (library == null) return;
+    final Book updated = book.copyWith(
+      readingStatus: status,
+      readingStatusManual: true,
+    );
+    await library.store.save(updated);
+    await library.store.upsertSearchIndex(updated);
+    if (mounted) await _loadShelf();
+  }
+
+  Future<void> _removeBook(Book book, {required bool deleteAsset}) async {
+    final LibraryService? library = _library;
+    if (library == null) return;
+    if (deleteAsset) {
+      for (final String? path in <String?>[book.localAssetPath, book.coverPath]) {
+        if (path == null) continue;
+        try {
+          final File f = File(path);
+          if (await f.exists()) await f.delete();
+        } catch (_) {
+          // Best effort; the DB row is removed regardless.
+        }
+      }
+    }
+    await library.store.delete(book.id);
+    if (mounted) {
+      setState(() => _message = 'Removed "${book.title}".');
+      await _loadShelf();
+    }
+  }
+
+  Future<void> _showBookActions(Book book) async {
+    final ReadingStatus? chosen = await showModalBottomSheet<ReadingStatus>(
+      context: context,
+      builder: (BuildContext ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('View details'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => BookDetailsPage(
+                      book: book,
+                      library: _library!,
+                      onChanged: _loadShelf,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            for (final ReadingStatus s in ReadingStatus.values)
+              ListTile(
+                leading: Icon(
+                  book.readingStatus == s ? Icons.check : Icons.circle_outlined,
+                ),
+                title: Text(s.label),
+                onTap: () => Navigator.pop(ctx, s),
+              ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: const Text('Remove from library…'),
+              onTap: () => Navigator.pop(ctx, null),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted) return;
+    if (chosen != null) {
+      await _setStatus(book, chosen);
+      return;
+    }
+    // Removal chosen.
+    final int? choice = await showDialog<int>(
+      context: context,
+      builder: (BuildContext ctx) => AlertDialog(
+        title: const Text('Remove book?'),
+        content: const Text(
+          'Choose what to delete. The source file is never removed unless '
+          'you pick "Delete file too".',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 0),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 1),
+            child: const Text('Keep file'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 2),
+            child: const Text('Delete file too'),
+          ),
+        ],
+      ),
+    );
+    if (choice == 1) {
+      await _removeBook(book, deleteAsset: false);
+    } else if (choice == 2) {
+      await _removeBook(book, deleteAsset: true);
+    }
   }
 
   Future<void> _importEpub() async {
@@ -148,13 +402,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _importUrl() async {
     if (_importing) return;
-    _urlController.clear();
+    _searchController.clear();
+    // keep search controller separate; use a local controller for URL
+    final TextEditingController urlController = TextEditingController();
     final bool? go = await showDialog<bool>(
       context: context,
       builder: (BuildContext ctx) => AlertDialog(
         title: const Text('Add book from URL'),
         content: TextField(
-          controller: _urlController,
+          controller: urlController,
           autofocus: true,
           keyboardType: TextInputType.url,
           decoration: const InputDecoration(
@@ -175,7 +431,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-    final String text = _urlController.text.trim();
+    final String text = urlController.text.trim();
+    urlController.dispose();
     if (go != true || text.isEmpty) return;
     final Uri? uri = Uri.tryParse(text);
     if (uri == null || !uri.hasScheme) {
@@ -221,6 +478,162 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
+  }
+
+  Future<void> _loadSavedViews() async {
+    final LibraryService? library = _library;
+    if (library == null) return;
+    try {
+      final String? raw = await library.store.readSetting('library.savedViews');
+      if (raw == null || raw.isEmpty) {
+        _savedViews = <Map<String, dynamic>>[];
+        return;
+      }
+      final dynamic decoded = jsonDecode(raw);
+      if (decoded is List) {
+        _savedViews = decoded
+            .whereType<Map>()
+            .map((Map m) => Map<String, dynamic>.from(m))
+            .toList();
+      }
+    } catch (_) {
+      _savedViews = <Map<String, dynamic>>[];
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _persistSavedViews() async {
+    final LibraryService? library = _library;
+    if (library == null) return;
+    await library.store.writeSetting(
+      'library.savedViews',
+      jsonEncode(_savedViews),
+    );
+  }
+
+  Future<void> _saveCurrentView() async {
+    final TextEditingController c = TextEditingController();
+    final String? name = await showDialog<String>(
+      context: context,
+      builder: (BuildContext ctx) => AlertDialog(
+        title: const Text('Save current view'),
+        content: TextField(
+          controller: c,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'View name',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, c.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    c.dispose();
+    if (name == null || name.isEmpty) return;
+    _savedViews.removeWhere((Map<String, dynamic> v) => v['name'] == name);
+    _savedViews.add(<String, dynamic>{
+      'name': name,
+      'search': _query.search,
+      'sort': _query.sort.name,
+      'direction': _query.direction.name,
+      'viewMode': _query.viewMode.name,
+      'groupBy': _query.groupBy.name,
+      'sourceFilter': _query.sourceFilter.name,
+      'availabilityFilter': _query.availabilityFilter.name,
+      'statuses': _query.statuses.map((ReadingStatus s) => s.name).toList(),
+    });
+    await _persistSavedViews();
+    if (mounted) setState(() {});
+  }
+
+  void _applySavedView(Map<String, dynamic> v) {
+    LibrarySortKey sort = LibrarySortKey.title;
+    for (final LibrarySortKey k in LibrarySortKey.values) {
+      if (k.name == v['sort']) sort = k;
+    }
+    LibrarySortDirection dir = LibrarySortDirection.ascending;
+    if (v['direction'] == 'descending') dir = LibrarySortDirection.descending;
+    LibraryViewMode view = LibraryViewMode.list;
+    if (v['viewMode'] == 'grid') view = LibraryViewMode.grid;
+    LibraryGroupBy group = LibraryGroupBy.none;
+    for (final LibraryGroupBy g in LibraryGroupBy.values) {
+      if (g.name == v['groupBy']) group = g;
+    }
+    LibrarySourceFilter source = LibrarySourceFilter.all;
+    for (final LibrarySourceFilter f in LibrarySourceFilter.values) {
+      if (f.name == v['sourceFilter']) source = f;
+    }
+    LibraryAvailabilityFilter avail = LibraryAvailabilityFilter.all;
+    for (final LibraryAvailabilityFilter f in LibraryAvailabilityFilter.values) {
+      if (f.name == v['availabilityFilter']) avail = f;
+    }
+    final Set<ReadingStatus> statuses = <ReadingStatus>{};
+    final dynamic rawStatuses = v['statuses'];
+    if (rawStatuses is List) {
+      for (final dynamic s in rawStatuses) {
+        for (final ReadingStatus rs in ReadingStatus.values) {
+          if (rs.name == s) statuses.add(rs);
+        }
+      }
+    }
+    _updateQuery(LibraryQuery(
+      search: v['search'] as String?,
+      sort: sort,
+      direction: dir,
+      viewMode: view,
+      groupBy: group,
+      sourceFilter: source,
+      availabilityFilter: avail,
+      statuses: statuses,
+    ));
+    if (v['search'] != null) {
+      _searchController.text = v['search'] as String;
+    } else {
+      _searchController.clear();
+    }
+  }
+
+  Future<void> _deleteSavedView(String name) async {
+    _savedViews.removeWhere((Map<String, dynamic> v) => v['name'] == name);
+    await _persistSavedViews();
+    if (mounted) setState(() {});
+  }
+
+  String _groupLabel(LibraryGroupBy g) => switch (g) {
+        LibraryGroupBy.none => 'None',
+        LibraryGroupBy.author => 'Author',
+        LibraryGroupBy.series => 'Series',
+        LibraryGroupBy.status => 'Status',
+        LibraryGroupBy.source => 'Source',
+        LibraryGroupBy.availability => 'Availability',
+      };
+
+  String _sourceLabel(LibrarySourceFilter f) => switch (f) {
+        LibrarySourceFilter.all => 'All',
+        LibrarySourceFilter.local => 'Local',
+        LibrarySourceFilter.remote => 'Remote',
+      };
+
+  String _availLabel(LibraryAvailabilityFilter f) => switch (f) {
+        LibraryAvailabilityFilter.all => 'All',
+        LibraryAvailabilityFilter.available => 'Available',
+        LibraryAvailabilityFilter.missing => 'Missing',
+      };
+
+  LibrarySortKey? _sortKeyByName(String name) {
+    for (final LibrarySortKey k in LibrarySortKey.values) {
+      if (k.name == name) return k;
+    }
+    return null;
   }
 
   @override
@@ -284,33 +697,197 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(_message!),
                 ),
               ),
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search title, author, series…',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => _searchController.clear(),
+                      ),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  ChoiceChip(
+                    label: const Text('All'),
+                    selected: _query.statuses.isEmpty,
+                    onSelected: (_) =>
+                        _updateQuery(_query.copyWith(statuses: <ReadingStatus>{})),
+                  ),
+                  for (final ReadingStatus s in ReadingStatus.values)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: ChoiceChip(
+                        label: Text(s.label),
+                        selected: _query.statuses.contains(s),
+                        onSelected: (bool v) => _updateQuery(_query.copyWith(
+                          statuses: v ? <ReadingStatus>{s} : <ReadingStatus>{},
+                        )),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: <Widget>[
-                const Expanded(child: Text('On this device')),
-                Text(
-                  '${_books.length} book(s)',
-                  style: Theme.of(context).textTheme.bodySmall,
+                Expanded(
+                  child: DropdownButton<LibraryGroupBy>(
+                    value: _query.groupBy,
+                    isExpanded: true,
+                    items: <DropdownMenuItem<LibraryGroupBy>>[
+                      for (final LibraryGroupBy g in LibraryGroupBy.values)
+                        DropdownMenuItem<LibraryGroupBy>(
+                          value: g,
+                          child: Text('Group: ${_groupLabel(g)}'),
+                        ),
+                    ],
+                    onChanged: (LibraryGroupBy? g) {
+                      if (g != null) _updateQuery(_query.copyWith(groupBy: g));
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButton<LibrarySourceFilter>(
+                    value: _query.sourceFilter,
+                    isExpanded: true,
+                    items: <DropdownMenuItem<LibrarySourceFilter>>[
+                      for (final LibrarySourceFilter f in LibrarySourceFilter.values)
+                        DropdownMenuItem<LibrarySourceFilter>(
+                          value: f,
+                          child: Text('Source: ${_sourceLabel(f)}'),
+                        ),
+                    ],
+                    onChanged: (LibrarySourceFilter? f) {
+                      if (f != null) _updateQuery(_query.copyWith(sourceFilter: f));
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButton<LibraryAvailabilityFilter>(
+                    value: _query.availabilityFilter,
+                    isExpanded: true,
+                    items: <DropdownMenuItem<LibraryAvailabilityFilter>>[
+                      for (final LibraryAvailabilityFilter f in LibraryAvailabilityFilter.values)
+                        DropdownMenuItem<LibraryAvailabilityFilter>(
+                          value: f,
+                          child: Text('Files: ${_availLabel(f)}'),
+                        ),
+                    ],
+                    onChanged: (LibraryAvailabilityFilter? f) {
+                      if (f != null) _updateQuery(_query.copyWith(availabilityFilter: f));
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: DropdownButton<String>(
+                    hint: const Text('Saved views'),
+                    value: null,
+                    isExpanded: true,
+                    items: _savedViews
+                        .map((Map<String, dynamic> v) =>
+                            DropdownMenuItem<String>(
+                              value: v['name'] as String,
+                              child: Text(v['name'] as String),
+                            ))
+                        .toList(),
+                    onChanged: (String? name) {
+                      if (name == null) return;
+                      final Map<String, dynamic>? v = _savedViews
+                          .cast<Map<String, dynamic>?>()
+                          .firstWhere(
+                            (Map<String, dynamic>? e) => e?['name'] == name,
+                            orElse: () => null,
+                          );
+                      if (v != null) _applySavedView(v);
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.save_outlined),
+                  tooltip: 'Save current view',
+                  onPressed: _saveCurrentView,
+                ),
+                if (_savedViews.isNotEmpty)
+                  PopupMenuButton<String>(
+                    tooltip: 'Delete a saved view',
+                    icon: const Icon(Icons.delete_outline),
+                    onSelected: _deleteSavedView,
+                    itemBuilder: (BuildContext ctx) =>
+                        <PopupMenuEntry<String>>[
+                      for (final Map<String, dynamic> v in _savedViews)
+                        PopupMenuItem<String>(
+                          value: v['name'] as String,
+                          child: Text(v['name'] as String),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    'On this device · ${_books.length} book(s)',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                _SortMenu(
+                  value: _query.sort,
+                  direction: _query.direction,
+                  onChanged: (LibrarySortKey key) =>
+                      _updateQuery(_query.copyWith(sort: key)),
+                  onToggleDirection: () => _updateQuery(_query.copyWith(
+                    direction: _query.direction == LibrarySortDirection.ascending
+                        ? LibrarySortDirection.descending
+                        : LibrarySortDirection.ascending,
+                  )),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(_query.viewMode == LibraryViewMode.grid
+                      ? Icons.view_list
+                      : Icons.grid_view),
+                  tooltip: _query.viewMode == LibraryViewMode.grid
+                      ? 'Switch to list'
+                      : 'Switch to grid',
+                  onPressed: () => _updateQuery(_query.copyWith(
+                    viewMode: _query.viewMode == LibraryViewMode.grid
+                        ? LibraryViewMode.list
+                        : LibraryViewMode.grid,
+                  )),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             if (!_loading && _books.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  'No EPUB files yet. Tap + to import one, or copy books into:\n'
-                  '${_library?.importer.booksDirectory.path ?? ''}',
-                  style: const TextStyle(fontSize: 13),
-                ),
+              _EmptyState(
+                path: _library?.importer.booksDirectory.path ?? '',
               ),
-            ..._books.map((Book book) => Card(
-                  child: ListTile(
-                    leading: _cover(book),
-                    title: Text(book.title),
-                    subtitle: Text(_subtitle(book)),
-                    onTap: () => _open(book),
-                  ),
-                )),
+            if (_books.isNotEmpty)
+              _GroupedBooks(
+                books: _books,
+                groupBy: _query.groupBy,
+                viewMode: _query.viewMode,
+                onOpen: _open,
+                onLongPress: _showBookActions,
+              ),
             const Divider(height: 32),
             Align(
               alignment: Alignment.centerLeft,
@@ -325,36 +902,286 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
-  Widget _cover(Book book) {
-    final String? cover = book.coverPath;
-    if (cover == null) return const Icon(Icons.menu_book_outlined);
-    final File file = File(cover);
-    if (!file.existsSync()) return const Icon(Icons.menu_book_outlined);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: Image.file(
-        file,
-        width: 40,
-        height: 56,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => const Icon(Icons.menu_book_outlined),
-      ),
+class _SortMenu extends StatelessWidget {
+  const _SortMenu({
+    required this.value,
+    required this.direction,
+    required this.onChanged,
+    required this.onToggleDirection,
+  });
+
+  final LibrarySortKey value;
+  final LibrarySortDirection direction;
+  final ValueChanged<LibrarySortKey> onChanged;
+  final VoidCallback onToggleDirection;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        PopupMenuButton<LibrarySortKey>(
+          initialValue: value,
+          tooltip: 'Sort by',
+          onSelected: onChanged,
+          itemBuilder: (BuildContext ctx) => <PopupMenuEntry<LibrarySortKey>>[
+            for (final LibrarySortKey k in LibrarySortKey.values)
+              PopupMenuItem<LibrarySortKey>(
+                value: k,
+                child: Text(_label(k)),
+              ),
+          ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(_label(value), style: Theme.of(context).textTheme.labelLarge),
+          ),
+        ),
+        IconButton(
+          icon: Icon(direction == LibrarySortDirection.ascending
+              ? Icons.arrow_upward
+              : Icons.arrow_downward),
+          tooltip: 'Toggle sort direction',
+          onPressed: onToggleDirection,
+        ),
+      ],
     );
   }
 
-  String _subtitle(Book book) {
-    final List<String> parts = <String>[];
-    if (book.authors.isNotEmpty) parts.add(book.authors.join(', '));
-    if (book.series != null) {
-      parts.add(book.seriesIndex == null
-          ? book.series!
-          : '${book.series!} #${book.seriesIndex}');
-    }
-    if (parts.isEmpty) {
-      final String? path = book.localAssetPath;
-      if (path != null) parts.add(p.basename(path));
-    }
-    return parts.join(' · ');
+  String _label(LibrarySortKey key) => switch (key) {
+        LibrarySortKey.title => 'Title',
+        LibrarySortKey.author => 'Author',
+        LibrarySortKey.added => 'Added',
+        LibrarySortKey.lastRead => 'Last read',
+        LibrarySortKey.series => 'Series',
+        LibrarySortKey.progress => 'Progress',
+      };
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Column(
+        children: <Widget>[
+          const Icon(Icons.menu_book_outlined, size: 48),
+          const SizedBox(height: 8),
+          Text(
+            'No EPUB files yet.\nTap + to import one, or copy books into:\n$path',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 13),
+          ),
+        ],
+      ),
+    );
   }
+}
+
+class _GroupedBooks extends StatelessWidget {
+  const _GroupedBooks({
+    required this.books,
+    required this.groupBy,
+    required this.viewMode,
+    required this.onOpen,
+    required this.onLongPress,
+  });
+
+  final List<Book> books;
+  final LibraryGroupBy groupBy;
+  final LibraryViewMode viewMode;
+  final ValueChanged<Book> onOpen;
+  final ValueChanged<Book> onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<MapEntry<String, List<Book>>> sections =
+        groupBooks(books, groupBy);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sections.map((MapEntry<String, List<Book>> section) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (groupBy != LibraryGroupBy.none)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  '${section.key} (${section.value.length})',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+            viewMode == LibraryViewMode.grid
+                ? _BookGrid(
+                    books: section.value,
+                    onOpen: onOpen,
+                    onLongPress: onLongPress,
+                  )
+                : _BookList(
+                    books: section.value,
+                    onOpen: onOpen,
+                    onLongPress: onLongPress,
+                  ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+}
+class _BookList extends StatelessWidget {
+  const _BookList({
+    required this.books,
+    required this.onOpen,
+    required this.onLongPress,
+  });
+
+  final List<Book> books;
+  final ValueChanged<Book> onOpen;
+  final ValueChanged<Book> onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: books
+          .map((Book book) => Card(
+                child: ListTile(
+                  leading: _cover(book),
+                  title: Text(book.title),
+                  subtitle: Text(_subtitle(book)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (book.progressPercentage != null)
+                        Text('${(book.progressPercentage! * 100).round()}%'),
+                      IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        tooltip: 'Book actions',
+                        onPressed: () => onLongPress(book),
+                      ),
+                    ],
+                  ),
+                  onTap: () => onOpen(book),
+                  onLongPress: () => onLongPress(book),
+                ),
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _BookGrid extends StatelessWidget {
+  const _BookGrid({
+    required this.books,
+    required this.onOpen,
+    required this.onLongPress,
+  });
+
+  final List<Book> books;
+  final ValueChanged<Book> onOpen;
+  final ValueChanged<Book> onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final int columns = MediaQuery.of(context).size.width >= 720 ? 4 : 2;
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
+        childAspectRatio: 0.62,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: books.length,
+      itemBuilder: (BuildContext ctx, int i) {
+        final Book book = books[i];
+        return Card(
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => onOpen(book),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Expanded(child: _cover(book, fill: true)),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        book.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        book.authors.isEmpty
+                            ? 'Unknown author'
+                            : book.authors.join(', '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.more_vert, size: 18),
+                          tooltip: 'Book actions',
+                          onPressed: () => onLongPress(book),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+Widget _cover(Book book, {bool fill = false}) {
+  final String? cover = book.coverPath;
+  if (cover == null) {
+    final Widget icon = Icon(Icons.menu_book_outlined,
+        size: fill ? 48 : null);
+    return fill
+        ? Center(child: icon)
+        : icon;
+  }
+  final File file = File(cover);
+  if (!file.existsSync()) {
+    final Widget icon = Icon(Icons.menu_book_outlined,
+        size: fill ? 48 : null);
+    return fill ? Center(child: icon) : icon;
+  }
+  return Image.file(
+    file,
+    fit: BoxFit.cover,
+    errorBuilder: (_, _, _) =>
+        Icon(Icons.menu_book_outlined, size: fill ? 48 : null),
+  );
+}
+
+String _subtitle(Book book) {
+  final List<String> parts = <String>[];
+  if (book.authors.isNotEmpty) parts.add(book.authors.join(', '));
+  if (book.series != null) {
+    parts.add(book.seriesIndex == null
+        ? book.series!
+        : '${book.series!} #${book.seriesIndex}');
+  }
+  if (parts.isEmpty) {
+    final String? path = book.localAssetPath;
+    if (path != null) parts.add(p.basename(path));
+  }
+  return parts.join(' · ');
 }

@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+@TableIndex(name: 'books_title_idx', columns: {#title})
+@TableIndex(name: 'books_added_at_idx', columns: {#addedAt})
 class Books extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
@@ -9,6 +11,7 @@ class Books extends Table {
   TextColumn get description => text().nullable()();
   TextColumn get coverPath => text().nullable()();
   TextColumn get readingStatus => text().withDefault(const Constant('unread'))();
+  BoolColumn get readingStatusManual => boolean().withDefault(const Constant(false))();
   TextColumn get locator => text().nullable()(); // JSON
   TextColumn get remoteProviderInstanceId => text().nullable()();
   TextColumn get remoteBookId => text().nullable()();

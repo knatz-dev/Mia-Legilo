@@ -17,6 +17,7 @@ class Book {
     this.description,
     this.coverPath,
     this.readingStatus = ReadingStatus.unread,
+    this.readingStatusManual = false,
     this.locator,
     this.remoteIdentity,
     this.downloadState = DownloadState.notDownloaded,
@@ -39,6 +40,7 @@ class Book {
   final String? description;
   final String? coverPath;
   final ReadingStatus readingStatus;
+  final bool readingStatusManual;
   final ReadingLocator? locator;
   final RemoteIdentity? remoteIdentity;
   final DownloadState downloadState;
@@ -66,6 +68,7 @@ class Book {
     String? description,
     String? coverPath,
     ReadingStatus? readingStatus,
+    bool? readingStatusManual,
     ReadingLocator? locator,
     RemoteIdentity? remoteIdentity,
     DownloadState? downloadState,
@@ -88,6 +91,7 @@ class Book {
         description: description ?? this.description,
         coverPath: coverPath ?? this.coverPath,
         readingStatus: readingStatus ?? this.readingStatus,
+        readingStatusManual: readingStatusManual ?? this.readingStatusManual,
         locator: locator ?? this.locator,
         remoteIdentity: remoteIdentity ?? this.remoteIdentity,
         downloadState: downloadState ?? this.downloadState,
@@ -111,6 +115,7 @@ class Book {
         'description': description,
         'coverPath': coverPath,
         'readingStatus': readingStatus.name,
+        'readingStatusManual': readingStatusManual,
         'locator': locator?.toJson(),
         'remoteIdentity': remoteIdentity?.toJson(),
         'downloadState': downloadState.name,
@@ -139,6 +144,7 @@ class Book {
           (s) => s.name == json['readingStatus'],
           orElse: () => ReadingStatus.unread,
         ),
+        readingStatusManual: json['readingStatusManual'] as bool? ?? false,
         locator: json['locator'] == null
             ? null
             : ReadingLocator.fromJson(json['locator'] as Map<String, dynamic>),

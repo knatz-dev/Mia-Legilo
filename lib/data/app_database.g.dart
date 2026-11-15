@@ -92,6 +92,20 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
     requiredDuringInsert: false,
     defaultValue: const Constant('unread'),
   );
+  static const VerificationMeta _readingStatusManualMeta =
+      const VerificationMeta('readingStatusManual');
+  @override
+  late final GeneratedColumn<bool> readingStatusManual = GeneratedColumn<bool>(
+    'reading_status_manual',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reading_status_manual" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _locatorMeta = const VerificationMeta(
     'locator',
   );
@@ -236,6 +250,7 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
     description,
     coverPath,
     readingStatus,
+    readingStatusManual,
     locator,
     remoteProviderInstanceId,
     remoteBookId,
@@ -316,6 +331,15 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
         readingStatus.isAcceptableOrUnknown(
           data['reading_status']!,
           _readingStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reading_status_manual')) {
+      context.handle(
+        _readingStatusManualMeta,
+        readingStatusManual.isAcceptableOrUnknown(
+          data['reading_status_manual']!,
+          _readingStatusManualMeta,
         ),
       );
     }
@@ -459,6 +483,10 @@ class $BooksTable extends Books with TableInfo<$BooksTable, Book> {
         DriftSqlType.string,
         data['${effectivePrefix}reading_status'],
       )!,
+      readingStatusManual: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reading_status_manual'],
+      )!,
       locator: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}locator'],
@@ -525,6 +553,7 @@ class Book extends DataClass implements Insertable<Book> {
   final String? description;
   final String? coverPath;
   final String readingStatus;
+  final bool readingStatusManual;
   final String? locator;
   final String? remoteProviderInstanceId;
   final String? remoteBookId;
@@ -546,6 +575,7 @@ class Book extends DataClass implements Insertable<Book> {
     this.description,
     this.coverPath,
     required this.readingStatus,
+    required this.readingStatusManual,
     this.locator,
     this.remoteProviderInstanceId,
     this.remoteBookId,
@@ -578,6 +608,7 @@ class Book extends DataClass implements Insertable<Book> {
       map['cover_path'] = Variable<String>(coverPath);
     }
     map['reading_status'] = Variable<String>(readingStatus);
+    map['reading_status_manual'] = Variable<bool>(readingStatusManual);
     if (!nullToAbsent || locator != null) {
       map['locator'] = Variable<String>(locator);
     }
@@ -631,6 +662,7 @@ class Book extends DataClass implements Insertable<Book> {
           ? const Value.absent()
           : Value(coverPath),
       readingStatus: Value(readingStatus),
+      readingStatusManual: Value(readingStatusManual),
       locator: locator == null && nullToAbsent
           ? const Value.absent()
           : Value(locator),
@@ -678,6 +710,9 @@ class Book extends DataClass implements Insertable<Book> {
       description: serializer.fromJson<String?>(json['description']),
       coverPath: serializer.fromJson<String?>(json['coverPath']),
       readingStatus: serializer.fromJson<String>(json['readingStatus']),
+      readingStatusManual: serializer.fromJson<bool>(
+        json['readingStatusManual'],
+      ),
       locator: serializer.fromJson<String?>(json['locator']),
       remoteProviderInstanceId: serializer.fromJson<String?>(
         json['remoteProviderInstanceId'],
@@ -710,6 +745,7 @@ class Book extends DataClass implements Insertable<Book> {
       'description': serializer.toJson<String?>(description),
       'coverPath': serializer.toJson<String?>(coverPath),
       'readingStatus': serializer.toJson<String>(readingStatus),
+      'readingStatusManual': serializer.toJson<bool>(readingStatusManual),
       'locator': serializer.toJson<String?>(locator),
       'remoteProviderInstanceId': serializer.toJson<String?>(
         remoteProviderInstanceId,
@@ -736,6 +772,7 @@ class Book extends DataClass implements Insertable<Book> {
     Value<String?> description = const Value.absent(),
     Value<String?> coverPath = const Value.absent(),
     String? readingStatus,
+    bool? readingStatusManual,
     Value<String?> locator = const Value.absent(),
     Value<String?> remoteProviderInstanceId = const Value.absent(),
     Value<String?> remoteBookId = const Value.absent(),
@@ -757,6 +794,7 @@ class Book extends DataClass implements Insertable<Book> {
     description: description.present ? description.value : this.description,
     coverPath: coverPath.present ? coverPath.value : this.coverPath,
     readingStatus: readingStatus ?? this.readingStatus,
+    readingStatusManual: readingStatusManual ?? this.readingStatusManual,
     locator: locator.present ? locator.value : this.locator,
     remoteProviderInstanceId: remoteProviderInstanceId.present
         ? remoteProviderInstanceId.value
@@ -796,6 +834,9 @@ class Book extends DataClass implements Insertable<Book> {
       readingStatus: data.readingStatus.present
           ? data.readingStatus.value
           : this.readingStatus,
+      readingStatusManual: data.readingStatusManual.present
+          ? data.readingStatusManual.value
+          : this.readingStatusManual,
       locator: data.locator.present ? data.locator.value : this.locator,
       remoteProviderInstanceId: data.remoteProviderInstanceId.present
           ? data.remoteProviderInstanceId.value
@@ -840,6 +881,7 @@ class Book extends DataClass implements Insertable<Book> {
           ..write('description: $description, ')
           ..write('coverPath: $coverPath, ')
           ..write('readingStatus: $readingStatus, ')
+          ..write('readingStatusManual: $readingStatusManual, ')
           ..write('locator: $locator, ')
           ..write('remoteProviderInstanceId: $remoteProviderInstanceId, ')
           ..write('remoteBookId: $remoteBookId, ')
@@ -857,7 +899,7 @@ class Book extends DataClass implements Insertable<Book> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     title,
     authors,
@@ -866,6 +908,7 @@ class Book extends DataClass implements Insertable<Book> {
     description,
     coverPath,
     readingStatus,
+    readingStatusManual,
     locator,
     remoteProviderInstanceId,
     remoteBookId,
@@ -878,7 +921,7 @@ class Book extends DataClass implements Insertable<Book> {
     lastReadAt,
     progressPercentage,
     metadataProvenance,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -891,6 +934,7 @@ class Book extends DataClass implements Insertable<Book> {
           other.description == this.description &&
           other.coverPath == this.coverPath &&
           other.readingStatus == this.readingStatus &&
+          other.readingStatusManual == this.readingStatusManual &&
           other.locator == this.locator &&
           other.remoteProviderInstanceId == this.remoteProviderInstanceId &&
           other.remoteBookId == this.remoteBookId &&
@@ -914,6 +958,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
   final Value<String?> description;
   final Value<String?> coverPath;
   final Value<String> readingStatus;
+  final Value<bool> readingStatusManual;
   final Value<String?> locator;
   final Value<String?> remoteProviderInstanceId;
   final Value<String?> remoteBookId;
@@ -936,6 +981,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
     this.description = const Value.absent(),
     this.coverPath = const Value.absent(),
     this.readingStatus = const Value.absent(),
+    this.readingStatusManual = const Value.absent(),
     this.locator = const Value.absent(),
     this.remoteProviderInstanceId = const Value.absent(),
     this.remoteBookId = const Value.absent(),
@@ -959,6 +1005,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
     this.description = const Value.absent(),
     this.coverPath = const Value.absent(),
     this.readingStatus = const Value.absent(),
+    this.readingStatusManual = const Value.absent(),
     this.locator = const Value.absent(),
     this.remoteProviderInstanceId = const Value.absent(),
     this.remoteBookId = const Value.absent(),
@@ -983,6 +1030,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
     Expression<String>? description,
     Expression<String>? coverPath,
     Expression<String>? readingStatus,
+    Expression<bool>? readingStatusManual,
     Expression<String>? locator,
     Expression<String>? remoteProviderInstanceId,
     Expression<String>? remoteBookId,
@@ -1006,6 +1054,8 @@ class BooksCompanion extends UpdateCompanion<Book> {
       if (description != null) 'description': description,
       if (coverPath != null) 'cover_path': coverPath,
       if (readingStatus != null) 'reading_status': readingStatus,
+      if (readingStatusManual != null)
+        'reading_status_manual': readingStatusManual,
       if (locator != null) 'locator': locator,
       if (remoteProviderInstanceId != null)
         'remote_provider_instance_id': remoteProviderInstanceId,
@@ -1033,6 +1083,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
     Value<String?>? description,
     Value<String?>? coverPath,
     Value<String>? readingStatus,
+    Value<bool>? readingStatusManual,
     Value<String?>? locator,
     Value<String?>? remoteProviderInstanceId,
     Value<String?>? remoteBookId,
@@ -1056,6 +1107,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
       description: description ?? this.description,
       coverPath: coverPath ?? this.coverPath,
       readingStatus: readingStatus ?? this.readingStatus,
+      readingStatusManual: readingStatusManual ?? this.readingStatusManual,
       locator: locator ?? this.locator,
       remoteProviderInstanceId:
           remoteProviderInstanceId ?? this.remoteProviderInstanceId,
@@ -1099,6 +1151,9 @@ class BooksCompanion extends UpdateCompanion<Book> {
     }
     if (readingStatus.present) {
       map['reading_status'] = Variable<String>(readingStatus.value);
+    }
+    if (readingStatusManual.present) {
+      map['reading_status_manual'] = Variable<bool>(readingStatusManual.value);
     }
     if (locator.present) {
       map['locator'] = Variable<String>(locator.value);
@@ -1155,6 +1210,7 @@ class BooksCompanion extends UpdateCompanion<Book> {
           ..write('description: $description, ')
           ..write('coverPath: $coverPath, ')
           ..write('readingStatus: $readingStatus, ')
+          ..write('readingStatusManual: $readingStatusManual, ')
           ..write('locator: $locator, ')
           ..write('remoteProviderInstanceId: $remoteProviderInstanceId, ')
           ..write('remoteBookId: $remoteBookId, ')
@@ -3312,6 +3368,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $OutboxEntriesTable outboxEntries = $OutboxEntriesTable(this);
   late final $ConflictsTable conflicts = $ConflictsTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final Index booksTitleIdx = Index(
+    'books_title_idx',
+    'CREATE INDEX books_title_idx ON books (title)',
+  );
+  late final Index booksAddedAtIdx = Index(
+    'books_added_at_idx',
+    'CREATE INDEX books_added_at_idx ON books (added_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3323,6 +3387,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     outboxEntries,
     conflicts,
     settings,
+    booksTitleIdx,
+    booksAddedAtIdx,
   ];
 }
 
@@ -3335,6 +3401,7 @@ typedef $$BooksTableCreateCompanionBuilder = BooksCompanion Function({
   Value<String?> description,
   Value<String?> coverPath,
   Value<String> readingStatus,
+  Value<bool> readingStatusManual,
   Value<String?> locator,
   Value<String?> remoteProviderInstanceId,
   Value<String?> remoteBookId,
@@ -3358,6 +3425,7 @@ typedef $$BooksTableUpdateCompanionBuilder = BooksCompanion Function({
   Value<String?> description,
   Value<String?> coverPath,
   Value<String> readingStatus,
+  Value<bool> readingStatusManual,
   Value<String?> locator,
   Value<String?> remoteProviderInstanceId,
   Value<String?> remoteBookId,
@@ -3418,6 +3486,11 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
 
   ColumnFilters<String> get readingStatus => $composableBuilder(
     column: $table.readingStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get readingStatusManual => $composableBuilder(
+    column: $table.readingStatusManual,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3531,6 +3604,11 @@ class $$BooksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get readingStatusManual => $composableBuilder(
+    column: $table.readingStatusManual,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get locator => $composableBuilder(
     column: $table.locator,
     builder: (column) => ColumnOrderings(column),
@@ -3631,6 +3709,11 @@ class $$BooksTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get readingStatusManual => $composableBuilder(
+    column: $table.readingStatusManual,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get locator =>
       $composableBuilder(column: $table.locator, builder: (column) => column);
 
@@ -3722,6 +3805,7 @@ class $$BooksTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> coverPath = const Value.absent(),
                 Value<String> readingStatus = const Value.absent(),
+                Value<bool> readingStatusManual = const Value.absent(),
                 Value<String?> locator = const Value.absent(),
                 Value<String?> remoteProviderInstanceId = const Value.absent(),
                 Value<String?> remoteBookId = const Value.absent(),
@@ -3744,6 +3828,7 @@ class $$BooksTableTableManager
                 description: description,
                 coverPath: coverPath,
                 readingStatus: readingStatus,
+                readingStatusManual: readingStatusManual,
                 locator: locator,
                 remoteProviderInstanceId: remoteProviderInstanceId,
                 remoteBookId: remoteBookId,
@@ -3768,6 +3853,7 @@ class $$BooksTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<String?> coverPath = const Value.absent(),
                 Value<String> readingStatus = const Value.absent(),
+                Value<bool> readingStatusManual = const Value.absent(),
                 Value<String?> locator = const Value.absent(),
                 Value<String?> remoteProviderInstanceId = const Value.absent(),
                 Value<String?> remoteBookId = const Value.absent(),
@@ -3790,6 +3876,7 @@ class $$BooksTableTableManager
                 description: description,
                 coverPath: coverPath,
                 readingStatus: readingStatus,
+                readingStatusManual: readingStatusManual,
                 locator: locator,
                 remoteProviderInstanceId: remoteProviderInstanceId,
                 remoteBookId: remoteBookId,

@@ -1,14 +1,23 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../domain/locator.dart';
+import '../../domain/status.dart';
 import '../../reader_engines/foliate/foliate_engine.dart';
 
 class ReaderPage extends StatefulWidget {
-  const ReaderPage({super.key, this.source, this.title});
+  const ReaderPage({super.key, this.source, this.title, this.onFinished, this.initialStatus, this.initialStatusManual = false, this.onProgress, this.onAddBookmark});
 
   /// Local file path or remote URL of the EPUB to display.
   final String? source;
   final String? title;
+  final Future<void> Function()? onFinished;
+  final ReadingStatus? initialStatus;
+  final bool initialStatusManual;
+  final Future<void> Function(ReadingLocator locator)? onProgress;
+  final Future<void> Function(ReadingLocator locator)? onAddBookmark;
 
   @override
   State<ReaderPage> createState() => _ReaderPageState();
@@ -20,6 +29,9 @@ class _ReaderPageState extends State<ReaderPage> {
   bool _loading = true;
   String? _loadError;
   bool _paginated = false;
+  bool _completionPrompted = false;
+  ReadingLocator? _lastLocator;
+  StreamSubscription<ReadingLocator>? _locationSub;
 
   @override
   void initState() {
@@ -39,6 +51,7 @@ class _ReaderPageState extends State<ReaderPage> {
       await _engine.load(source);
       await _engine.bookOpened;
       if (!mounted) return;
+      _locationSub = _engine.onLocationChanged.listen(_onLocation);
       setState(() => _loading = false);
     } catch (e) {
       if (!mounted) return;
@@ -51,9 +64,50 @@ class _ReaderPageState extends State<ReaderPage> {
 
   @override
   void dispose() {
+    _locationSub?.cancel();
     _searchController.dispose();
     _engine.dispose();
     super.dispose();
+  }
+
+  void _onLocation(ReadingLocator locator) {
+    _lastLocator = locator;
+    if (_completionPrompted) return;
+    if (widget.initialStatus == ReadingStatus.completed) return;
+    if (widget.initialStatusManual) return;
+    if ((locator.percentage ?? 0) < 0.995) {
+      widget.onProgress?.call(locator);
+      return;
+    }
+    _completionPrompted = true;
+    widget.onProgress?.call(locator);
+    _showCompletionPrompt();
+  }
+
+  Future<void> _showCompletionPrompt() async {
+    if (!mounted) return;
+    final bool? mark = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) => AlertDialog(
+        title: const Text('Finished reading?'),
+        content: const Text(
+          'You reached the end of this book. Mark it as completed?',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Not yet'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Mark completed'),
+          ),
+        ],
+      ),
+    );
+    if (mark == true) {
+      await widget.onFinished?.call();
+    }
   }
 
   Future<void> _showSearch() async {
@@ -111,7 +165,13 @@ class _ReaderPageState extends State<ReaderPage> {
             label: 'Add bookmark',
             child: IconButton(
               icon: const Icon(Icons.bookmark_add),
-              onPressed: _engine.addBookmark,
+              onPressed: () async {
+                await _engine.addBookmark();
+                final ReadingLocator? loc = _lastLocator;
+                if (loc != null) {
+                  await widget.onAddBookmark?.call(loc);
+                }
+              },
               tooltip: 'Bookmark',
             ),
           ),

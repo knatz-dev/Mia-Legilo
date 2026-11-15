@@ -134,6 +134,7 @@ class LibraryImporter {
 
     try {
       await store.save(book);
+      await store.upsertSearchIndex(book);
     } catch (e) {
       // Keep the promoted file when a previous identical import may have
       // created it; deleting a content-addressed file is only safe when this
@@ -192,6 +193,7 @@ class LibraryImporter {
       downloadState: domain.DownloadState.downloaded,
     );
     await store.save(repaired);
+    await store.upsertSearchIndex(repaired);
     return ImportResult(
       outcome: ImportOutcome.imported,
       book: repaired,
@@ -262,5 +264,77 @@ class LibraryImporter {
     final String withoutExtension = p.basenameWithoutExtension(originalName);
     final String cleaned = withoutExtension.replaceAll(RegExp(r'[_-]+'), ' ').trim();
     return cleaned.isEmpty ? 'Untitled' : cleaned;
+  }
+
+  /// Replaces the on-disk asset of an existing book without changing its id.
+  Future<domain.Book> relink(domain.Book existing, Uint8List bytes, {
+    String originalName = 'book.epub',
+  }) async {
+    final EpubMetadata metadata = inspector.inspectBytes(bytes);
+    final String sha256 = _fingerprint(bytes);
+    await _ensureDirectories();
+    final File asset = File(p.join(booksDirectory.path, '$sha256.epub'));
+    await _promote(bytes, asset, stagingName: '$sha256.epub.part');
+
+    String? coverPath = existing.coverPath;
+    if (metadata.coverBytes != null && metadata.coverExtension != null) {
+      final File cover = File(
+        p.join(coversDirectory.path, '$sha256${metadata.coverExtension!}'),
+      );
+      await _promote(
+        metadata.coverBytes!,
+        cover,
+        stagingName: '$sha256.cover.part',
+      );
+      coverPath = cover.path;
+    }
+
+    final domain.Book updated = existing.copyWith(
+      title: metadata.title.trim().isEmpty ? existing.title : metadata.title.trim(),
+      authors: metadata.authors.isEmpty ? existing.authors : metadata.authors,
+      series: metadata.series ?? existing.series,
+      seriesIndex: metadata.seriesIndex ?? existing.seriesIndex,
+      description: metadata.description ?? existing.description,
+      coverPath: coverPath,
+      downloadState: domain.DownloadState.downloaded,
+      localAssetPath: asset.path,
+      localAssetSha256: sha256,
+      localAssetRevision: (existing.localAssetRevision ?? 0) + 1,
+    );
+    await store.save(updated);
+    await store.upsertSearchIndex(updated);
+    return updated;
+  }
+
+  /// Extracts a cover from the stored EPUB if the book has none.
+  Future<domain.Book> ensureCover(domain.Book book) async {
+    if (book.coverPath != null && File(book.coverPath!).existsSync()) {
+      return book;
+    }
+    if (book.localAssetPath == null) return book;
+    final Uint8List bytes = await File(book.localAssetPath!).readAsBytes();
+    final EpubMetadata metadata;
+    try {
+      metadata = inspector.inspectBytes(bytes);
+    } catch (_) {
+      return book;
+    }
+    if (metadata.coverBytes == null || metadata.coverExtension == null) {
+      return book;
+    }
+    await _ensureDirectories();
+    final String sha256 = book.localAssetSha256 ?? _fingerprint(bytes);
+    final File cover = File(
+      p.join(coversDirectory.path, '$sha256${metadata.coverExtension!}'),
+    );
+    await _promote(
+      metadata.coverBytes!,
+      cover,
+      stagingName: '$sha256.cover.part',
+    );
+    final domain.Book updated = book.copyWith(coverPath: cover.path);
+    await store.save(updated);
+    await store.upsertSearchIndex(updated);
+    return updated;
   }
 }
