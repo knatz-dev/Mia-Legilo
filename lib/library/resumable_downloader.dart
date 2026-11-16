@@ -70,6 +70,25 @@ class ResumableDownloader {
     void Function(DownloadProgress progress)? onProgress,
     String? expectedSha256,
     CancelToken? cancelToken,
+    Dio? dio,
+  }) async {
+    final ResumableDownloader impl =
+        dio == null ? this : ResumableDownloader(dio: dio);
+    return impl._downloadImpl(
+      uri,
+      target: target,
+      onProgress: onProgress,
+      expectedSha256: expectedSha256,
+      cancelToken: cancelToken,
+    );
+  }
+
+  Future<File> _downloadImpl(
+    Uri uri, {
+    required File target,
+    void Function(DownloadProgress progress)? onProgress,
+    String? expectedSha256,
+    CancelToken? cancelToken,
   }) async {
     if (await target.exists()) {
       if (expectedSha256 == null) return target;

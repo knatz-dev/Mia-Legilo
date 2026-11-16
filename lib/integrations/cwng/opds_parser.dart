@@ -9,6 +9,7 @@ class OpdsBook {
     this.summary,
     this.coverUrl,
     this.acquisitionUrl,
+    this.navigationUrl,
     this.updated,
   });
 
@@ -18,9 +19,11 @@ class OpdsBook {
   final String? summary;
   final String? coverUrl;
   final String? acquisitionUrl;
+  final String? navigationUrl;
   final DateTime? updated;
 
   bool get isDownloadable => acquisitionUrl != null && acquisitionUrl!.isNotEmpty;
+  bool get isNavigation => navigationUrl != null && navigationUrl!.isNotEmpty;
 }
 
 /// A navigation link in an OPDS feed.
@@ -54,6 +57,7 @@ class OpdsParser {
       final String? summary = _text(entry, 'summary') ?? _text(entry, 'content');
       String? coverUrl;
       String? acquisitionUrl;
+      String? navigationUrl;
       for (final XmlElement link in entry.findElements('link')) {
         final String rel = link.getAttribute('rel') ?? '';
         final String href = link.getAttribute('href') ?? '';
@@ -64,6 +68,10 @@ class OpdsParser {
         if (rel.contains('acquisition') || rel.contains('http://opds-spec.org/acquisition')) {
           acquisitionUrl ??= href;
         }
+        if (rel.contains('subsection') || rel.contains('http://opds-spec.org/subsection') ||
+            rel.contains('alternate')) {
+          navigationUrl ??= href;
+        }
       }
       // Fallback: any link with an epub-ish href.
       if (acquisitionUrl == null) {
@@ -71,6 +79,16 @@ class OpdsParser {
           final String href = link.getAttribute('href') ?? '';
           if (href.toLowerCase().endsWith('.epub')) {
             acquisitionUrl = href;
+            break;
+          }
+        }
+      }
+      // Fallback navigation: if no acquisition, use the first subsection link.
+      if (navigationUrl == null && acquisitionUrl == null) {
+        for (final XmlElement link in entry.findElements('link')) {
+          final String href = link.getAttribute('href') ?? '';
+          if (href.isNotEmpty) {
+            navigationUrl = href;
             break;
           }
         }
@@ -87,6 +105,7 @@ class OpdsParser {
         summary: summary,
         coverUrl: coverUrl,
         acquisitionUrl: acquisitionUrl,
+        navigationUrl: navigationUrl,
         updated: updated,
       ));
     }
@@ -98,7 +117,6 @@ class OpdsParser {
     final List<OpdsLink> links = <OpdsLink>[];
     // Feed-level links.
     final XmlElement feed = doc.rootElement;
-    if (feed == null) return links;
     for (final XmlElement link in feed.findElements('link')) {
       final String rel = link.getAttribute('rel') ?? '';
       final String href = link.getAttribute('href') ?? '';

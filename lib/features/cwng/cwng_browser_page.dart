@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
@@ -84,16 +83,22 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
     }
   }
 
-  Future<void> _loadFeed(String path) async {
+  Future<void> _loadFeed(String pathOrUrl) async {
     final CwngClient? client = _client;
     if (client == null) return;
+    // Normalize to a path for client.get (which prepends baseUrl).
+    String path = pathOrUrl;
+    if (path.startsWith('http')) {
+      final Uri uri = Uri.parse(path);
+      path = uri.path;
+      if (uri.query.isNotEmpty) path = '$path?${uri.query}';
+    }
     setState(() {
       _loadingFeed = true;
       _error = null;
     });
     try {
-      final Response<String> response =
-          await client.get<String>(path);
+      final Response<String> response = await client.get<String>(path);
       final String body = response.data ?? '';
       final OpdsParser parser = const OpdsParser();
       setState(() {
@@ -127,6 +132,7 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       await widget.library.downloader.download(
         Uri.parse(url),
         target: target,
+        dio: client.dio,
         onProgress: (DownloadProgress progress) {
           if (mounted && progress.fraction != null) {
             setState(() => _downloadProgress[key] = progress.fraction!);
@@ -281,22 +287,29 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
               final bool isDownloading = _downloading.contains(book.id);
               return Card(
                 child: ListTile(
-                  leading: const Icon(Icons.menu_book_outlined),
+                  leading: Icon(book.isNavigation
+                      ? Icons.folder_outlined
+                      : Icons.menu_book_outlined),
                   title: Text(book.title),
                   subtitle: Text(book.authors.join(', ')),
-                  trailing: isDownloading
-                      ? SizedBox(
-                          width: 48,
-                          child: LinearProgressIndicator(
-                            value: _downloadProgress[book.id],
-                          ),
-                        )
-                      : (book.isDownloadable
-                          ? IconButton(
+                  onTap: book.isNavigation
+                      ? () => _loadFeed(book.navigationUrl!)
+                      : null,
+                  trailing: book.isDownloadable
+                      ? (isDownloading
+                          ? SizedBox(
+                              width: 48,
+                              child: LinearProgressIndicator(
+                                value: _downloadProgress[book.id],
+                              ),
+                            )
+                          : IconButton(
                               icon: const Icon(Icons.download),
                               tooltip: 'Download',
                               onPressed: () => _downloadBook(book),
-                            )
+                            ))
+                      : (book.isNavigation
+                          ? const Icon(Icons.chevron_right)
                           : const Icon(Icons.block)),
                 ),
               );
