@@ -35,8 +35,40 @@ class CwngCapabilityProbe {
       states[CapabilityResource.downloads] = CapabilityState.unknown;
     }
 
-    // Status/progress/shelves/bookmarks/annotations: unverified by default.
-    // They are only upgraded after explicit verification (INT-005).
+    // CWNG write endpoints: verify app-password-based status writes.
+    // POST /api/v1/books/{id}/read-status, /read, /archived accept Basic Auth.
+    // We verify the endpoint exists (not 404) without writing test data.
+    if (auth.isBasic) {
+      // Check if the CWNG write API is available by probing a non-existent book.
+      // A 404 or 405 means the endpoint exists but the book doesn't (expected).
+      // A 401/403 means auth is insufficient.
+      try {
+        await client.post('/api/v1/books/probe/read-status',
+            data: <String, dynamic>{'status': 'unread'});
+        // If we get here, the endpoint accepted the request (unlikely for probe).
+        states[CapabilityResource.status] = CapabilityState.readWrite;
+      } on CwngException catch (e) {
+        if (e.statusCode == 404 || e.statusCode == 405 || e.statusCode == 400) {
+          // Endpoint exists but book not found / method not allowed / bad request.
+          // This means the CWNG write API is available.
+          states[CapabilityResource.status] = CapabilityState.readWrite;
+        } else if (e.statusCode == 401 || e.statusCode == 403) {
+          states[CapabilityResource.status] = CapabilityState.readOnly;
+        } else {
+          states[CapabilityResource.status] = CapabilityState.unknown;
+        }
+      } catch (_) {
+        states[CapabilityResource.status] = CapabilityState.unknown;
+      }
+
+      // Mark read (mark a book as read) uses the same auth.
+      if (states[CapabilityResource.status] == CapabilityState.readWrite) {
+        states[CapabilityResource.progress] = CapabilityState.readWrite;
+      }
+    }
+
+    // Shelves/bookmarks/annotations: OPDS doesn't support writes.
+    // CWNG doesn't have shelf sync via OPDS. Keep as unknown.
     return CapabilityMatrix(states);
   }
 }

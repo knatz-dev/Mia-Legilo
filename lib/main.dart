@@ -20,6 +20,8 @@ import 'library/epub_inspector.dart';
 import 'library/library_importer.dart';
 import 'library/library_query.dart';
 import 'library/library_service.dart';
+import 'sync/sync_service.dart';
+import 'domain/ids.dart';
 import 'library/resumable_downloader.dart';
 
 void main() {
@@ -264,6 +266,17 @@ class _HomeScreenState extends State<HomeScreen> {
     if (library == null) return;
     try {
       await library.setStatus(book.id, status);
+      // Enqueue sync if CWNG is connected.
+      final SyncService? sync = library.syncService;
+      if (sync != null) {
+        await sync.enqueueStatusChange(
+          bookId: book.id,
+          status: status,
+          providerInstanceId: book.remoteIdentity?.providerInstanceId ?? ProviderInstanceId('cwng'),
+          remoteBookId: book.remoteIdentity?.remoteBookId.value,
+        );
+        sync.sync().catchError((_) => const SyncResult());
+      }
       if (mounted) await _loadShelf();
     } catch (error) {
       if (mounted) setState(() => _error = 'Could not save status: $error');
@@ -570,6 +583,25 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Mia Legilo'),
         actions: <Widget>[
+          if (_library?.syncService != null)
+            IconButton(
+              icon: Icon(_library!.syncService!.isSyncing
+                  ? Icons.sync
+                  : Icons.sync_outlined),
+              tooltip: 'Sync with CWNG',
+              onPressed: _library!.syncService!.isSyncing
+                  ? null
+                  : () async {
+                      final result = await _library!.syncService!.sync();
+                      if (mounted) {
+                        setState(() {
+                          _message = 'Sync: ${result.committed} committed, '
+                              '${result.failed} failed';
+                        });
+                        await _loadShelf();
+                      }
+                    },
+            ),
           if (_importing && _cancelToken != null)
             IconButton(
               icon: const Icon(Icons.cancel_outlined),

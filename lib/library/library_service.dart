@@ -18,6 +18,8 @@ import '../domain/status.dart';
 import 'library_importer.dart';
 import 'library_store.dart';
 import 'resumable_downloader.dart';
+import '../sync/conflict_store.dart';
+import '../sync/sync_service.dart';
 
 /// Application-facing library facade: one place that owns the database,
 /// content-addressed storage, imports and downloads.
@@ -155,7 +157,22 @@ class LibraryService {
     originalName: p.basename(file.path),
   );
 
+  SyncService? _syncService;
+
+  SyncService? get syncService => _syncService;
+
+  void setSyncService(SyncService service) {
+    _syncService = service;
+  }
+
   Future<Book> ensureCover(Book book) => importer.ensureCover(book);
+
+  ConflictStore? get conflicts {
+    if (store is DriftLibraryStore) {
+      return ConflictStore((store as DriftLibraryStore).database);
+    }
+    return null;
+  }
 
   Future<List<Bookmark>> bookmarksFor(BookId id) => store.bookmarksFor(id);
 

@@ -8,7 +8,13 @@ import '../../integrations/cwng/cwng.dart';
 import '../../integrations/cwng/opds_parser.dart';
 import '../../library/library_importer.dart';
 import '../../library/library_service.dart';
+import '../../library/library_store.dart';
+import '../../domain/book.dart';
+import '../../domain/ids.dart';
 import '../../library/resumable_downloader.dart';
+import '../../sync/conflict_store.dart';
+import '../../sync/outbox_repository.dart';
+import '../../sync/sync_service.dart';
 
 class CwngBrowserPage extends StatefulWidget {
   const CwngBrowserPage({super.key, required this.library});
@@ -27,6 +33,7 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
 
   CwngClient? _client;
   CwngAuthState? _authState;
+  SyncService? _syncService;
   bool _connecting = false;
   String? _error;
   String? _message;
@@ -70,9 +77,31 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       final CwngAuthState state = await auth.loginBasic(username, password);
       final CwngClient client = CwngClient(baseUrl: baseUrl, authenticator: auth);
       client.attachAuth(state);
+      // Create sync service if using Drift store.
+      SyncService? syncService;
+      if (widget.library.store is DriftLibraryStore) {
+        final db = (widget.library.store as DriftLibraryStore).database;
+        final outbox = OutboxRepository(db);
+        final conflicts = ConflictStore(db);
+        final provider = CwngLibraryProvider(
+          instanceId: ProviderInstanceId(baseUrl),
+          authenticator: auth,
+          client: client,
+        );
+        await provider.refreshCapabilities();
+        syncService = SyncService(
+          outbox: outbox,
+          conflicts: conflicts,
+          provider: provider,
+          db: db,
+          client: client,
+        );
+        widget.library.setSyncService(syncService);
+      }
       setState(() {
         _authState = state;
         _client = client;
+        _syncService = syncService;
         _message = 'Connected to $baseUrl';
       });
       await _loadFeed('/opds');
@@ -140,6 +169,17 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
         },
       );
       final ImportResult result = await widget.library.importer.importFile(target);
+      // Set remote identity on the imported book.
+      if (book.calibreId != null) {
+        final Book updated = result.book.copyWith(
+          remoteIdentity: RemoteIdentity(
+            providerInstanceId: ProviderInstanceId(_client!.baseUrl),
+            remoteBookId: RemoteBookId(book.calibreId!),
+          ),
+        );
+        await widget.library.store.save(updated);
+        await widget.library.store.upsertSearchIndex(updated);
+      }
       try {
         await target.delete();
       } catch (_) {}
@@ -184,6 +224,24 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       appBar: AppBar(
         title: const Text('CWNG Library'),
         actions: <Widget>[
+          if (_syncService != null)
+            IconButton(
+              icon: Icon(_syncService!.isSyncing
+                  ? Icons.sync
+                  : Icons.sync_outlined),
+              tooltip: 'Sync',
+              onPressed: _syncService!.isSyncing
+                  ? null
+                  : () async {
+                      final result = await _syncService!.sync();
+                      if (mounted) {
+                        setState(() {
+                          _message = 'Sync: ${result.committed} committed, '
+                              '${result.failed} failed, ${result.conflicts} conflicts';
+                        });
+                      }
+                    },
+            ),
           if (_authState != null)
             IconButton(
               icon: const Icon(Icons.refresh),

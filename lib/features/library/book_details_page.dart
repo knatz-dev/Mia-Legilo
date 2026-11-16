@@ -9,6 +9,7 @@ import '../../domain/locator.dart';
 import '../../domain/status.dart';
 import '../../library/epub_inspector.dart';
 import '../../library/library_service.dart';
+import '../../sync/conflict_store.dart';
 import '../reader/reader_page.dart';
 import 'book_removal.dart';
 
@@ -33,6 +34,7 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   late Book _book;
   List<Bookmark> _bookmarks = <Bookmark>[];
+  List<BookConflict> _conflicts = <BookConflict>[];
   bool _busy = false;
 
   @override
@@ -41,6 +43,14 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
     _book = widget.book;
     _ensureCover();
     _loadBookmarks();
+    _loadConflicts();
+  }
+
+  Future<void> _loadConflicts() async {
+    final ConflictStore? cs = widget.library.conflicts;
+    if (cs == null) return;
+    final List<BookConflict> list = await cs.unresolvedFor(_book.id);
+    if (mounted) setState(() => _conflicts = list);
   }
 
   Future<void> _loadBookmarks() async {
@@ -277,6 +287,45 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
                 ],
               ),
             ),
+          if (_conflicts.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 12),
+            Text('Sync conflicts', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 4),
+            for (final BookConflict c in _conflicts)
+              Card(
+                color: Theme.of(context).colorScheme.errorContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Field: ${c.field}'),
+                      Text('Local: ${c.localValue}'),
+                      Text('Remote: ${c.remoteValue}'),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: () async {
+                              final ConflictStore? cs = widget.library.conflicts;
+                              if (cs != null) await cs.resolve(c.id);
+                              await _loadConflicts();
+                            },
+                            child: const Text('Resolve'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await _loadConflicts();
+                            },
+                            child: const Text('Defer'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
