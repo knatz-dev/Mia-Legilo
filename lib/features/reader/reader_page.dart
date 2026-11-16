@@ -56,6 +56,7 @@ class _ReaderPageState extends State<ReaderPage> {
   double? _progress;
   Future<void> _locationWrites = Future<void>.value();
   StreamSubscription<ReadingLocator>? _locationSub;
+  StreamSubscription<String>? _errorSub;
 
   @override
   void initState() {
@@ -89,6 +90,21 @@ class _ReaderPageState extends State<ReaderPage> {
       }
       _lastLocator = widget.initialLocator;
       _locationSub = _engine.onLocationChanged.listen(_onLocation);
+      _errorSub = _engine.onError.listen((String e) async {
+        if (!mounted) return;
+        // Attempt bounded crash recovery.
+        final bool recovered = await _engine.recover();
+        if (recovered) {
+          if (!mounted) return;
+          setState(() => _loading = false);
+          return;
+        }
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _loadError = 'Renderer error: $e';
+        });
+      });
       setState(() => _loading = false);
     } catch (e) {
       if (!mounted) return;
@@ -102,6 +118,7 @@ class _ReaderPageState extends State<ReaderPage> {
   @override
   void dispose() {
     _locationSub?.cancel();
+    _errorSub?.cancel();
     _searchController.dispose();
     _engine.dispose();
     super.dispose();
@@ -128,20 +145,23 @@ class _ReaderPageState extends State<ReaderPage> {
               _completionPrompted ||
               widget.initialStatus == ReadingStatus.completed ||
               widget.initialStatusManual ||
-              (locator.percentage ?? 0) < 0.995)
+              (locator.percentage ?? 0) < 0.995) {
             return;
+          }
           if (library != null &&
               widget.bookId != null &&
-              !await library.claimCompletionPrompt(BookId(widget.bookId!)))
+              !await library.claimCompletionPrompt(BookId(widget.bookId!))) {
             return;
+          }
           _completionPrompted = true;
           await _showCompletionPrompt();
         })
         .catchError((Object error) {
-          if (mounted)
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Could not save reading state: $error')),
             );
+          }
         });
   }
 
@@ -200,6 +220,7 @@ class _ReaderPageState extends State<ReaderPage> {
         double margin = _settings.margin;
         String theme = _settings.theme;
         String layout = _settings.layout;
+        bool reducedMotion = _settings.reducedMotion;
         return StatefulBuilder(
           builder: (BuildContext ctx, StateSetter setModalState) {
             return Padding(
@@ -264,7 +285,7 @@ class _ReaderPageState extends State<ReaderPage> {
                   Text('Theme', style: Theme.of(ctx).textTheme.titleMedium),
                   Wrap(
                     spacing: 8,
-                    children: <String>['light', 'dark', 'sepia']
+                    children: <String>['light', 'dark', 'sepia', 'high-contrast']
                         .map(
                           (String t) => ChoiceChip(
                             label: Text(t),
@@ -288,6 +309,13 @@ class _ReaderPageState extends State<ReaderPage> {
                         )
                         .toList(),
                   ),
+                  SwitchListTile(
+                    title: const Text('Reduced motion'),
+                    subtitle: const Text('Disable animations for e-ink / accessibility'),
+                    value: reducedMotion,
+                    onChanged: (bool v) =>
+                        setModalState(() => reducedMotion = v),
+                  ),
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerRight,
@@ -299,6 +327,7 @@ class _ReaderPageState extends State<ReaderPage> {
                           margin: margin,
                           theme: theme,
                           layout: layout,
+                          reducedMotion: reducedMotion,
                         );
                         setState(() => _settings = next);
                         _paginated = next.layout == 'paginated';

@@ -67,10 +67,11 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       if (mounted) setState(() => _book = updated);
       widget.onChanged?.call();
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not save status: $error')),
         );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -122,8 +123,9 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
         widget.library,
         _book,
         downloadOnly: downloadOnly,
-      ))
+      )) {
         return;
+      }
       final updated = await widget.library.bookById(_book.id.value);
       widget.onChanged?.call();
       if (!mounted) return;

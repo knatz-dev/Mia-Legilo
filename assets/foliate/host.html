@@ -160,13 +160,19 @@
       },
       setTheme: (theme) => {
         const dark = theme === 'dark';
+        const hc = theme === 'high-contrast';
         const sepia = theme === 'sepia';
-        const bg = dark ? '#121212' : (sepia ? '#f4ecd8' : '#fdfbf7');
-        const fg = dark ? '#e8e8e8' : (sepia ? '#5b4636' : '#1b1b1b');
+        const bg = hc ? '#ffffff' : (dark ? '#121212' : (sepia ? '#f4ecd8' : '#fdfbf7'));
+        const fg = hc ? '#000000' : (dark ? '#e8e8e8' : (sepia ? '#5b4636' : '#1b1b1b'));
         document.documentElement.style.background = bg;
         document.documentElement.style.color = fg;
         document.body.style.background = bg;
         document.body.style.color = fg;
+        if (hc) {
+          document.body.style.fontWeight = 'bold';
+        } else {
+          document.body.style.fontWeight = '';
+        }
       },
     };
 

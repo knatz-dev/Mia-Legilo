@@ -79,8 +79,9 @@ class DriftLibraryStore implements LibraryStore {
   }) => database.transaction(() async {
     final current = await findById(id);
     if (current == null) return;
-    if (current.remoteIdentity != null)
+    if (current.remoteIdentity != null) {
       throw StateError('This is not a local import.');
+    }
     await save(
       current.copyWith(
         hiddenFromLibrary: true,
@@ -465,8 +466,9 @@ class MemoryLibraryStore implements LibraryStore {
     required bool deleteReadingData,
   }) async {
     await update(id, (current) {
-      if (current.remoteIdentity != null)
+      if (current.remoteIdentity != null) {
         throw StateError('This is not a local import.');
+      }
       return current.copyWith(
         hiddenFromLibrary: true,
         clearReadingData: deleteReadingData,
@@ -514,16 +516,19 @@ class MemoryLibraryStore implements LibraryStore {
     Iterable<domain.Book> result = _books.values.where(
       (b) => !b.hiddenFromLibrary,
     );
-    if (query.authors.isNotEmpty)
+    if (query.authors.isNotEmpty) {
       result = result.where((b) => authorValues(b).any(query.authors.contains));
-    if (query.series.isNotEmpty)
+    }
+    if (query.series.isNotEmpty) {
       result = result.where(
         (b) => query.series.contains((b.series ?? '').trim()),
       );
-    if (query.shelfIds.isNotEmpty)
+    }
+    if (query.shelfIds.isNotEmpty) {
       result = result.where(
         (b) => b.shelfIds.any((s) => query.shelfIds.contains(s.value)),
       );
+    }
     final String? search = query.search?.trim().toLowerCase();
     if (search != null && search.isNotEmpty) {
       result = result.where(

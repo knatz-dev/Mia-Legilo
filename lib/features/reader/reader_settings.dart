@@ -7,6 +7,8 @@ class ReaderSettings {
     this.margin = 20,
     this.theme = 'light',
     this.layout = 'scrolled',
+    this.highContrast = false,
+    this.reducedMotion = false,
   });
 
   final double fontSize;
@@ -14,6 +16,8 @@ class ReaderSettings {
   final double margin;
   final String theme;
   final String layout;
+  final bool highContrast;
+  final bool reducedMotion;
 
   ReaderSettings copyWith({
     double? fontSize,
@@ -21,6 +25,8 @@ class ReaderSettings {
     double? margin,
     String? theme,
     String? layout,
+    bool? highContrast,
+    bool? reducedMotion,
   }) =>
       ReaderSettings(
         fontSize: fontSize ?? this.fontSize,
@@ -28,6 +34,8 @@ class ReaderSettings {
         margin: margin ?? this.margin,
         theme: theme ?? this.theme,
         layout: layout ?? this.layout,
+        highContrast: highContrast ?? this.highContrast,
+        reducedMotion: reducedMotion ?? this.reducedMotion,
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -36,6 +44,8 @@ class ReaderSettings {
         'margin': margin,
         'theme': theme,
         'layout': layout,
+        'highContrast': highContrast,
+        'reducedMotion': reducedMotion,
       };
 
   factory ReaderSettings.fromJson(Map<String, dynamic> json) => ReaderSettings(
@@ -44,6 +54,8 @@ class ReaderSettings {
         margin: (json['margin'] as num?)?.toDouble() ?? 20,
         theme: json['theme'] as String? ?? 'light',
         layout: json['layout'] as String? ?? 'scrolled',
+        highContrast: json['highContrast'] as bool? ?? false,
+        reducedMotion: json['reducedMotion'] as bool? ?? false,
       );
 
   static ReaderSettings fromJsonString(String raw) {

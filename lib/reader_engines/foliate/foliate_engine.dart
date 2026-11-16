@@ -28,6 +28,9 @@ class FoliateEngine implements ReaderEngine {
         onWebResourceError: (WebResourceError error) {
           // ignore: avoid_print
           print('FoliateEngine resource error: ${error.description} (${error.errorCode})');
+          if (!_errorController.isClosed) {
+            _errorController.add(error.description);
+          }
         },
       ));
   }
@@ -36,6 +39,17 @@ class FoliateEngine implements ReaderEngine {
   FoliateServer? _server;
   final StreamController<ReadingLocator> _locationController =
       StreamController<ReadingLocator>.broadcast();
+  final StreamController<String> _errorController =
+      StreamController<String>.broadcast();
+
+  /// Tracks the last successfully loaded source for crash recovery.
+  String? _lastSource;
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
+  ReadingLocator? _lastLocator;
+
+  /// Stream of renderer errors for crash recovery.
+  Stream<String> get onError => _errorController.stream;
 
   /// Resolves with the book title once the renderer has opened the book.
   Completer<String>? _bookOpened;
@@ -60,6 +74,8 @@ class FoliateEngine implements ReaderEngine {
     if (!await file.exists()) {
       throw FileSystemException('Book file not found', file.path);
     }
+    _lastSource = source;
+    _retryCount = 0;
     final Uri bookUri = server.registerBook(file);
     final Uri page = server.harnessUri
         .replace(queryParameters: <String, String>{'book': bookUri.toString()});
@@ -233,9 +249,54 @@ class FoliateEngine implements ReaderEngine {
     ''');
   }
 
+  /// Last known reading position, used for crash recovery.
+  ReadingLocator? get lastLocator => _lastLocator;
+
+  /// Attempts crash recovery with bounded retries. Returns true if recovery
+  /// succeeded.
+  Future<bool> recover() async {
+    if (_lastSource == null || _retryCount >= _maxRetries) {
+      return false;
+    }
+    _retryCount++;
+    try {
+      await initialize();
+      final FoliateServer server = _server!;
+      final File file = await _materialize(_lastSource!);
+      if (!await file.exists()) return false;
+      final Uri bookUri = server.registerBook(file);
+      final Uri page = server.harnessUri.replace(
+        queryParameters: <String, String>{'book': bookUri.toString()},
+      );
+      _bookOpened = Completer<String>();
+      await _controller.loadRequest(page);
+      // Wait for book to open.
+      await _bookOpened!.future.timeout(const Duration(seconds: 15));
+      // Restore position.
+      if (_lastLocator != null) {
+        await goTo(_lastLocator!);
+      }
+      _retryCount = 0;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Reloads the current book from the last known source.
+  Future<void> reload() async {
+    if (_lastSource != null) {
+      await load(_lastSource!);
+      if (_lastLocator != null) {
+        await goTo(_lastLocator!);
+      }
+    }
+  }
+
   @override
   Future<void> dispose() async {
     await _locationController.close();
+    await _errorController.close();
     await _server?.close();
     _server = null;
   }
@@ -248,7 +309,7 @@ class FoliateEngine implements ReaderEngine {
       final Map<String, dynamic> payload = msg.payload ?? <String, dynamic>{};
       switch (msg.type) {
         case 'location':
-          _locationController.add(ReadingLocator(
+          final ReadingLocator loc = ReadingLocator(
             cfi: payload['cfi'] as String?,
             anchor: payload['anchor'] as String?,
             percentage: (payload['percentage'] as num?)?.toDouble(),
@@ -256,7 +317,9 @@ class FoliateEngine implements ReaderEngine {
               (LocatorPrecision e) => e.name == payload['precision'],
               orElse: () => LocatorPrecision.approximate,
             ),
-          ));
+          );
+          _lastLocator = loc;
+          _locationController.add(loc);
         case 'book':
           // ignore: avoid_print
           print('FoliateEngine.book: ${payload['title']} (${payload['sections']} sections)');

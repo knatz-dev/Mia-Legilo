@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import 'domain/book.dart';
 import 'domain/locator.dart';
 import 'domain/status.dart';
+import 'features/cwng/cwng_browser_page.dart';
 import 'features/library/book_details_page.dart';
 import 'features/library/book_removal.dart';
 import 'features/library/library_filters.dart';
@@ -134,8 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
         final raw = await library.store.readSetting('library.query');
-        if (raw != null)
+        if (raw != null) {
           q = LibraryQuery.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+        }
         _query = q;
         _searchController.removeListener(_onSearchChanged);
         _searchController.text = q.search ?? '';
@@ -182,8 +184,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       if (mounted) await _runQuery();
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() => _error = 'Could not save library preferences: $error');
+      }
     }
   }
 
@@ -652,10 +655,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   if (mounted) setState(() => _autoStartReading = value);
                 } catch (error) {
-                  if (mounted)
+                  if (mounted) {
                     setState(
                       () => _error = 'Could not save preference: $error',
                     );
+                  }
                 }
               },
             ),
@@ -736,8 +740,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     ],
                     onChanged: (LibrarySourceFilter? f) {
-                      if (f != null)
+                      if (f != null) {
                         _updateQuery(_query.copyWith(sourceFilter: f));
+                      }
                     },
                   ),
                 ),
@@ -755,8 +760,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                     ],
                     onChanged: (LibraryAvailabilityFilter? f) {
-                      if (f != null)
+                      if (f != null) {
                         _updateQuery(_query.copyWith(availabilityFilter: f));
+                      }
                     },
                   ),
                 ),
@@ -871,7 +877,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 onOpen: _open,
                 onLongPress: _showBookActions,
               ),
-            const Divider(height: 32),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.cloud),
+                label: const Text('Browse CWNG'),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => CwngBrowserPage(library: _library!),
+                    ),
+                  );
+                },
+              ),
+            ),
             Align(
               alignment: Alignment.centerLeft,
               child: OutlinedButton.icon(

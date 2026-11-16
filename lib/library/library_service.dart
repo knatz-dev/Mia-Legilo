@@ -100,8 +100,9 @@ class LibraryService {
     final book = await store.findById(id);
     if (book == null ||
         book.readingStatus == ReadingStatus.completed ||
-        book.readingStatusManual)
+        book.readingStatusManual) {
       return false;
+    }
     final key =
         'reader.completionPrompted:${id.value}:${book.localAssetRevision ?? 0}';
     if (await store.readSetting(key) == 'true') return false;
@@ -122,8 +123,9 @@ class LibraryService {
         final managedRoot = await root.resolveSymbolicLinks();
         if (await file.exists()) {
           final resolved = await file.resolveSymbolicLinks();
-          if (!p.isWithin(managedRoot, resolved))
+          if (!p.isWithin(managedRoot, resolved)) {
             throw StateError('File is outside app-managed storage.');
+          }
           await file.delete();
         }
       }
