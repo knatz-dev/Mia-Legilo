@@ -164,7 +164,8 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       );
       final SettingsService? settings = widget.settings;
       if (settings != null) {
-        final List<ConnectionProfile> profiles = await settings.connections();
+        final List<ConnectionProfile> profiles =
+            List<ConnectionProfile>.from(await settings.connections());
         profiles.add(profile);
         await settings.saveConnections(profiles);
       }
@@ -249,7 +250,8 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       // Update lastConnectedAt.
       final SettingsService? settings = widget.settings;
       if (settings != null && profileId != null) {
-        final List<ConnectionProfile> profiles = await settings.connections();
+        final List<ConnectionProfile> profiles =
+            List<ConnectionProfile>.from(await settings.connections());
         final int idx = profiles.indexWhere(
           (ConnectionProfile p) => p.id == profileId,
         );
