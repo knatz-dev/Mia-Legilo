@@ -43,9 +43,9 @@ class CwngCapabilityProbe {
       // A 404 or 405 means the endpoint exists but the book doesn't (expected).
       // A 401/403 means auth is insufficient.
       try {
-        await client.post('/api/v1/books/probe/read-status',
-            data: <String, dynamic>{'status': 'unread'});
-        // If we get here, the endpoint accepted the request (unlikely for probe).
+        await client.head('/api/v1/books/probe/read-status');
+        // A HEAD that reaches the endpoint proves it exists. Some deployments
+        // reject HEAD, so a 405 is also evidence of the route, not of a write.
         states[CapabilityResource.status] = CapabilityState.readWrite;
       } on CwngException catch (e) {
         if (e.statusCode == 404 || e.statusCode == 405 || e.statusCode == 400) {

@@ -51,6 +51,15 @@ class CwngClient {
     }
   }
 
+  /// Non-mutating probe: checks that a route exists without writing.
+  Future<Response<void>> head(String path) async {
+    try {
+      return await _dio.head<void>(path);
+    } on DioException catch (e) {
+      throw _map(e);
+    }
+  }
+
   CwngException _map(DioException e) {
     final status = e.response?.statusCode;
     if (e.type == DioExceptionType.connectionError ||

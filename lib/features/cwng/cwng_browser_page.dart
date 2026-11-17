@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -10,6 +11,7 @@ import '../../core/design/widgets.dart';
 import '../../domain/book.dart';
 import '../../domain/ids.dart';
 import '../../integrations/cwng/cwng.dart';
+import '../../integrations/cwng/credential_store.dart';
 import '../../integrations/cwng/opds_parser.dart';
 import '../../library/library_importer.dart';
 import '../../library/library_service.dart';
@@ -18,22 +20,34 @@ import '../../library/resumable_downloader.dart';
 import '../../sync/conflict_store.dart';
 import '../../sync/outbox_repository.dart';
 import '../../sync/sync_service.dart';
+import '../settings/settings_model.dart';
+import '../settings/settings_service.dart';
 
-/// CWNG catalog browsing and download. Credentials come from the secure
-/// store via [CwngAuthenticator]; this page never renders a password.
+/// CWNG catalog browsing and download.
+///
+/// The server URL and username are pre-filled from the saved connection
+/// profiles in Settings; the password is read from secure storage and is never
+/// rendered. One [SecureTokenStore] is shared by the authenticator, the client
+/// and the sync service so an authenticated session survives the page.
 class CwngBrowserPage extends StatefulWidget {
-  const CwngBrowserPage({super.key, required this.library});
+  const CwngBrowserPage({
+    super.key,
+    required this.library,
+    this.settings,
+    this.credentials,
+  });
 
   final LibraryService library;
+  final SettingsService? settings;
+  final CwngCredentialStore? credentials;
 
   @override
   State<CwngBrowserPage> createState() => _CwngBrowserPageState();
 }
 
 class _CwngBrowserPageState extends State<CwngBrowserPage> {
-  final TextEditingController _urlController = TextEditingController(
-    text: 'https://library.knatz.dev',
-  );
+  final TokenStore _tokenStore = SecureTokenStore();
+  final TextEditingController _urlController = TextEditingController();
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
@@ -43,6 +57,7 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
   bool _connecting = false;
   String? _error;
   String? _message;
+  String? _activeProfileId;
 
   List<OpdsBook> _books = <OpdsBook>[];
   List<OpdsLink> _links = <OpdsLink>[];
@@ -52,12 +67,46 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
   final Map<String, double> _downloadProgress = <String, double>{};
   final Set<String> _downloading = <String>{};
 
+  CwngCredentialStore get _credentialStore =>
+      widget.credentials ?? CwngCredentialStore();
+
+  @override
+  void initState() {
+    super.initState();
+    _prefillFromSaved();
+  }
+
   @override
   void dispose() {
     _urlController.dispose();
     _userController.dispose();
     _passController.dispose();
     super.dispose();
+  }
+
+  /// Fills the form from the most recent saved connection and silently tries
+  /// to resume that session. A failure just leaves the login form showing.
+  Future<void> _prefillFromSaved() async {
+    final SettingsService? settings = widget.settings;
+    if (settings == null) return;
+    final List<ConnectionProfile> profiles = await settings.connections();
+    if (!mounted || profiles.isEmpty) return;
+    final ConnectionProfile profile = profiles.first;
+    setState(() {
+      _urlController.text = profile.serverUrl;
+      _userController.text = profile.username;
+    });
+    final String? secret = await _credentialStore.read(profile.id);
+    if (!mounted || secret == null) return;
+    final List<String> parts = utf8.decode(base64Decode(secret)).split(':');
+    if (parts.length != 2) return;
+    await _connectWith(
+      baseUrl: profile.serverUrl,
+      username: parts[0],
+      password: parts[1],
+      profileId: profile.id,
+      restoring: true,
+    );
   }
 
   Future<void> _connect() async {
@@ -68,6 +117,65 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       setState(() => _error = 'Enter server URL and username.');
       return;
     }
+    final Uri? uri = Uri.tryParse(baseUrl);
+    if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
+      setState(() => _error = 'Enter a valid server URL, including https://');
+      return;
+    }
+    if (password.isEmpty) {
+      // A saved profile may already hold the secret.
+      final String? profileId =
+          _activeProfileId ?? await _profileIdFor(baseUrl);
+      final String? secret = profileId == null
+          ? null
+          : await _credentialStore.read(profileId);
+      if (secret == null) {
+        setState(
+          () => _error = 'Enter a password or app password.',
+        );
+        return;
+      }
+      final List<String> parts = utf8.decode(base64Decode(secret)).split(':');
+      if (parts.length != 2 || parts[0] != username) {
+        setState(() => _error = 'Enter a password or app password.');
+        return;
+      }
+      await _connectWith(
+        baseUrl: baseUrl,
+        username: username,
+        password: parts[1],
+        profileId: profileId,
+      );
+      return;
+    }
+    final String? profileId = await _profileIdFor(baseUrl);
+    await _connectWith(
+      baseUrl: baseUrl,
+      username: username,
+      password: password,
+      profileId: profileId,
+    );
+  }
+
+  /// Finds the saved profile whose server URL matches [baseUrl], so a manual
+  /// login can still reuse and refresh the stored secret.
+  Future<String?> _profileIdFor(String baseUrl) async {
+    final SettingsService? settings = widget.settings;
+    if (settings == null) return null;
+    final List<ConnectionProfile> profiles = await settings.connections();
+    for (final ConnectionProfile profile in profiles) {
+      if (profile.serverUrl == baseUrl) return profile.id;
+    }
+    return null;
+  }
+
+  Future<void> _connectWith({
+    required String baseUrl,
+    required String username,
+    required String password,
+    String? profileId,
+    bool restoring = false,
+  }) async {
     setState(() {
       _connecting = true;
       _error = null;
@@ -77,10 +185,13 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       final Dio dio = Dio(BaseOptions(baseUrl: baseUrl));
       final CwngAuthenticator auth = CwngAuthenticator(
         dio: dio,
-        tokenStore: InMemoryTokenStore(),
+        tokenStore: _tokenStore,
         baseUrl: baseUrl,
       );
       final CwngAuthState state = await auth.loginBasic(username, password);
+      if (profileId != null) {
+        await _credentialStore.write(profileId, username, password);
+      }
       final CwngClient client = CwngClient(
         baseUrl: baseUrl,
         authenticator: auth,
@@ -96,6 +207,7 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
           authenticator: auth,
           client: client,
         );
+        provider.attachAuth(state);
         await provider.refreshCapabilities();
         syncService = SyncService(
           outbox: outbox,
@@ -104,19 +216,23 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
           db: db,
           client: client,
         );
+        await syncService.recoverOnStartup();
         widget.library.setSyncService(syncService);
       }
       setState(() {
         _authState = state;
         _client = client;
         _syncService = syncService;
+        _activeProfileId = profileId;
         _message = 'Connected to $baseUrl';
       });
       await _loadFeed('/opds');
     } catch (e) {
-      setState(() => _error = 'Connection failed: $e');
+      if (!restoring) setState(() => _error = 'Connection failed: $e');
     } finally {
-      if (mounted) setState(() => _connecting = false);
+      if (mounted) {
+        setState(() => _connecting = false);
+      }
     }
   }
 
@@ -458,25 +574,5 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
         ],
       ),
     );
-  }
-}
-
-/// In-memory token store for the browse session. Credentials entered here are
-/// held only for the lifetime of the page; the app's saved connections keep
-/// their own secure store.
-class InMemoryTokenStore implements TokenStore {
-  final Map<String, String> _store = <String, String>{};
-
-  @override
-  Future<String?> read(String key) async => _store[key];
-
-  @override
-  Future<void> write(String key, String value) async {
-    _store[key] = value;
-  }
-
-  @override
-  Future<void> delete(String key) async {
-    _store.remove(key);
   }
 }

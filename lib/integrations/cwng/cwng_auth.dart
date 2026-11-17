@@ -71,6 +71,7 @@ class CwngAuthenticator {
   static const _tokenKey = 'cwng_access_token';
   static const _refreshKey = 'cwng_refresh_token';
   static const _expiryKey = 'cwng_token_expiry';
+  static const _schemeKey = 'cwng_auth_scheme';
 
   Future<CwngAuthState> login(CwngCredentials credentials) async {
     try {
@@ -104,8 +105,7 @@ class CwngAuthenticator {
       );
       if (response.statusCode != null && response.statusCode! >= 200 && response.statusCode! < 300) {
         final state = CwngAuthState(accessToken: creds, scheme: 'basic');
-        await tokenStore.write(_tokenKey, creds);
-        await tokenStore.write('cwng_auth_scheme', 'basic');
+        await _persist(state);
         return state;
       }
       throw const CwngException(CwngErrorKind.authentication, 'Invalid credentials');
@@ -150,10 +150,12 @@ class CwngAuthenticator {
     await tokenStore.delete(_tokenKey);
     await tokenStore.delete(_refreshKey);
     await tokenStore.delete(_expiryKey);
+    await tokenStore.delete(_schemeKey);
   }
 
   Future<void> _persist(CwngAuthState state) async {
     await tokenStore.write(_tokenKey, state.accessToken);
+    await tokenStore.write(_schemeKey, state.scheme);
     if (state.refreshToken != null) {
       await tokenStore.write(_refreshKey, state.refreshToken!);
     }

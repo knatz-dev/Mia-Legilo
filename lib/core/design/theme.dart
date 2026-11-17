@@ -47,27 +47,84 @@ TextTheme buildMiaLegiloTextTheme() {
   );
 }
 
-/// Builds the app theme from the shared tokens.
-ThemeData buildMiaLegiloTheme() {
+/// Colour roles the theme builder needs, so light and dark share one layout
+/// and differ only in palette.
+class _Palette {
+  const _Palette({
+    required this.paper,
+    required this.surface,
+    required this.ink,
+    required this.inkMuted,
+    required this.inkDisabled,
+    required this.accent,
+    required this.accentFill,
+    required this.borderInk,
+    required this.borderFaint,
+  });
+
+  final Color paper;
+  final Color surface;
+  final Color ink;
+  final Color inkMuted;
+  final Color inkDisabled;
+  final Color accent;
+  final Color accentFill;
+  final Color borderInk;
+  final Color borderFaint;
+}
+
+const _Palette _lightPalette = _Palette(
+  paper: kPaper,
+  surface: kPaperSurface,
+  ink: kInk,
+  inkMuted: kInkMuted,
+  inkDisabled: kInkDisabled,
+  accent: kAccent,
+  accentFill: kAccentFill,
+  borderInk: kBorderInk,
+  borderFaint: kBorderFaint,
+);
+
+/// Same warm palette inverted: the accent stays the single saturated colour.
+const _Palette _darkPalette = _Palette(
+  paper: kPaperDark,
+  surface: kPaperSurfaceDark,
+  ink: kInkDark,
+  inkMuted: kInkMutedDark,
+  inkDisabled: kInkDisabledDark,
+  accent: kAccent,
+  accentFill: kAccentFillDark,
+  borderInk: kBorderInkDark,
+  borderFaint: kBorderFaintDark,
+);
+
+/// Builds the light app theme from the shared tokens.
+ThemeData buildMiaLegiloTheme() => _buildTheme(_lightPalette);
+
+/// Builds the dark app theme. Same type, spacing and sketch tokens as the
+/// light theme; only the palette changes.
+ThemeData buildMiaLegiloDarkTheme() => _buildTheme(_darkPalette);
+
+ThemeData _buildTheme(_Palette p) {
   final ColorScheme scheme = ColorScheme.light(
-    primary: kAccent,
-    onPrimary: kPaper,
-    primaryContainer: kAccentFill,
-    onPrimaryContainer: kAccent,
-    secondary: kInkMuted,
-    onSecondary: kPaper,
-    secondaryContainer: kAccentFill,
-    onSecondaryContainer: kInk,
-    surface: kPaper,
-    onSurface: kInk,
-    surfaceContainerHighest: kPaperSurface,
-    onSurfaceVariant: kInkMuted,
-    outline: kBorderInk,
-    outlineVariant: kBorderFaint,
-    error: kAccent,
-    onError: kPaper,
-    errorContainer: kAccentFill,
-    onErrorContainer: kAccent,
+    primary: p.accent,
+    onPrimary: p.paper,
+    primaryContainer: p.accentFill,
+    onPrimaryContainer: p.accent,
+    secondary: p.inkMuted,
+    onSecondary: p.paper,
+    secondaryContainer: p.accentFill,
+    onSecondaryContainer: p.ink,
+    surface: p.paper,
+    onSurface: p.ink,
+    surfaceContainerHighest: p.surface,
+    onSurfaceVariant: p.inkMuted,
+    outline: p.borderInk,
+    outlineVariant: p.borderFaint,
+    error: p.accent,
+    onError: p.paper,
+    errorContainer: p.accentFill,
+    onErrorContainer: p.accent,
   );
 
   final TextTheme text = buildMiaLegiloTextTheme();
@@ -75,10 +132,10 @@ ThemeData buildMiaLegiloTheme() {
   return ThemeData(
     useMaterial3: true,
     colorScheme: scheme,
-    scaffoldBackgroundColor: kPaper,
-    canvasColor: kPaper,
+    scaffoldBackgroundColor: p.paper,
+    canvasColor: p.paper,
     splashFactory: NoSplash.splashFactory,
-    highlightColor: kAccentFill.withValues(alpha: 0.45),
+    highlightColor: p.accentFill.withValues(alpha: 0.45),
     textTheme: text,
     primaryTextTheme: text,
     typography: Typography.material2021(
@@ -86,123 +143,123 @@ ThemeData buildMiaLegiloTheme() {
       colorScheme: scheme,
     ),
     appBarTheme: AppBarTheme(
-      backgroundColor: kPaper,
-      foregroundColor: kInk,
+      backgroundColor: p.paper,
+      foregroundColor: p.ink,
       elevation: 0,
       scrolledUnderElevation: 0,
       centerTitle: false,
-      titleTextStyle: _style(19, FontWeight.w700, kInk),
+      titleTextStyle: _style(19, FontWeight.w700, p.ink),
     ),
-    dividerTheme: const DividerThemeData(
-      color: kBorderFaint,
+    dividerTheme: DividerThemeData(
+      color: p.borderFaint,
       thickness: 1,
       space: 1,
     ),
-    dividerColor: kBorderFaint,
+    dividerColor: p.borderFaint,
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: kPaperSurface,
+      fillColor: p.surface,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: kSpace3,
         vertical: kSpace3,
       ),
-      hintStyle: const TextStyle(color: kInkDisabled, fontSize: 15),
-      labelStyle: const TextStyle(color: kInkMuted, fontSize: 15),
-      floatingLabelStyle: const TextStyle(color: kAccent, fontSize: 14),
-      border: const OutlineInputBorder(
-        borderSide: BorderSide(color: kBorderInk, width: kStrokeHairline),
+      hintStyle: TextStyle(color: p.inkDisabled, fontSize: 15),
+      labelStyle: TextStyle(color: p.inkMuted, fontSize: 15),
+      floatingLabelStyle: TextStyle(color: p.accent, fontSize: 14),
+      border: OutlineInputBorder(
+        borderSide: BorderSide(color: p.borderInk, width: kStrokeHairline),
         borderRadius: BorderRadius.all(Radius.circular(3)),
       ),
-      enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: kBorderInk, width: kStrokeHairline),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: p.borderInk, width: kStrokeHairline),
         borderRadius: BorderRadius.all(Radius.circular(3)),
       ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: kAccent, width: kStrokeFocus),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: p.accent, width: kStrokeFocus),
         borderRadius: BorderRadius.all(Radius.circular(3)),
       ),
-      errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: kAccent, width: kStrokeHairline),
+      errorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: p.accent, width: kStrokeHairline),
         borderRadius: BorderRadius.all(Radius.circular(3)),
       ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: kAccent, width: kStrokeFocus),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: p.accent, width: kStrokeFocus),
         borderRadius: BorderRadius.all(Radius.circular(3)),
       ),
     ),
-    textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: kAccent,
-      selectionColor: kAccentFill,
-      selectionHandleColor: kAccent,
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: p.accent,
+      selectionColor: p.accentFill,
+      selectionHandleColor: p.accent,
     ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
         (Set<WidgetState> states) =>
-            states.contains(WidgetState.selected) ? kAccent : kPaperSurface,
+            states.contains(WidgetState.selected) ? p.accent : p.surface,
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (Set<WidgetState> states) =>
-            states.contains(WidgetState.selected) ? kAccentFill : kPaperSurface,
+            states.contains(WidgetState.selected) ? p.accentFill : p.surface,
       ),
-      trackOutlineColor: const WidgetStatePropertyAll(kBorderInk),
+      trackOutlineColor: WidgetStatePropertyAll(p.borderInk),
       trackOutlineWidth: const WidgetStatePropertyAll(1.4),
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (Set<WidgetState> states) =>
-            states.contains(WidgetState.selected) ? kAccentFill : kPaperSurface,
+            states.contains(WidgetState.selected) ? p.accentFill : p.surface,
       ),
-      checkColor: const WidgetStatePropertyAll(kAccent),
-      side: const BorderSide(color: kBorderInk, width: 1.4),
+      checkColor: WidgetStatePropertyAll(p.accent),
+      side: BorderSide(color: p.borderInk, width: 1.4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
     ),
     radioTheme: RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith(
         (Set<WidgetState> states) =>
-            states.contains(WidgetState.selected) ? kAccent : kPaperSurface,
+            states.contains(WidgetState.selected) ? p.accent : p.surface,
       ),
     ),
-    sliderTheme: const SliderThemeData(
-      activeTrackColor: kAccent,
-      inactiveTrackColor: kBorderFaint,
-      thumbColor: kAccent,
-      overlayColor: kAccentFill,
+    sliderTheme: SliderThemeData(
+      activeTrackColor: p.accent,
+      inactiveTrackColor: p.borderFaint,
+      thumbColor: p.accent,
+      overlayColor: p.accentFill,
       trackHeight: 3,
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: kAccent,
-      linearTrackColor: kBorderFaint,
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: p.accent,
+      linearTrackColor: p.borderFaint,
     ),
-    tabBarTheme: const TabBarThemeData(
-      labelColor: kAccent,
-      unselectedLabelColor: kInkMuted,
-      indicatorColor: kAccent,
-      dividerColor: kBorderFaint,
+    tabBarTheme: TabBarThemeData(
+      labelColor: p.accent,
+      unselectedLabelColor: p.inkMuted,
+      indicatorColor: p.accent,
+      dividerColor: p.borderFaint,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: kPaperSurface,
-      contentTextStyle: const TextStyle(color: kInk, fontSize: 14.5),
+      backgroundColor: p.surface,
+      contentTextStyle: TextStyle(color: p.ink, fontSize: 14.5),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
-        side: const BorderSide(color: kBorderInk, width: kStrokeHairline),
+        side: BorderSide(color: p.borderInk, width: kStrokeHairline),
       ),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: kPaperSurface,
+      backgroundColor: p.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
-        side: const BorderSide(color: kBorderInk, width: kStrokeHairline),
+        side: BorderSide(color: p.borderInk, width: kStrokeHairline),
       ),
-      titleTextStyle: _style(19, FontWeight.w700, kInk),
-      contentTextStyle: _style(14.5, FontWeight.w400, kInk, height: 1.5),
+      titleTextStyle: _style(19, FontWeight.w700, p.ink),
+      contentTextStyle: _style(14.5, FontWeight.w400, p.ink, height: 1.5),
     ),
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: kPaperSurface,
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: p.surface,
       surfaceTintColor: Colors.transparent,
-      modalBackgroundColor: kPaperSurface,
+      modalBackgroundColor: p.surface,
       elevation: 0,
       modalElevation: 0,
       shape: RoundedRectangleBorder(
@@ -210,47 +267,47 @@ ThemeData buildMiaLegiloTheme() {
           topLeft: Radius.circular(3),
           topRight: Radius.circular(3),
         ),
-        side: BorderSide(color: kBorderInk, width: kStrokeHairline),
+        side: BorderSide(color: p.borderInk, width: kStrokeHairline),
       ),
       showDragHandle: false,
     ),
-    drawerTheme: const DrawerThemeData(
-      backgroundColor: kPaperSurface,
+    drawerTheme: DrawerThemeData(
+      backgroundColor: p.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
     ),
-    listTileTheme: const ListTileThemeData(
-      iconColor: kInk,
-      textColor: kInk,
+    listTileTheme: ListTileThemeData(
+      iconColor: p.ink,
+      textColor: p.ink,
       contentPadding: EdgeInsets.symmetric(horizontal: kSpace4),
       minVerticalPadding: kSpace2,
     ),
     popupMenuTheme: PopupMenuThemeData(
-      color: kPaperSurface,
+      color: p.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      textStyle: const TextStyle(color: kInk, fontSize: 14.5),
+      textStyle: TextStyle(color: p.ink, fontSize: 14.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
-        side: const BorderSide(color: kBorderInk, width: kStrokeHairline),
+        side: BorderSide(color: p.borderInk, width: kStrokeHairline),
       ),
     ),
-    menuTheme: const MenuThemeData(
+    menuTheme: MenuThemeData(
       style: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(kPaperSurface),
+        backgroundColor: WidgetStatePropertyAll(p.surface),
         surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
         elevation: WidgetStatePropertyAll(0),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(3)),
-            side: BorderSide(color: kBorderInk, width: kStrokeHairline),
+            side: BorderSide(color: p.borderInk, width: kStrokeHairline),
           ),
         ),
       ),
     ),
-    tooltipTheme: const TooltipThemeData(
-      textStyle: TextStyle(color: kPaper, fontSize: 12.5),
-      decoration: BoxDecoration(color: kInk),
+    tooltipTheme: TooltipThemeData(
+      textStyle: TextStyle(color: p.paper, fontSize: 12.5),
+      decoration: BoxDecoration(color: p.ink),
     ),
     buttonTheme: const ButtonThemeData(
       shape: RoundedRectangleBorder(),
@@ -260,50 +317,50 @@ ThemeData buildMiaLegiloTheme() {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: kAccent,
-        minimumSize: const Size(72, kMinTarget),
-        textStyle: _style(14.5, FontWeight.w600, kAccent),
+        foregroundColor: p.accent,
+        minimumSize: Size(72, kMinTarget),
+        textStyle: _style(14.5, FontWeight.w600, p.accent),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: kAccent,
-        foregroundColor: kPaper,
+        backgroundColor: p.accent,
+        foregroundColor: p.paper,
         minimumSize: const Size(72, kMinTarget),
-        shape: const RoundedRectangleBorder(),
-        textStyle: _style(15, FontWeight.w600, kPaper),
+        shape: RoundedRectangleBorder(),
+        textStyle: _style(15, FontWeight.w600, p.paper),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: kInk,
-        minimumSize: const Size(72, kMinTarget),
-        side: const BorderSide(color: kBorderInk, width: kStrokeBold),
-        shape: const RoundedRectangleBorder(),
-        textStyle: _style(15, FontWeight.w600, kInk),
+        foregroundColor: p.ink,
+        minimumSize: Size(72, kMinTarget),
+        side: BorderSide(color: p.borderInk, width: kStrokeBold),
+        shape: RoundedRectangleBorder(),
+        textStyle: _style(15, FontWeight.w600, p.ink),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: kAccentFill,
-        foregroundColor: kInk,
+        backgroundColor: p.accentFill,
+        foregroundColor: p.ink,
         elevation: 0,
         minimumSize: const Size(72, kMinTarget),
         shape: const RoundedRectangleBorder(),
       ),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: kPaperSurface,
-      selectedColor: kAccentFill,
-      labelStyle: const TextStyle(color: kInk, fontSize: 14),
-      secondaryLabelStyle: const TextStyle(color: kAccent, fontSize: 14),
-      side: const BorderSide(color: kBorderInk, width: kStrokeHairline),
+      backgroundColor: p.surface,
+      selectedColor: p.accentFill,
+      labelStyle: TextStyle(color: p.ink, fontSize: 14),
+      secondaryLabelStyle: TextStyle(color: p.accent, fontSize: 14),
+      side: BorderSide(color: p.borderInk, width: kStrokeHairline),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
       padding: const EdgeInsets.symmetric(horizontal: kSpace3),
       showCheckmark: false,
     ),
-    focusColor: kAccent,
-    hoverColor: kAccentFill.withValues(alpha: 0.5),
-    splashColor: kAccentFill,
+    focusColor: p.accent,
+    hoverColor: p.accentFill.withValues(alpha: 0.5),
+    splashColor: p.accentFill,
   );
 }

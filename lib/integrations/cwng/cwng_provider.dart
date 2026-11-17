@@ -34,6 +34,13 @@ class CwngLibraryProvider implements LibraryProvider {
     await refreshCapabilities();
   }
 
+  /// Adopts an already-authenticated session and probes it, so a caller that
+  /// logged in directly does not have to authenticate twice.
+  Future<void> attachAuth(CwngAuthState state) async {
+    _auth = state;
+    client.attachAuth(state);
+  }
+
   @override
   Future<CapabilityMatrix> refreshCapabilities() async {
     if (_auth == null) return _capabilities;

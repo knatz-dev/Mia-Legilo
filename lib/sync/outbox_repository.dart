@@ -74,10 +74,23 @@ class OutboxRepository {
 
   Future<List<OutboxEntry>> pending() async {
     final rows = await (db.select(db.outboxEntries)
-          ..where((t) => t.status.equals('pending') | t.status.equals('failed'))
+          ..where((t) =>
+              t.status.equals('pending') |
+              t.status.equals('failed') |
+              t.status.equals('inFlight'))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
     return rows.map(_toEntry).toList();
+  }
+
+  /// Marks entries abandoned by a previous process run as retryable. Called
+  /// once when the sync service starts, so a kill between `markInFlight` and
+  /// `markCommitted` cannot strand a row forever.
+  Future<int> recoverInFlight() async {
+    final result = await (db.update(db.outboxEntries)
+          ..where((t) => t.status.equals('inFlight')))
+        .write(const data.OutboxEntriesCompanion(status: Value('failed')));
+    return result;
   }
 
   Future<void> markInFlight(String id) async {

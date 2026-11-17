@@ -3,23 +3,33 @@ import 'package:material_ui/material_ui.dart';
 import '../../core/design/fields.dart';
 import '../../core/design/tokens.dart';
 import '../../core/design/widgets.dart';
+import '../../integrations/cwng/credential_store.dart';
 import 'settings_model.dart';
 import 'settings_service.dart';
 
 /// Connections: add, edit and remove CWNG server profiles.
 ///
-/// Credentials are entered once and stored by the authenticator's secure
-/// store; this page never displays a password (SPEC CON-002).
+/// Credentials are entered once and written to platform secure storage keyed
+/// by profile id; this page never displays a password (SPEC CON-002), and the
+/// non-secret [ConnectionProfile] JSON never carries one.
 class ConnectionSettingsPage extends StatefulWidget {
-  const ConnectionSettingsPage({super.key, required this.settings});
+  const ConnectionSettingsPage({
+    super.key,
+    required this.settings,
+    this.credentials,
+  });
 
   final SettingsService settings;
+  final CwngCredentialStore? credentials;
 
   @override
   State<ConnectionSettingsPage> createState() => _ConnectionSettingsPageState();
 }
 
 class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
+  CwngCredentialStore get _credentials =>
+      widget.credentials ?? CwngCredentialStore();
+
   List<ConnectionProfile> _profiles = <ConnectionProfile>[];
   bool _loading = true;
 
@@ -42,30 +52,44 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
   Future<void> _persist() => widget.settings.saveConnections(_profiles);
 
   Future<void> _add() async {
-    final ConnectionProfile? profile = await showDialog<ConnectionProfile>(
+    final _ConnectionDraft? draft = await showDialog<_ConnectionDraft>(
       context: context,
       builder: (_) => const _ConnectionEditDialog(),
     );
-    if (profile == null) return;
+    if (draft == null) return;
+    if (draft.password.isNotEmpty) {
+      await _credentials.write(
+        draft.profile.id,
+        draft.profile.username,
+        draft.password,
+      );
+    }
     setState(() {
       _profiles = <ConnectionProfile>[
-        ..._profiles.where((ConnectionProfile p) => p.id != profile.id),
-        profile,
+        ..._profiles.where((ConnectionProfile p) => p.id != draft.profile.id),
+        draft.profile,
       ];
     });
     await _persist();
   }
 
   Future<void> _edit(ConnectionProfile profile) async {
-    final ConnectionProfile? updated = await showDialog<ConnectionProfile>(
+    final _ConnectionDraft? draft = await showDialog<_ConnectionDraft>(
       context: context,
       builder: (_) => _ConnectionEditDialog(existing: profile),
     );
-    if (updated == null) return;
+    if (draft == null) return;
+    if (draft.password.isNotEmpty) {
+      await _credentials.write(
+        draft.profile.id,
+        draft.profile.username,
+        draft.password,
+      );
+    }
     setState(() {
       _profiles = <ConnectionProfile>[
         for (final ConnectionProfile p in _profiles)
-          if (p.id == updated.id) updated else p,
+          if (p.id == draft.profile.id) draft.profile else p,
       ];
     });
     await _persist();
@@ -95,6 +119,7 @@ class _ConnectionSettingsPageState extends State<ConnectionSettingsPage> {
       ),
     );
     if (confirmed != true) return;
+    await _credentials.delete(profile.id);
     setState(
       () => _profiles = <ConnectionProfile>[
         ..._profiles.where((ConnectionProfile p) => p.id != profile.id),
@@ -241,6 +266,15 @@ class _ConnectionTile extends StatelessWidget {
   }
 }
 
+class _ConnectionDraft {
+  const _ConnectionDraft({required this.profile, required this.password});
+
+  final ConnectionProfile profile;
+
+  /// Empty means "keep the stored secret"; non-empty replaces it.
+  final String password;
+}
+
 class _ConnectionEditDialog extends StatefulWidget {
   const _ConnectionEditDialog({this.existing});
 
@@ -277,7 +311,7 @@ class _ConnectionEditDialogState extends State<_ConnectionEditDialog> {
     final String user = _user.text.trim();
     final String password = _pass.text;
     final Uri? uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+    if (uri == null || uri.scheme != 'https' || uri.host.isEmpty) {
       setState(() => _error = 'Enter a valid server URL, including https://');
       return;
     }
@@ -290,14 +324,17 @@ class _ConnectionEditDialogState extends State<_ConnectionEditDialog> {
       return;
     }
     Navigator.of(context).pop(
-      ConnectionProfile(
-        id:
-            widget.existing?.id ??
-            'cwng-${uri.host}-${DateTime.now().microsecondsSinceEpoch}',
-        serverUrl: url,
-        username: user,
-        label: _label.text.trim().isEmpty ? uri.host : _label.text.trim(),
-        lastConnectedAt: widget.existing?.lastConnectedAt,
+      _ConnectionDraft(
+        profile: ConnectionProfile(
+          id:
+              widget.existing?.id ??
+              'cwng-${uri.host}-${DateTime.now().microsecondsSinceEpoch}',
+          serverUrl: url,
+          username: user,
+          label: _label.text.trim().isEmpty ? uri.host : _label.text.trim(),
+          lastConnectedAt: widget.existing?.lastConnectedAt,
+        ),
+        password: password,
       ),
     );
   }

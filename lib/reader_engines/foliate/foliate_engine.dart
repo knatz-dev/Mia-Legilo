@@ -324,8 +324,9 @@ class FoliateEngine implements ReaderEngine {
           // ignore: avoid_print
           print('FoliateEngine.book: ${payload['title']} (${payload['sections']} sections)');
         case 'page':
+          // Index only — the bridge no longer carries section text.
           // ignore: avoid_print
-          print('FoliateEngine.page ${payload['index']}: ${payload['text']}');
+          print('FoliateEngine.page ${payload['index']}');
         case 'ready':
           final Completer<String>? opened = _bookOpened;
           if (opened != null && !opened.isCompleted) opened.complete('ready');

@@ -222,7 +222,7 @@ class SyncService {
     String? remoteBookId,
   }) async {
     final caps = provider.capabilities;
-    final cap = caps.stateOf(CapabilityResource.books);
+    final cap = caps.stateOf(CapabilityResource.status);
     if (cap == CapabilityState.readOnly ||
         cap == CapabilityState.unsupported ||
         cap == CapabilityState.unknown) {
@@ -252,7 +252,7 @@ class SyncService {
     String? observedRemoteRevision,
   }) async {
     final caps = provider.capabilities;
-    final cap = caps.stateOf(CapabilityResource.books);
+    final cap = caps.stateOf(CapabilityResource.progress);
     if (cap == CapabilityState.readOnly ||
         cap == CapabilityState.unsupported ||
         cap == CapabilityState.unknown) {
@@ -272,10 +272,13 @@ class SyncService {
 
   CapabilityState _capabilityFor(String field, CapabilityMatrix caps) {
     switch (field) {
+      // Status writes go to the read-status endpoint; gate on the capability
+      // the probe actually verified rather than on read access to the catalog.
       case 'readingStatus':
+        return caps.stateOf(CapabilityResource.status);
       case 'readingPosition':
       case 'progress':
-        return caps.stateOf(CapabilityResource.books);
+        return caps.stateOf(CapabilityResource.progress);
       case 'bookmark':
         return caps.stateOf(CapabilityResource.annotations);
       default:

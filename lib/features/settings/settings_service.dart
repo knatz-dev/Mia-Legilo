@@ -30,7 +30,19 @@ class SettingsService {
 
   final LibraryService _library;
 
+  /// Serialises writes per key. A slider fires a save per change; without this
+  /// an earlier (smaller) value can commit after a later one.
+  final Map<String, Future<void>> _writes = <String, Future<void>>{};
+
   LibraryService get library => _library;
+
+  Future<void> _writeSequenced(String key, String value) {
+    final Future<void> previous = _writes[key] ?? Future<void>.value();
+    final Future<void> next =
+        previous.then((_) => _library.store.writeSetting(key, value));
+    _writes[key] = next;
+    return next;
+  }
 
   Future<LibraryDefaults> libraryDefaults() async {
     final String? raw = await _library.store.readSetting(
@@ -41,8 +53,8 @@ class SettingsService {
         : LibraryDefaults.fromJsonString(raw);
   }
 
-  Future<void> saveLibraryDefaults(LibraryDefaults value) => _library.store
-      .writeSetting(SettingKeys.libraryDefaults, value.toJsonString());
+  Future<void> saveLibraryDefaults(LibraryDefaults value) =>
+      _writeSequenced(SettingKeys.libraryDefaults, value.toJsonString());
 
   Future<LibraryBehaviour> libraryBehaviour() async {
     final String? raw = await _library.store.readSetting(
@@ -57,12 +69,12 @@ class SettingsService {
   }
 
   Future<void> saveLibraryBehaviour(LibraryBehaviour value) async {
-    await _library.store.writeSetting(
+    await _writeSequenced(
       SettingKeys.libraryBehaviour,
       value.toJsonString(),
     );
     // Keep the reader's own read in sync so behaviour stays consistent.
-    await _library.store.writeSetting(
+    await _writeSequenced(
       SettingKeys.legacyAutoStart,
       value.autoStartReading.toString(),
     );
@@ -78,7 +90,7 @@ class SettingsService {
   }
 
   Future<void> saveAppearance(AppearanceSettings value) =>
-      _library.store.writeSetting(SettingKeys.appearance, value.toJsonString());
+      _writeSequenced(SettingKeys.appearance, value.toJsonString());
 
   Future<ReaderDefaults> readerDefaults() async {
     final String? raw = await _library.store.readSetting(
@@ -99,13 +111,13 @@ class SettingsService {
   }
 
   Future<void> saveReaderDefaults(ReaderDefaults value) async {
-    await _library.store.writeSetting(
+    await _writeSequenced(
       SettingKeys.readerDefaults,
       value.toJsonString(),
     );
     // Keep the reader's legacy key in sync for one release so an in-flight
     // reader page never observes a different value.
-    await _library.store.writeSetting(
+    await _writeSequenced(
       SettingKeys.legacyReader,
       value.toJsonString(),
     );
@@ -130,7 +142,7 @@ class SettingsService {
   }
 
   Future<void> saveConnections(List<ConnectionProfile> profiles) =>
-      _library.store.writeSetting(
+      _writeSequenced(
         SettingKeys.connections,
         jsonEncode(profiles.map((ConnectionProfile p) => p.toJson()).toList()),
       );

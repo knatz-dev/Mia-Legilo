@@ -1,9 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/design/fields.dart';
 import '../../core/design/tokens.dart';
 import '../../core/design/widgets.dart';
 import '../../library/library_query.dart';
+import 'appearance_provider.dart';
 import 'connections_page.dart';
 import 'settings_model.dart';
 import 'settings_service.dart';
@@ -212,16 +214,18 @@ class _SettingsScope extends InheritedWidget {
 }
 
 /// Appearance: app theme and sketch intensity.
-class AppearanceSettingsPage extends StatefulWidget {
+class AppearanceSettingsPage extends ConsumerStatefulWidget {
   const AppearanceSettingsPage({super.key, required this.settings});
 
   final SettingsService settings;
 
   @override
-  State<AppearanceSettingsPage> createState() => _AppearanceSettingsPageState();
+  ConsumerState<AppearanceSettingsPage> createState() =>
+      _AppearanceSettingsPageState();
 }
 
-class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
+class _AppearanceSettingsPageState
+    extends ConsumerState<AppearanceSettingsPage> {
   AppearanceSettings? _settings;
 
   @override
@@ -238,6 +242,9 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Future<void> _save(AppearanceSettings next) async {
     setState(() => _settings = next);
     await widget.settings.saveAppearance(next);
+    // Apply immediately: the theme, sketch intensity and reader defaults read
+    // this provider rather than waiting for a restart.
+    ref.read(appearanceProvider.notifier).state = next;
   }
 
   @override

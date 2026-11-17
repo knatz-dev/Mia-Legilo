@@ -26,22 +26,17 @@ void main() {
         await outbox.enqueue(entry);
         await outbox.markInFlight(entry.id);
 
-        // Verify it's in-flight.
+        // An in-flight entry is recoverable, so the drain must see it.
         final pendingBefore = await outbox.pending();
-        expect(pendingBefore, isEmpty); // in-flight is not pending
+        expect(pendingBefore, hasLength(1));
+        expect(pendingBefore.first.status, sync.OutboxStatus.inFlight);
 
         await db.close();
 
-        // Reopen DB and run recovery.
+        // Reopen DB and run the real startup recovery.
         db = AppDatabase(NativeDatabase(file));
         final outbox2 = sync.OutboxRepository(db);
-        // Simulate recoverOnStartup: mark in-flight → failed.
-        final allEntries = await db.select(db.outboxEntries).get();
-        for (final row in allEntries) {
-          if (row.status == 'inFlight') {
-            await outbox2.markFailed(row.id, attempts: row.attempts);
-          }
-        }
+        await outbox2.recoverInFlight();
 
         // After recovery, the entry should be in pending (failed → retryable).
         final pendingAfter = await outbox2.pending();

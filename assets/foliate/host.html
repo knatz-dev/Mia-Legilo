@@ -106,14 +106,9 @@
         },
       });
     });
-    view.addEventListener('load', ({ detail }) => {
-      try {
-        const text = (detail.doc?.body?.innerText ?? '')
-          .replace(/\s+/g, ' ').trim().slice(0, 160);
-        bridge({ type: 'page', payload: { index: detail.index, text } });
-      } catch (_) {
-        // Diagnostics only.
-      }
+    view.addEventListener('load', ({ detail }) {
+      // Index only: section text is book content and must not reach logcat.
+      bridge({ type: 'page', payload: { index: detail.index } });
     });
     view.addEventListener('error', ({ detail }) => {
       bridge({ type: 'error', payload: { message: String(detail?.message ?? detail) } });

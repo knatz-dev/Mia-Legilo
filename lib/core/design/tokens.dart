@@ -32,6 +32,17 @@ const Color kBorderInk = Color(0xFF3A362F);
 /// enough for a decorative divider and never used for text.
 const Color kBorderFaint = Color(0xFFD8D3C9);
 
+// Dark palette: the same warm paper/ink relationship inverted. Contrast is
+// preserved so the sketch strokes and focus rings read the same way.
+const Color kPaperDark = Color(0xFF211E1B);
+const Color kPaperSurfaceDark = Color(0xFF2B2723);
+const Color kInkDark = Color(0xFFF3EEE6);
+const Color kInkMutedDark = Color(0xFFB3AA9E);
+const Color kInkDisabledDark = Color(0xFF7E776D);
+const Color kAccentFillDark = Color(0xFF3E2C24);
+const Color kBorderInkDark = Color(0xFFE7E1D7);
+const Color kBorderFaintDark = Color(0xFF403A34);
+
 /// Hairline for the sketch stroke of small controls.
 const double kStrokeHairline = 1.15;
 

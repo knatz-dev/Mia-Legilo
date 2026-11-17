@@ -799,9 +799,10 @@ class View {
             visibility: 'hidden',
             width: '100%', height: '100%',
         })
-        // `allow-scripts` is needed for events because of WebKit bug
-        // https://bugs.webkit.org/show_bug.cgi?id=218086
-        this.#iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts')
+        // WebKit needs `allow-scripts` for its load events; Android WebView is
+        // Chromium, so scripts stay disabled and the section cannot reach the
+        // parent-origin bridge.
+        this.#iframe.setAttribute('sandbox', 'allow-same-origin')
         this.#iframe.setAttribute('scrolling', 'no')
     }
     get element() {

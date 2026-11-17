@@ -31,16 +31,12 @@ import 'library/library_service.dart';
 import 'library/resumable_downloader.dart';
 import 'sync/sync_service.dart';
 
-/// Opens the library once and exposes it to the widget tree.
-final libraryProvider = Provider<LibraryService>((ref) {
-  final LibraryService service = LibraryService.bootstrap();
+/// Opens the library once for the whole app and keeps it alive across tab
+/// switches, so Settings and the library read and write the same Drift store.
+final libraryProvider = FutureProvider<LibraryService>((ref) async {
+  final LibraryService service = await LibraryService.open();
   ref.onDispose(service.close);
   return service;
-});
-
-/// Settings read through the same store as the library.
-final settingsProvider = Provider<SettingsService>((ref) {
-  return SettingsService(ref.watch(libraryProvider));
 });
 
 /// The appearance currently in effect, so a settings save recolours the app.
@@ -67,7 +63,8 @@ class _MiaLegiloAppState extends ConsumerState<MiaLegiloApp> {
   }
 
   Future<void> _loadAppearance() async {
-    final SettingsService settings = ref.read(settingsProvider);
+    final LibraryService library = await ref.read(libraryProvider.future);
+    final SettingsService settings = SettingsService(library);
     final AppearanceSettings value = await settings.appearance();
     if (mounted) ref.read(appearanceProvider.notifier).state = value;
   }
@@ -79,7 +76,7 @@ class _MiaLegiloAppState extends ConsumerState<MiaLegiloApp> {
       title: 'Mia Legilo',
       debugShowCheckedModeBanner: false,
       theme: buildMiaLegiloTheme(),
-      darkTheme: buildMiaLegiloTheme(),
+      darkTheme: buildMiaLegiloDarkTheme(),
       themeMode: switch (appearance.themeMode) {
         AppThemeMode.light => ThemeMode.light,
         AppThemeMode.dark => ThemeMode.dark,
@@ -104,16 +101,60 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final AsyncValue<LibraryService> library = ref.watch(libraryProvider);
+    if (library.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (library.hasError) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(kSpace5),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(Icons.error_outline, size: 40, color: kInkMuted),
+                const SizedBox(height: kSpace3),
+                const Text(
+                  'The library could not be opened.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15, height: 1.5, color: kInk),
+                ),
+                const SizedBox(height: kSpace4),
+                SketchButton(
+                  label: 'Retry',
+                  icon: Icons.refresh,
+                  onPressed: () => ref.invalidate(libraryProvider),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    final LibraryService service = library.requireValue;
+    final SettingsService settings = SettingsService(service);
     final AppearanceSettings appearance = ref.watch(appearanceProvider);
     final double roughness = appearance.sketchIntensity.roughness;
     return Scaffold(
-      body: switch (_tab) {
-        _AppTab.library => const LibraryScreen(),
-        _AppTab.settings => SettingsHost(
-          service: ref.read(settingsProvider),
-          child: SettingsPage(settings: ref.read(settingsProvider)),
-        ),
-      },
+      // IndexedStack keeps both tabs alive: switching must not dispose the
+      // library (an in-progress import would abort, and the CWNG session and
+      // its outbox would be dropped).
+      body: IndexedStack(
+        index: switch (_tab) {
+          _AppTab.library => 0,
+          _AppTab.settings => 1,
+        },
+        children: <Widget>[
+          LibraryScreen(library: service),
+          SettingsHost(
+            service: settings,
+            child: SettingsPage(settings: settings),
+          ),
+        ],
+      ),
       bottomNavigationBar: _AppTabBar(
         current: _tab,
         roughness: roughness,
@@ -1036,7 +1077,10 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute<void>(
                                 builder: (_) =>
-                                    CwngBrowserPage(library: _library!),
+                                    CwngBrowserPage(
+                                      library: _library!,
+                                      settings: SettingsService(_library!),
+                                    ),
                               ),
                             );
                           },

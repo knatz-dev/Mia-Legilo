@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart' show FlutterError;
 import 'package:flutter/services.dart';
@@ -16,6 +17,11 @@ class FoliateServer {
   final HttpServer _server;
   final Map<String, File> _books = <String, File>{};
   int _nextBookId = 0;
+
+  /// Unguessable per-session secret. The book URL is handed to the WebView, so
+  /// it also has to stop any other app on the device from fetching the open
+  /// EPUB off the loopback port.
+  final String _token = _randomToken();
 
   static const String _assetRoot = 'reader_engines/foliate/foliate-js';
   static const String _harnessAsset = 'assets/foliate/host.html';
@@ -59,7 +65,9 @@ class FoliateServer {
   Uri registerBook(File file) {
     final String id = 'book-${_nextBookId++}';
     _books[id] = file;
-    return origin.replace(path: '/books/$id');
+    return origin.replace(path: '/books/$id', queryParameters: <String, String>{
+      'token': _token,
+    });
   }
 
   Future<void> close() async {
@@ -71,9 +79,17 @@ class FoliateServer {
     final HttpResponse response = request.response;
     try {
       response.headers.set(HttpHeaders.cacheControlHeader, 'no-store');
-      response.headers.set('Access-Control-Allow-Origin', '*');
+      // Loopback origin only: the renderer is same-origin with the harness, so
+      // a wildcard CORS grant buys nothing and would expose the book to any
+      // page that can reach the port.
+      response.headers.set('Access-Control-Allow-Origin', origin.toString());
       if (request.method != 'GET' && request.method != 'HEAD') {
         response.statusCode = HttpStatus.methodNotAllowed;
+        return;
+      }
+      if (request.uri.queryParameters['token'] != _token &&
+          request.uri.pathSegments.first == 'books') {
+        response.statusCode = HttpStatus.forbidden;
         return;
       }
       final List<String> segments = request.uri.pathSegments;
@@ -172,5 +188,11 @@ class FoliateServer {
     final String extension =
         dot == -1 ? '' : name.substring(dot + 1).toLowerCase();
     return _contentTypes[extension] ?? 'application/octet-stream';
+  }
+
+  static String _randomToken() {
+    final Random random = Random.secure();
+    final List<int> bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return bytes.map((int b) => b.toRadixString(16).padLeft(2, '0')).join();
   }
 }
