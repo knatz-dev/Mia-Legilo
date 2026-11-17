@@ -1,5 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../core/design/fields.dart';
+import '../../core/design/tokens.dart';
+import '../../core/design/widgets.dart';
 import '../../domain/book.dart';
 import '../../library/library_service.dart';
 
@@ -12,31 +15,38 @@ Future<bool> confirmBookRemoval(
 }) async {
   final choice = await showDialog<String>(
     context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text(downloadOnly ? 'Remove download?' : 'Remove local import?'),
+    builder: (ctx) => SketchDialog(
+      title: downloadOnly ? 'Remove download?' : 'Remove local import?',
+      seedKey: downloadOnly ? 'remove-download' : 'remove-import',
       content: Text(
         downloadOnly
-            ? 'Delete only the app-managed EPUB copy of "${book.title}". Keep its library entry, status, progress and bookmarks.'
-            : 'Hide "${book.title}" from your library. Keep the EPUB file; use Remove download separately to delete it. Choose whether to retain reading data for a later re-import. No server book is deleted.',
+            ? 'Delete only the app-managed EPUB copy of "${book.title}". Keep '
+                  'its library entry, status, progress and bookmarks.'
+            : 'Hide "${book.title}" from your library. Keep the EPUB file; use '
+                  'Remove download separately to delete it. No server book is '
+                  'deleted.',
+        style: const TextStyle(fontSize: 14, height: 1.5, color: kInk),
       ),
-      actions: [
+      actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(ctx),
           child: const Text('Cancel'),
         ),
         if (downloadOnly)
-          FilledButton(
+          SketchButton(
+            label: 'Remove download',
+            danger: true,
             onPressed: () => Navigator.pop(ctx, 'download'),
-            child: const Text('Remove download'),
           )
-        else ...[
-          TextButton(
+        else ...<Widget>[
+          SketchButton(
+            label: 'Keep reading data',
             onPressed: () => Navigator.pop(ctx, 'retain'),
-            child: const Text('Keep reading data'),
           ),
-          TextButton(
+          SketchButton(
+            label: 'Delete reading data',
+            danger: true,
             onPressed: () => Navigator.pop(ctx, 'purge'),
-            child: const Text('Delete reading data'),
           ),
         ],
       ],

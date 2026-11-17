@@ -42,6 +42,20 @@ class LibraryService {
 
   Directory get downloadDirectory => Directory(p.join(root.path, 'downloads'));
 
+  /// A bootstrap service for widget tests and first-frame rendering. It owns
+  /// an in-memory store so the UI can build before the real database opens.
+  factory LibraryService.bootstrap() {
+    return LibraryService(
+      store: MemoryLibraryStore(),
+      importer: LibraryImporter(
+        store: MemoryLibraryStore(),
+        libraryDirectory: Directory.systemTemp,
+      ),
+      downloader: ResumableDownloader(),
+      root: Directory.systemTemp,
+    );
+  }
+
   static Future<LibraryService> open({
     LibraryStore? store,
     LibraryImporter? importer,

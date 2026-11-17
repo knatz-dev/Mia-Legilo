@@ -4,18 +4,23 @@ import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
+import '../../core/design/fields.dart';
+import '../../core/design/tokens.dart';
+import '../../core/design/widgets.dart';
+import '../../domain/book.dart';
+import '../../domain/ids.dart';
 import '../../integrations/cwng/cwng.dart';
 import '../../integrations/cwng/opds_parser.dart';
 import '../../library/library_importer.dart';
 import '../../library/library_service.dart';
 import '../../library/library_store.dart';
-import '../../domain/book.dart';
-import '../../domain/ids.dart';
 import '../../library/resumable_downloader.dart';
 import '../../sync/conflict_store.dart';
 import '../../sync/outbox_repository.dart';
 import '../../sync/sync_service.dart';
 
+/// CWNG catalog browsing and download. Credentials come from the secure
+/// store via [CwngAuthenticator]; this page never renders a password.
 class CwngBrowserPage extends StatefulWidget {
   const CwngBrowserPage({super.key, required this.library});
 
@@ -26,8 +31,9 @@ class CwngBrowserPage extends StatefulWidget {
 }
 
 class _CwngBrowserPageState extends State<CwngBrowserPage> {
-  final TextEditingController _urlController =
-      TextEditingController(text: 'https://library.knatz.dev');
+  final TextEditingController _urlController = TextEditingController(
+    text: 'https://library.knatz.dev',
+  );
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
@@ -75,9 +81,11 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
         baseUrl: baseUrl,
       );
       final CwngAuthState state = await auth.loginBasic(username, password);
-      final CwngClient client = CwngClient(baseUrl: baseUrl, authenticator: auth);
+      final CwngClient client = CwngClient(
+        baseUrl: baseUrl,
+        authenticator: auth,
+      );
       client.attachAuth(state);
-      // Create sync service if using Drift store.
       SyncService? syncService;
       if (widget.library.store is DriftLibraryStore) {
         final db = (widget.library.store as DriftLibraryStore).database;
@@ -115,7 +123,6 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
   Future<void> _loadFeed(String pathOrUrl) async {
     final CwngClient? client = _client;
     if (client == null) return;
-    // Normalize to a path for client.get (which prepends baseUrl).
     String path = pathOrUrl;
     if (path.startsWith('http')) {
       final Uri uri = Uri.parse(path);
@@ -168,8 +175,9 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
           }
         },
       );
-      final ImportResult result = await widget.library.importer.importFile(target);
-      // Set remote identity on the imported book.
+      final ImportResult result = await widget.library.importer.importFile(
+        target,
+      );
       if (book.calibreId != null) {
         final Book updated = result.book.copyWith(
           remoteIdentity: RemoteIdentity(
@@ -213,8 +221,7 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
     return cleaned.isEmpty ? 'book.epub' : '$cleaned.epub';
   }
 
-  OpdsLink? get _nextLink =>
-      _links.where((OpdsLink l) => l.isNext).firstOrNull;
+  OpdsLink? get _nextLink => _links.where((OpdsLink l) => l.isNext).firstOrNull;
   OpdsLink? get _prevLink =>
       _links.where((OpdsLink l) => l.isPrevious).firstOrNull;
 
@@ -225,10 +232,8 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
         title: const Text('CWNG Library'),
         actions: <Widget>[
           if (_syncService != null)
-            IconButton(
-              icon: Icon(_syncService!.isSyncing
-                  ? Icons.sync
-                  : Icons.sync_outlined),
+            SketchIconButton(
+              icon: _syncService!.isSyncing ? Icons.sync : Icons.sync_outlined,
               tooltip: 'Sync',
               onPressed: _syncService!.isSyncing
                   ? null
@@ -236,17 +241,21 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
                       final result = await _syncService!.sync();
                       if (mounted) {
                         setState(() {
-                          _message = 'Sync: ${result.committed} committed, '
-                              '${result.failed} failed, ${result.conflicts} conflicts';
+                          _message =
+                              'Sync: ${result.committed} committed, '
+                              '${result.failed} failed, '
+                              '${result.conflicts} conflicts';
                         });
                       }
                     },
             ),
           if (_authState != null)
-            IconButton(
-              icon: const Icon(Icons.refresh),
+            SketchIconButton(
+              icon: Icons.refresh,
               tooltip: 'Reload feed',
-              onPressed: _loadingFeed ? null : () => _loadFeed(_currentFeedUrl ?? '/opds'),
+              onPressed: _loadingFeed
+                  ? null
+                  : () => _loadFeed(_currentFeedUrl ?? '/opds'),
             ),
         ],
       ),
@@ -255,153 +264,206 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
   }
 
   Widget _buildLogin() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: <Widget>[
-        TextField(
-          controller: _urlController,
-          decoration: const InputDecoration(
-            labelText: 'Server URL',
-            hintText: 'https://library.knatz.dev',
-            border: OutlineInputBorder(),
+    return SketchPage(
+      child: ListView(
+        padding: const EdgeInsets.all(kSpace4),
+        children: <Widget>[
+          const SketchSectionHeading('Connect to CWNG'),
+          const SizedBox(height: kSpace2),
+          const Text(
+            'CWNG uses HTTP Basic Auth against /opds. Credentials are stored '
+            'in secure storage.',
+            style: TextStyle(fontSize: 13, height: 1.45, color: kInkMuted),
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _userController,
-          decoration: const InputDecoration(
-            labelText: 'Username',
-            border: OutlineInputBorder(),
+          const SizedBox(height: kSpace4),
+          SketchTextField(
+            label: 'Server URL',
+            controller: _urlController,
+            hintText: 'https://library.example.org',
+            keyboardType: TextInputType.url,
+            seedKey: 'cwng-url',
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _passController,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Password',
-            border: OutlineInputBorder(),
+          const SizedBox(height: kSpace3),
+          SketchTextField(
+            label: 'Username',
+            controller: _userController,
+            seedKey: 'cwng-username',
           ),
-        ),
-        const SizedBox(height: 16),
-        if (_connecting) const LinearProgressIndicator(),
-        if (_error != null)
-          Card(
-            color: Theme.of(context).colorScheme.errorContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(_error!),
-            ),
+          const SizedBox(height: kSpace3),
+          SketchTextField(
+            label: 'Password or app password',
+            controller: _passController,
+            obscureText: true,
+            seedKey: 'cwng-password',
           ),
-        if (_message != null)
-          Card(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(_message!),
-            ),
+          const SizedBox(height: kSpace4),
+          if (_connecting) const LinearProgressIndicator(),
+          if (_error != null) ...<Widget>[
+            const SizedBox(height: kSpace2),
+            SketchNotice(message: _error!, kind: SketchNoticeKind.error),
+          ],
+          if (_message != null) ...<Widget>[
+            const SizedBox(height: kSpace2),
+            SketchNotice(message: _message!),
+          ],
+          const SizedBox(height: kSpace4),
+          SketchButton(
+            label: 'Connect',
+            icon: Icons.login,
+            filled: true,
+            expanded: true,
+            onPressed: _connecting ? null : _connect,
           ),
-        const SizedBox(height: 8),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.login),
-          label: const Text('Connect'),
-          onPressed: _connecting ? null : _connect,
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'CWNG uses HTTP Basic Auth against /opds. '
-          'Credentials are stored in secure storage.',
-          style: TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildCatalog() {
-    return Column(
-      children: <Widget>[
-        if (_loadingFeed) const LinearProgressIndicator(),
-        if (_error != null)
-          Card(
-            color: Theme.of(context).colorScheme.errorContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(_error!),
+    return SketchPage(
+      child: Column(
+        children: <Widget>[
+          if (_loadingFeed) const LinearProgressIndicator(),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(kSpace4, kSpace3, kSpace4, 0),
+              child: SketchNotice(
+                message: _error!,
+                kind: SketchNoticeKind.error,
+              ),
             ),
-          ),
-        if (_message != null)
-          Card(
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(_message!),
+          if (_message != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(kSpace4, kSpace3, kSpace4, 0),
+              child: SketchNotice(message: _message!),
             ),
-          ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: _books.length,
-            itemBuilder: (BuildContext ctx, int i) {
-              final OpdsBook book = _books[i];
-              final bool isDownloading = _downloading.contains(book.id);
-              return Card(
-                child: ListTile(
-                  leading: Icon(book.isNavigation
-                      ? Icons.folder_outlined
-                      : Icons.menu_book_outlined),
-                  title: Text(book.title),
-                  subtitle: Text(book.authors.join(', ')),
-                  onTap: book.isNavigation
-                      ? () => _loadFeed(book.navigationUrl!)
-                      : null,
-                  trailing: book.isDownloadable
-                      ? (isDownloading
-                          ? SizedBox(
-                              width: 48,
-                              child: LinearProgressIndicator(
-                                value: _downloadProgress[book.id],
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: kSpace2),
+              itemCount: _books.length,
+              itemBuilder: (BuildContext ctx, int i) {
+                final OpdsBook book = _books[i];
+                final bool isDownloading = _downloading.contains(book.id);
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    kSpace4,
+                    kSpace2,
+                    kSpace4,
+                    0,
+                  ),
+                  child: SketchSurface(
+                    seedKey: 'opds-${book.id}',
+                    padding: const EdgeInsets.all(kSpace2),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          book.isNavigation
+                              ? Icons.folder_outlined
+                              : Icons.menu_book_outlined,
+                          size: 22,
+                          color: kInkMuted,
+                        ),
+                        const SizedBox(width: kSpace3),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                book.title,
+                                style: const TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: kInk,
+                                ),
                               ),
-                            )
-                          : IconButton(
-                              icon: const Icon(Icons.download),
-                              tooltip: 'Download',
-                              onPressed: () => _downloadBook(book),
-                            ))
-                      : (book.isNavigation
-                          ? const Icon(Icons.chevron_right)
-                          : const Icon(Icons.block)),
-                ),
-              );
-            },
+                              if (book.authors.isNotEmpty)
+                                Text(
+                                  book.authors.join(', '),
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: kInkMuted,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (book.isDownloadable)
+                          isDownloading
+                              ? SizedBox(
+                                  width: 48,
+                                  child: LinearProgressIndicator(
+                                    value: _downloadProgress[book.id],
+                                  ),
+                                )
+                              : SketchIconButton(
+                                  icon: Icons.download_outlined,
+                                  tooltip: 'Download ${book.title}',
+                                  onPressed: () => _downloadBook(book),
+                                )
+                        else if (book.isNavigation)
+                          SketchIconButton(
+                            icon: Icons.chevron_right,
+                            tooltip: 'Open ${book.title}',
+                            onPressed: () => _loadFeed(book.navigationUrl!),
+                          )
+                        else
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: kSpace2),
+                            child: SketchBadge(label: 'Unavailable'),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              if (_prevLink != null)
-                TextButton(
-                  onPressed: () => _loadFeed(_prevLink!.href),
-                  child: const Text('Previous'),
-                )
-              else
-                const SizedBox.shrink(),
-              Text('${_books.length} entries'),
-              if (_nextLink != null)
-                TextButton(
-                  onPressed: () => _loadFeed(_nextLink!.href),
-                  child: const Text('Next'),
-                )
-              else
-                const SizedBox.shrink(),
-            ],
+          SafeArea(
+            top: false,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: kPaperSurface,
+                border: Border(top: BorderSide(color: kBorderFaint)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: kSpace3),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  if (_prevLink != null)
+                    TextButton(
+                      onPressed: () => _loadFeed(_prevLink!.href),
+                      child: const Text('Previous'),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                  Text(
+                    '${_books.length} entries',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: kInkMuted,
+                    ),
+                  ),
+                  if (_nextLink != null)
+                    TextButton(
+                      onPressed: () => _loadFeed(_nextLink!.href),
+                      child: const Text('Next'),
+                    )
+                  else
+                    const SizedBox.shrink(),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
+/// In-memory token store for the browse session. Credentials entered here are
+/// held only for the lifetime of the page; the app's saved connections keep
+/// their own secure store.
 class InMemoryTokenStore implements TokenStore {
   final Map<String, String> _store = <String, String>{};
 

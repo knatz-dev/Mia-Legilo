@@ -8,7 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 
+import 'core/design/fields.dart';
+import 'core/design/theme.dart';
+import 'core/design/tokens.dart';
+import 'core/design/widgets.dart';
 import 'domain/book.dart';
+import 'domain/ids.dart';
 import 'domain/locator.dart';
 import 'domain/status.dart';
 import 'features/cwng/cwng_browser_page.dart';
@@ -16,44 +21,224 @@ import 'features/library/book_details_page.dart';
 import 'features/library/book_removal.dart';
 import 'features/library/library_filters.dart';
 import 'features/reader/reader_page.dart';
+import 'features/settings/settings_model.dart';
+import 'features/settings/settings_pages.dart';
+import 'features/settings/settings_service.dart';
 import 'library/epub_inspector.dart';
 import 'library/library_importer.dart';
 import 'library/library_query.dart';
 import 'library/library_service.dart';
-import 'sync/sync_service.dart';
-import 'domain/ids.dart';
 import 'library/resumable_downloader.dart';
+import 'sync/sync_service.dart';
+
+/// Opens the library once and exposes it to the widget tree.
+final libraryProvider = Provider<LibraryService>((ref) {
+  final LibraryService service = LibraryService.bootstrap();
+  ref.onDispose(service.close);
+  return service;
+});
+
+/// Settings read through the same store as the library.
+final settingsProvider = Provider<SettingsService>((ref) {
+  return SettingsService(ref.watch(libraryProvider));
+});
+
+/// The appearance currently in effect, so a settings save recolours the app.
+final appearanceProvider = StateProvider<AppearanceSettings>(
+  (ref) => const AppearanceSettings(),
+);
 
 void main() {
   runApp(const ProviderScope(child: MiaLegiloApp()));
 }
 
-class MiaLegiloApp extends StatelessWidget {
+class MiaLegiloApp extends ConsumerStatefulWidget {
   const MiaLegiloApp({super.key});
 
   @override
+  ConsumerState<MiaLegiloApp> createState() => _MiaLegiloAppState();
+}
+
+class _MiaLegiloAppState extends ConsumerState<MiaLegiloApp> {
+  @override
+  void initState() {
+    super.initState();
+    _loadAppearance();
+  }
+
+  Future<void> _loadAppearance() async {
+    final SettingsService settings = ref.read(settingsProvider);
+    final AppearanceSettings value = await settings.appearance();
+    if (mounted) ref.read(appearanceProvider.notifier).state = value;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final AppearanceSettings appearance = ref.watch(appearanceProvider);
     return MaterialApp(
       title: 'Mia Legilo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B4F3A)),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: buildMiaLegiloTheme(),
+      darkTheme: buildMiaLegiloTheme(),
+      themeMode: switch (appearance.themeMode) {
+        AppThemeMode.light => ThemeMode.light,
+        AppThemeMode.dark => ThemeMode.dark,
+        AppThemeMode.system => ThemeMode.system,
+      },
+      home: const HomeShell(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, this.library});
+/// The app's navigation shell: a visible active location and a library that
+/// owns its temporary controls.
+class HomeShell extends ConsumerStatefulWidget {
+  const HomeShell({super.key});
+
+  @override
+  ConsumerState<HomeShell> createState() => _HomeShellState();
+}
+
+class _HomeShellState extends ConsumerState<HomeShell> {
+  _AppTab _tab = _AppTab.library;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppearanceSettings appearance = ref.watch(appearanceProvider);
+    final double roughness = appearance.sketchIntensity.roughness;
+    return Scaffold(
+      body: switch (_tab) {
+        _AppTab.library => const LibraryScreen(),
+        _AppTab.settings => SettingsHost(
+          service: ref.read(settingsProvider),
+          child: SettingsPage(settings: ref.read(settingsProvider)),
+        ),
+      },
+      bottomNavigationBar: _AppTabBar(
+        current: _tab,
+        roughness: roughness,
+        onChanged: (_AppTab tab) => setState(() => _tab = tab),
+      ),
+    );
+  }
+}
+
+enum _AppTab { library, settings }
+
+class _AppTabBar extends StatelessWidget {
+  const _AppTabBar({
+    required this.current,
+    required this.onChanged,
+    required this.roughness,
+  });
+
+  final _AppTab current;
+  final ValueChanged<_AppTab> onChanged;
+  final double roughness;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: kPaperSurface,
+          border: Border(top: BorderSide(color: kBorderFaint)),
+        ),
+        child: Row(
+          children: <Widget>[
+            for (final _AppTab tab in _AppTab.values)
+              Expanded(
+                child: _TabButton(
+                  tab: tab,
+                  selected: tab == current,
+                  roughness: roughness,
+                  onTap: () => onChanged(tab),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TabButton extends StatelessWidget {
+  const _TabButton({
+    required this.tab,
+    required this.selected,
+    required this.onTap,
+    required this.roughness,
+  });
+
+  final _AppTab tab;
+  final bool selected;
+  final VoidCallback onTap;
+  final double roughness;
+
+  String get _label => switch (tab) {
+    _AppTab.library => 'Library',
+    _AppTab.settings => 'Settings',
+  };
+
+  IconData get _icon => switch (tab) {
+    _AppTab.library => Icons.menu_book_outlined,
+    _AppTab.settings => Icons.settings_outlined,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final Color foreground = selected ? kAccent : kInkMuted;
+    return Semantics(
+      label: _label,
+      button: true,
+      selected: selected,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: kMinTarget + 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(_icon, size: 21, color: foreground),
+              const SizedBox(height: 3),
+              Text(
+                _label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: foreground,
+                ),
+              ),
+              const SizedBox(height: 3),
+              SizedBox(
+                width: 28,
+                child: selected
+                    ? SketchNavUnderline(width: 28)
+                    : const SizedBox(height: 5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The library screen. Its controls are temporary and stay here; saved
+/// defaults live in Settings → Library.
+class LibraryScreen extends ConsumerStatefulWidget {
+  const LibraryScreen({super.key, this.library});
 
   final LibraryService? library;
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _LibraryScreenState extends ConsumerState<LibraryScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _searchDebounce;
 
@@ -64,12 +249,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _message;
   bool _loading = true;
   bool _importing = false;
+  bool _showAdvancedFilters = false;
   DownloadProgress? _progress;
   List<Map<String, dynamic>> _savedViews = <Map<String, dynamic>>[];
   CancelToken? _cancelToken;
   int _queryGeneration = 0;
   Future<void> _queryWrites = Future<void>.value();
-  bool _autoStartReading = true;
   bool _prefsLoaded = false;
 
   @override
@@ -112,39 +297,29 @@ class _HomeScreenState extends State<HomeScreen> {
           widget.library ?? await LibraryService.open();
       if (!_prefsLoaded) {
         _prefsLoaded = true;
-        final String? view = await library.store.readSetting(
-          'library.viewMode',
+        // Saved defaults from Settings → Library, then the last live query.
+        final SettingsService settings = SettingsService(library);
+        final LibraryDefaults defaults = await settings.libraryDefaults();
+        LibraryQuery q = _query.copyWith(
+          viewMode: defaults.viewMode,
+          sort: defaults.sort,
+          direction: defaults.direction,
+          groupBy: defaults.groupBy,
+          sourceFilter: defaults.sourceFilter,
+          availabilityFilter: defaults.availabilityFilter,
+          statuses: defaults.statuses
+              .map((String name) => ReadingStatus.values.byName(name))
+              .toSet(),
         );
-        final String? sort = await library.store.readSetting('library.sort');
-        final String? dir = await library.store.readSetting('library.sortDir');
-        LibraryQuery q = _query;
-        if (view != null) {
-          q = q.copyWith(
-            viewMode: view == 'grid'
-                ? LibraryViewMode.grid
-                : LibraryViewMode.list,
-          );
-        }
-        if (sort != null) {
-          final LibrarySortKey? key = _sortKeyByName(sort);
-          if (key != null) q = q.copyWith(sort: key);
-        }
-        if (dir != null) {
-          q = q.copyWith(
-            direction: dir == 'desc'
-                ? LibrarySortDirection.descending
-                : LibrarySortDirection.ascending,
-          );
-        }
         final raw = await library.store.readSetting('library.query');
         if (raw != null) {
           q = LibraryQuery.fromJson(jsonDecode(raw) as Map<String, dynamic>);
         }
         _query = q;
-        _searchController.removeListener(_onSearchChanged);
-        _searchController.text = q.search ?? '';
-        _searchController.addListener(_onSearchChanged);
-        _autoStartReading = await library.autoStartEnabled();
+        _searchController
+          ..removeListener(_onSearchChanged)
+          ..text = q.search ?? ''
+          ..addListener(_onSearchChanged);
       }
       await _loadSavedViews();
       final int adopted = widget.library == null
@@ -194,9 +369,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _clearFilters() {
     _searchDebounce?.cancel();
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.clear();
-    _searchController.addListener(_onSearchChanged);
+    _searchController
+      ..removeListener(_onSearchChanged)
+      ..clear()
+      ..addListener(_onSearchChanged);
     _updateQuery(_query.clearFilters());
   }
 
@@ -266,13 +442,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (library == null) return;
     try {
       await library.setStatus(book.id, status);
-      // Enqueue sync if CWNG is connected.
       final SyncService? sync = library.syncService;
       if (sync != null) {
         await sync.enqueueStatusChange(
           bookId: book.id,
           status: status,
-          providerInstanceId: book.remoteIdentity?.providerInstanceId ?? ProviderInstanceId('cwng'),
+          providerInstanceId:
+              book.remoteIdentity?.providerInstanceId ??
+              ProviderInstanceId('cwng'),
           remoteBookId: book.remoteIdentity?.remoteBookId.value,
         );
         sync.sync().catchError((_) => const SyncResult());
@@ -286,42 +463,43 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _showBookActions(Book book) async {
     final chosen = await showModalBottomSheet<String>(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text('View details'),
-                onTap: () => Navigator.pop(ctx, 'details'),
+      builder: (ctx) => SketchSheet(
+        title: book.title,
+        seedKey: 'book-actions-${book.id.value}',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SketchNavRow(
+              label: 'View details',
+              icon: Icons.info_outline,
+              onTap: () => Navigator.pop(ctx, 'details'),
+            ),
+            const Divider(height: 1),
+            for (final ReadingStatus status in ReadingStatus.values)
+              SketchNavRow(
+                label: book.readingStatus == status
+                    ? '${status.label} (current)'
+                    : status.label,
+                icon: book.readingStatus == status
+                    ? Icons.check
+                    : Icons.circle_outlined,
+                onTap: () => Navigator.pop(ctx, status.name),
               ),
-              const Divider(),
-              for (final status in ReadingStatus.values)
-                ListTile(
-                  leading: Icon(
-                    book.readingStatus == status
-                        ? Icons.check
-                        : Icons.circle_outlined,
-                  ),
-                  title: Text(status.label),
-                  onTap: () => Navigator.pop(ctx, status.name),
-                ),
-              const Divider(),
-              if (book.localAssetPath != null)
-                ListTile(
-                  leading: const Icon(Icons.download_done),
-                  title: const Text('Remove download…'),
-                  onTap: () => Navigator.pop(ctx, 'download'),
-                ),
-              if (book.remoteIdentity == null)
-                ListTile(
-                  leading: const Icon(Icons.delete_outline),
-                  title: const Text('Remove local import…'),
-                  onTap: () => Navigator.pop(ctx, 'import'),
-                ),
-            ],
-          ),
+            const Divider(height: 1),
+            if (book.localAssetPath != null)
+              SketchNavRow(
+                label: 'Remove download…',
+                icon: Icons.download_done,
+                onTap: () => Navigator.pop(ctx, 'download'),
+              ),
+            if (book.remoteIdentity == null)
+              SketchNavRow(
+                label: 'Remove local import…',
+                icon: Icons.delete_outline,
+                onTap: () => Navigator.pop(ctx, 'import'),
+              ),
+          ],
         ),
       ),
     );
@@ -368,9 +546,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final int length = await picked.length();
       if (length > LibraryImporter.maxImportBytes) {
-        setState(
-          () => _error = 'The file is larger than the 512 MB import limit.',
-        );
+        setState(() {
+          _error = 'The file is larger than the 512 MB import limit.';
+        });
       } else {
         final ImportResult result = await library.importBytes(
           await picked.readAsBytes(),
@@ -392,30 +570,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _importUrl() async {
     if (_importing) return;
     _searchController.clear();
-    // keep search controller separate; use a local controller for URL
     final TextEditingController urlController = TextEditingController();
     final bool? go = await showDialog<bool>(
       context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Add book from URL'),
-        content: TextField(
+      builder: (BuildContext ctx) => SketchDialog(
+        title: 'Add book from URL',
+        seedKey: 'add-url',
+        content: SketchTextField(
+          label: 'EPUB URL',
           controller: urlController,
-          autofocus: true,
+          hintText: 'https://example.org/book.epub',
           keyboardType: TextInputType.url,
-          decoration: const InputDecoration(
-            labelText: 'EPUB URL',
-            hintText: 'https://example.org/book.epub',
-            border: OutlineInputBorder(),
-          ),
+          autofocus: true,
+          seedKey: 'add-url-field',
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          SketchButton(
+            label: 'Download',
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Download'),
           ),
         ],
       ),
@@ -504,24 +680,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final TextEditingController c = TextEditingController();
     final String? name = await showDialog<String>(
       context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Save current view'),
-        content: TextField(
+      builder: (BuildContext ctx) => SketchDialog(
+        title: 'Save current view',
+        seedKey: 'save-view',
+        content: SketchTextField(
+          label: 'View name',
           controller: c,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'View name',
-            border: OutlineInputBorder(),
-          ),
+          seedKey: 'save-view-name',
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          SketchButton(
+            label: 'Save',
             onPressed: () => Navigator.pop(ctx, c.text.trim()),
-            child: const Text('Save'),
           ),
         ],
       ),
@@ -537,9 +712,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _applySavedView(Map<String, dynamic> value) {
     final next = LibraryQuery.fromJson(value);
     _searchDebounce?.cancel();
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.text = next.search ?? '';
-    _searchController.addListener(_onSearchChanged);
+    _searchController
+      ..removeListener(_onSearchChanged)
+      ..text = next.search ?? ''
+      ..addListener(_onSearchChanged);
     _updateQuery(next);
   }
 
@@ -548,15 +724,6 @@ class _HomeScreenState extends State<HomeScreen> {
     await _persistSavedViews();
     if (mounted) setState(() {});
   }
-
-  String _groupLabel(LibraryGroupBy g) => switch (g) {
-    LibraryGroupBy.none => 'None',
-    LibraryGroupBy.author => 'Author',
-    LibraryGroupBy.series => 'Series',
-    LibraryGroupBy.status => 'Status',
-    LibraryGroupBy.source => 'Source',
-    LibraryGroupBy.availability => 'Availability',
-  };
 
   String _sourceLabel(LibrarySourceFilter f) => switch (f) {
     LibrarySourceFilter.all => 'All',
@@ -570,24 +737,29 @@ class _HomeScreenState extends State<HomeScreen> {
     LibraryAvailabilityFilter.missing => 'Missing',
   };
 
-  LibrarySortKey? _sortKeyByName(String name) {
-    for (final LibrarySortKey k in LibrarySortKey.values) {
-      if (k.name == name) return k;
-    }
-    return null;
-  }
+  String _groupLabel(LibraryGroupBy g) => switch (g) {
+    LibraryGroupBy.none => 'None',
+    LibraryGroupBy.author => 'Author',
+    LibraryGroupBy.series => 'Series',
+    LibraryGroupBy.status => 'Status',
+    LibraryGroupBy.source => 'Source',
+    LibraryGroupBy.availability => 'Availability',
+  };
 
   @override
   Widget build(BuildContext context) {
+    final AppearanceSettings appearance = ref.watch(appearanceProvider);
+    final double roughness = appearance.sketchIntensity.roughness;
+    final bool wide = MediaQuery.of(context).size.width >= 720;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mia Legilo'),
+        title: const Text('Library'),
         actions: <Widget>[
           if (_library?.syncService != null)
-            IconButton(
-              icon: Icon(_library!.syncService!.isSyncing
+            SketchIconButton(
+              icon: _library!.syncService!.isSyncing
                   ? Icons.sync
-                  : Icons.sync_outlined),
+                  : Icons.sync_outlined,
               tooltip: 'Sync with CWNG',
               onPressed: _library!.syncService!.isSyncing
                   ? null
@@ -595,7 +767,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       final result = await _library!.syncService!.sync();
                       if (mounted) {
                         setState(() {
-                          _message = 'Sync: ${result.committed} committed, '
+                          _message =
+                              'Sync: ${result.committed} committed, '
                               '${result.failed} failed';
                         });
                         await _loadShelf();
@@ -603,337 +776,429 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
             ),
           if (_importing && _cancelToken != null)
-            IconButton(
-              icon: const Icon(Icons.cancel_outlined),
+            SketchIconButton(
+              icon: Icons.cancel_outlined,
               tooltip: 'Cancel download',
               onPressed: () => _cancelToken?.cancel(),
             ),
-          Semantics(
-            label: 'Import EPUB',
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: 'Import EPUB',
-              onPressed: _importing ? null : _importEpub,
-            ),
+          SketchIconButton(
+            icon: Icons.add,
+            tooltip: 'Import EPUB',
+            onPressed: _importing ? null : _importEpub,
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reload shelf',
+          SketchIconButton(
+            icon: Icons.refresh,
+            tooltip: 'Reload library',
             onPressed: _importing ? null : _loadShelf,
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: _loadShelf,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: <Widget>[
-            if (_loading) const LinearProgressIndicator(),
-            if (_importing)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Text('Importing…'),
-                    const SizedBox(height: 6),
-                    LinearProgressIndicator(value: _progress?.fraction),
-                  ],
-                ),
-              ),
-            if (_error != null)
-              Card(
-                color: Theme.of(context).colorScheme.errorContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(_error!),
-                ),
-              ),
-            if (_message != null)
-              Card(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(_message!),
-                ),
-              ),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.filter_list),
-                  label: Text(
-                    'Filters (${_query.authors.length + _query.series.length + _query.shelfIds.length})',
+        child: SketchPage(
+          child: ListView(
+            padding: EdgeInsets.all(wide ? kSpace5 : kSpace4),
+            children: <Widget>[
+              if (_loading) const LinearProgressIndicator(),
+              if (_importing)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: kSpace3),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SketchLabel('Importing…'),
+                      const SizedBox(height: kSpace2),
+                      LinearProgressIndicator(value: _progress?.fraction),
+                    ],
                   ),
-                  onPressed: _showFilters,
                 ),
-                if (_query.hasFilters)
-                  TextButton(
-                    onPressed: _clearFilters,
-                    child: const Text('Clear filters'),
-                  ),
+              if (_error != null) ...<Widget>[
+                SketchNotice(message: _error!, kind: SketchNoticeKind.error),
+                const SizedBox(height: kSpace3),
               ],
-            ),
-            SwitchListTile(
-              title: const Text('Automatically mark as Reading'),
-              subtitle: const Text(
-                'On reading activity; manual statuses always take precedence.',
-              ),
-              value: _autoStartReading,
-              onChanged: (value) async {
-                try {
-                  await _library?.store.writeSetting(
-                    'library.autoStartReading',
-                    value.toString(),
-                  );
-                  if (mounted) setState(() => _autoStartReading = value);
-                } catch (error) {
-                  if (mounted) {
-                    setState(
-                      () => _error = 'Could not save preference: $error',
-                    );
-                  }
-                }
-              },
-            ),
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search title, author, series…',
-                prefixIcon: const Icon(Icons.search),
+              if (_message != null) ...<Widget>[
+                SketchNotice(message: _message!),
+                const SizedBox(height: kSpace3),
+              ],
+              SketchTextField(
+                label: 'Search title, author, series…',
+                controller: _searchController,
+                prefixIcon: Icons.search,
                 suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
                         icon: const Icon(Icons.clear),
+                        tooltip: 'Clear search',
                         onPressed: () => _searchController.clear(),
                       ),
-                border: const OutlineInputBorder(),
+                seedKey: 'library-search',
               ),
-            ),
-            const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+              const SizedBox(height: kSpace3),
+              // Status chips: the frequently used filter, always visible.
+              Wrap(
+                spacing: kSpace2,
+                runSpacing: kSpace2,
                 children: <Widget>[
-                  ChoiceChip(
-                    label: const Text('All'),
+                  SketchFilterChip(
+                    label: 'All',
                     selected: _query.statuses.isEmpty,
                     onSelected: (_) => _updateQuery(
                       _query.copyWith(statuses: <ReadingStatus>{}),
                     ),
+                    seedKey: 'status-all',
                   ),
                   for (final ReadingStatus s in ReadingStatus.values)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: FilterChip(
-                        label: Text(s.label),
-                        selected: _query.statuses.contains(s),
-                        onSelected: (bool v) => _updateQuery(
-                          _query.copyWith(
-                            statuses: v
-                                ? {..._query.statuses, s}
-                                : ({..._query.statuses}..remove(s)),
-                          ),
+                    SketchFilterChip(
+                      label: s.label,
+                      selected: _query.statuses.contains(s),
+                      onSelected: (bool v) => _updateQuery(
+                        _query.copyWith(
+                          statuses: v
+                              ? {..._query.statuses, s}
+                              : ({..._query.statuses}..remove(s)),
                         ),
                       ),
+                      seedKey: 'status-${s.name}',
                     ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: DropdownButton<LibraryGroupBy>(
-                    value: _query.groupBy,
-                    isExpanded: true,
-                    items: <DropdownMenuItem<LibraryGroupBy>>[
-                      for (final LibraryGroupBy g in LibraryGroupBy.values)
-                        DropdownMenuItem<LibraryGroupBy>(
-                          value: g,
-                          child: Text('Group: ${_groupLabel(g)}'),
-                        ),
-                    ],
-                    onChanged: (LibraryGroupBy? g) {
-                      if (g != null) _updateQuery(_query.copyWith(groupBy: g));
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: DropdownButton<LibrarySourceFilter>(
-                    value: _query.sourceFilter,
-                    isExpanded: true,
-                    items: <DropdownMenuItem<LibrarySourceFilter>>[
-                      for (final LibrarySourceFilter f
-                          in LibrarySourceFilter.values)
-                        DropdownMenuItem<LibrarySourceFilter>(
-                          value: f,
-                          child: Text('Source: ${_sourceLabel(f)}'),
-                        ),
-                    ],
-                    onChanged: (LibrarySourceFilter? f) {
-                      if (f != null) {
-                        _updateQuery(_query.copyWith(sourceFilter: f));
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: DropdownButton<LibraryAvailabilityFilter>(
-                    value: _query.availabilityFilter,
-                    isExpanded: true,
-                    items: <DropdownMenuItem<LibraryAvailabilityFilter>>[
-                      for (final LibraryAvailabilityFilter f
-                          in LibraryAvailabilityFilter.values)
-                        DropdownMenuItem<LibraryAvailabilityFilter>(
-                          value: f,
-                          child: Text('Files: ${_availLabel(f)}'),
-                        ),
-                    ],
-                    onChanged: (LibraryAvailabilityFilter? f) {
-                      if (f != null) {
-                        _updateQuery(_query.copyWith(availabilityFilter: f));
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: DropdownButton<String>(
-                    hint: const Text('Saved views'),
-                    value: null,
-                    isExpanded: true,
-                    items: _savedViews
-                        .map(
-                          (Map<String, dynamic> v) => DropdownMenuItem<String>(
-                            value: v['name'] as String,
-                            child: Text(v['name'] as String),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (String? name) {
-                      if (name == null) return;
-                      final Map<String, dynamic>? v = _savedViews
-                          .cast<Map<String, dynamic>?>()
-                          .firstWhere(
-                            (Map<String, dynamic>? e) => e?['name'] == name,
-                            orElse: () => null,
-                          );
-                      if (v != null) _applySavedView(v);
-                    },
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.save_outlined),
-                  tooltip: 'Save current view',
-                  onPressed: _saveCurrentView,
-                ),
-                if (_savedViews.isNotEmpty)
-                  PopupMenuButton<String>(
-                    tooltip: 'Delete a saved view',
-                    icon: const Icon(Icons.delete_outline),
-                    onSelected: _deleteSavedView,
-                    itemBuilder: (BuildContext ctx) => <PopupMenuEntry<String>>[
-                      for (final Map<String, dynamic> v in _savedViews)
-                        PopupMenuItem<String>(
-                          value: v['name'] as String,
-                          child: Text(v['name'] as String),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    'Library · ${_books.length} book(s)',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                _SortMenu(
-                  value: _query.sort,
-                  direction: _query.direction,
-                  onChanged: (LibrarySortKey key) =>
-                      _updateQuery(_query.copyWith(sort: key)),
-                  onToggleDirection: () => _updateQuery(
-                    _query.copyWith(
-                      direction:
-                          _query.direction == LibrarySortDirection.ascending
-                          ? LibrarySortDirection.descending
-                          : LibrarySortDirection.ascending,
+              const SizedBox(height: kSpace3),
+              // Compact toolbar: sort, view, and the advanced-filters toggle.
+              SketchToolbar(
+                children: <Widget>[
+                  _SortMenu(
+                    value: _query.sort,
+                    direction: _query.direction,
+                    onChanged: (LibrarySortKey key) =>
+                        _updateQuery(_query.copyWith(sort: key)),
+                    onToggleDirection: () => _updateQuery(
+                      _query.copyWith(
+                        direction:
+                            _query.direction == LibrarySortDirection.ascending
+                            ? LibrarySortDirection.descending
+                            : LibrarySortDirection.ascending,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                IconButton(
-                  icon: Icon(
-                    _query.viewMode == LibraryViewMode.grid
+                  SketchIconButton(
+                    icon: _query.viewMode == LibraryViewMode.grid
                         ? Icons.view_list
                         : Icons.grid_view,
-                  ),
-                  tooltip: _query.viewMode == LibraryViewMode.grid
-                      ? 'Switch to list'
-                      : 'Switch to grid',
-                  onPressed: () => _updateQuery(
-                    _query.copyWith(
-                      viewMode: _query.viewMode == LibraryViewMode.grid
-                          ? LibraryViewMode.list
-                          : LibraryViewMode.grid,
+                    tooltip: _query.viewMode == LibraryViewMode.grid
+                        ? 'Switch to list'
+                        : 'Switch to grid',
+                    onPressed: () => _updateQuery(
+                      _query.copyWith(
+                        viewMode: _query.viewMode == LibraryViewMode.grid
+                            ? LibraryViewMode.list
+                            : LibraryViewMode.grid,
+                      ),
                     ),
                   ),
+                  SketchIconButton(
+                    icon: Icons.filter_list,
+                    tooltip: _showAdvancedFilters
+                        ? 'Hide filters'
+                        : 'Show filters',
+                    selected: _showAdvancedFilters,
+                    onPressed: () => setState(
+                      () => _showAdvancedFilters = !_showAdvancedFilters,
+                    ),
+                  ),
+                ],
+              ),
+              if (_showAdvancedFilters) ...<Widget>[
+                const SizedBox(height: kSpace3),
+                _AdvancedFilters(
+                  query: _query,
+                  savedViews: _savedViews,
+                  onQuery: _updateQuery,
+                  onApplySavedView: _applySavedView,
+                  onSaveView: _saveCurrentView,
+                  onDeleteSavedView: _deleteSavedView,
+                  sourceLabel: _sourceLabel,
+                  availLabel: _availLabel,
+                  groupLabel: _groupLabel,
                 ),
               ],
-            ),
-            const SizedBox(height: 8),
-            if (!_loading && _books.isEmpty && _query.hasFilters)
-              const Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No books match these filters. Clear filters to see your library.',
-                ),
-              ),
-            if (!_loading && _books.isEmpty && !_query.hasFilters)
-              _EmptyState(path: _library?.importer.booksDirectory.path ?? ''),
-            if (_books.isNotEmpty)
-              _GroupedBooks(
-                books: _books,
-                groupBy: _query.groupBy,
-                viewMode: _query.viewMode,
-                onOpen: _open,
-                onLongPress: _showBookActions,
-              ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.cloud),
-                label: const Text('Browse CWNG'),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => CwngBrowserPage(library: _library!),
+              const SizedBox(height: kSpace3),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      '${_books.length} book${_books.length == 1 ? '' : 's'}'
+                      '${_query.hasFilters ? ' in view' : ''}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: kInk,
+                      ),
                     ),
-                  );
-                },
+                  ),
+                  if (_query.hasFilters)
+                    TextButton(
+                      onPressed: _clearFilters,
+                      child: const Text('Clear filters'),
+                    ),
+                  const SizedBox(width: kSpace2),
+                  SketchButton(
+                    label: 'Filters',
+                    icon: Icons.tune,
+                    seedKey: 'open-filters',
+                    onPressed: _showFilters,
+                  ),
+                ],
               ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.link),
-                label: const Text('Add from URL'),
-                onPressed: _importing ? null : _importUrl,
+              // Applied filters stay visible so the scope is always clear.
+              if (_query.hasFilters) ...<Widget>[
+                const SizedBox(height: kSpace2),
+                Wrap(
+                  spacing: kSpace2,
+                  runSpacing: kSpace2,
+                  children: <Widget>[
+                    if ((_query.search ?? '').trim().isNotEmpty)
+                      SketchBadge(
+                        label: 'Search: ${_query.search}',
+                        seedKey: 'applied-search',
+                      ),
+                    for (final ReadingStatus s in _query.statuses)
+                      SketchBadge(label: s.label, seedKey: 'applied-${s.name}'),
+                    if (_query.sourceFilter != LibrarySourceFilter.all)
+                      SketchBadge(
+                        label: _sourceLabel(_query.sourceFilter),
+                        seedKey: 'applied-source',
+                      ),
+                    if (_query.availabilityFilter !=
+                        LibraryAvailabilityFilter.all)
+                      SketchBadge(
+                        label: _availLabel(_query.availabilityFilter),
+                        seedKey: 'applied-availability',
+                      ),
+                    if (_query.authors.isNotEmpty)
+                      SketchBadge(
+                        label: '${_query.authors.length} author(s)',
+                        seedKey: 'applied-authors',
+                      ),
+                    if (_query.series.isNotEmpty)
+                      SketchBadge(
+                        label: '${_query.series.length} series',
+                        seedKey: 'applied-series',
+                      ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: kSpace3),
+              if (!_loading && _books.isEmpty && _query.hasFilters)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: kSpace5),
+                  child: Text(
+                    'No books match these filters. Clear filters to see your '
+                    'library.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: kInkMuted,
+                    ),
+                  ),
+                ),
+              if (!_loading && _books.isEmpty && !_query.hasFilters)
+                _EmptyState(path: _library?.importer.booksDirectory.path ?? ''),
+              if (_books.isNotEmpty)
+                _GroupedBooks(
+                  books: _books,
+                  groupBy: _query.groupBy,
+                  viewMode: _query.viewMode,
+                  roughness: roughness,
+                  onOpen: _open,
+                  onLongPress: _showBookActions,
+                ),
+              const SizedBox(height: kSpace4),
+              const SketchSectionHeading('Get books'),
+              const SizedBox(height: kSpace2),
+              const Text(
+                'Add a book from your device, from a URL, or browse a connected '
+                'CWNG library.',
+                style: TextStyle(fontSize: 13, height: 1.45, color: kInkMuted),
               ),
-            ),
-          ],
+              const SizedBox(height: kSpace3),
+              Wrap(
+                spacing: kSpace2,
+                runSpacing: kSpace2,
+                children: <Widget>[
+                  SketchButton(
+                    label: 'Browse CWNG',
+                    icon: Icons.cloud_outlined,
+                    seedKey: 'browse-cwng',
+                    onPressed: _library == null
+                        ? null
+                        : () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    CwngBrowserPage(library: _library!),
+                              ),
+                            );
+                          },
+                  ),
+                  SketchButton(
+                    label: 'Add from URL',
+                    icon: Icons.link,
+                    seedKey: 'add-url',
+                    onPressed: _importing ? null : _importUrl,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+/// Grouping, source, availability and saved views, revealed on request.
+class _AdvancedFilters extends StatelessWidget {
+  const _AdvancedFilters({
+    required this.query,
+    required this.savedViews,
+    required this.onQuery,
+    required this.onApplySavedView,
+    required this.onSaveView,
+    required this.onDeleteSavedView,
+    required this.sourceLabel,
+    required this.availLabel,
+    required this.groupLabel,
+  });
+
+  final LibraryQuery query;
+  final List<Map<String, dynamic>> savedViews;
+  final ValueChanged<LibraryQuery> onQuery;
+  final ValueChanged<Map<String, dynamic>> onApplySavedView;
+  final VoidCallback onSaveView;
+  final ValueChanged<String> onDeleteSavedView;
+  final String Function(LibrarySourceFilter) sourceLabel;
+  final String Function(LibraryAvailabilityFilter) availLabel;
+  final String Function(LibraryGroupBy) groupLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const SketchLabel('GROUP BY'),
+        const SizedBox(height: kSpace2),
+        Wrap(
+          spacing: kSpace2,
+          runSpacing: kSpace2,
+          children: <Widget>[
+            for (final LibraryGroupBy g in LibraryGroupBy.values)
+              SketchFilterChip(
+                label: groupLabel(g),
+                selected: query.groupBy == g,
+                onSelected: (_) => onQuery(query.copyWith(groupBy: g)),
+                seedKey: 'group-${g.name}',
+              ),
+          ],
+        ),
+        const SizedBox(height: kSpace4),
+        const SketchLabel('SOURCE'),
+        const SizedBox(height: kSpace2),
+        Wrap(
+          spacing: kSpace2,
+          runSpacing: kSpace2,
+          children: <Widget>[
+            for (final LibrarySourceFilter f in LibrarySourceFilter.values)
+              SketchFilterChip(
+                label: sourceLabel(f),
+                selected: query.sourceFilter == f,
+                onSelected: (_) => onQuery(query.copyWith(sourceFilter: f)),
+                seedKey: 'source-${f.name}',
+              ),
+          ],
+        ),
+        const SizedBox(height: kSpace4),
+        const SketchLabel('FILES'),
+        const SizedBox(height: kSpace2),
+        Wrap(
+          spacing: kSpace2,
+          runSpacing: kSpace2,
+          children: <Widget>[
+            for (final LibraryAvailabilityFilter f
+                in LibraryAvailabilityFilter.values)
+              SketchFilterChip(
+                label: availLabel(f),
+                selected: query.availabilityFilter == f,
+                onSelected: (_) =>
+                    onQuery(query.copyWith(availabilityFilter: f)),
+                seedKey: 'availability-${f.name}',
+              ),
+          ],
+        ),
+        const SizedBox(height: kSpace4),
+        const SketchLabel('SAVED VIEWS'),
+        const SizedBox(height: kSpace2),
+        if (savedViews.isEmpty)
+          const Text(
+            'No saved views yet. Set filters, then save the view.',
+            style: TextStyle(fontSize: 13, height: 1.45, color: kInkMuted),
+          )
+        else
+          Wrap(
+            spacing: kSpace2,
+            runSpacing: kSpace2,
+            children: <Widget>[
+              for (final Map<String, dynamic> view in savedViews)
+                SketchFilterChip(
+                  label: view['name'] as String,
+                  selected: false,
+                  onSelected: (_) => onApplySavedView(view),
+                  seedKey: 'saved-view-${view['name']}',
+                ),
+            ],
+          ),
+        const SizedBox(height: kSpace2),
+        Wrap(
+          spacing: kSpace2,
+          runSpacing: kSpace2,
+          children: <Widget>[
+            SketchButton(
+              label: 'Save current view',
+              icon: Icons.save_outlined,
+              seedKey: 'save-view',
+              onPressed: onSaveView,
+            ),
+            if (savedViews.isNotEmpty)
+              SketchButton(
+                label: 'Delete a view',
+                icon: Icons.delete_outline,
+                seedKey: 'delete-view',
+                onPressed: () async {
+                  final String? name = await showModalBottomSheet<String>(
+                    context: context,
+                    builder: (BuildContext ctx) => SketchSheet(
+                      title: 'Delete a saved view',
+                      seedKey: 'delete-view-sheet',
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          for (final Map<String, dynamic> view in savedViews)
+                            SketchNavRow(
+                              label: view['name'] as String,
+                              icon: Icons.bookmark_remove_outlined,
+                              onTap: () =>
+                                  Navigator.pop(ctx, view['name'] as String),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                  if (name != null) onDeleteSavedView(name);
+                },
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -964,20 +1229,24 @@ class _SortMenu extends StatelessWidget {
             for (final LibrarySortKey k in LibrarySortKey.values)
               PopupMenuItem<LibrarySortKey>(value: k, child: Text(_label(k))),
           ],
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: kMinTarget),
+            padding: const EdgeInsets.symmetric(horizontal: kSpace2),
+            alignment: Alignment.center,
             child: Text(
-              _label(value),
-              style: Theme.of(context).textTheme.labelLarge,
+              'Sort: ${_label(value)}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: kInk,
+              ),
             ),
           ),
         ),
-        IconButton(
-          icon: Icon(
-            direction == LibrarySortDirection.ascending
-                ? Icons.arrow_upward
-                : Icons.arrow_downward,
-          ),
+        SketchIconButton(
+          icon: direction == LibrarySortDirection.ascending
+              ? Icons.arrow_upward
+              : Icons.arrow_downward,
           tooltip: 'Toggle sort direction',
           onPressed: onToggleDirection,
         ),
@@ -1004,15 +1273,28 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: kSpace6),
       child: Column(
         children: <Widget>[
-          const Icon(Icons.menu_book_outlined, size: 48),
-          const SizedBox(height: 8),
+          const Icon(Icons.menu_book_outlined, size: 44, color: kInkMuted),
+          const SizedBox(height: kSpace3),
+          const Text(
+            'No EPUB files yet.',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: kInk,
+            ),
+          ),
+          const SizedBox(height: kSpace2),
           Text(
-            'No EPUB files yet.\nTap + to import one, or copy books into:\n$path',
+            'Tap + to import one, or copy books into:\n$path',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13),
+            style: const TextStyle(
+              fontSize: 13,
+              height: 1.45,
+              color: kInkMuted,
+            ),
           ),
         ],
       ),
@@ -1027,6 +1309,7 @@ class _GroupedBooks extends StatelessWidget {
     required this.viewMode,
     required this.onOpen,
     required this.onLongPress,
+    required this.roughness,
   });
 
   final List<Book> books;
@@ -1034,6 +1317,7 @@ class _GroupedBooks extends StatelessWidget {
   final LibraryViewMode viewMode;
   final ValueChanged<Book> onOpen;
   final ValueChanged<Book> onLongPress;
+  final double roughness;
 
   @override
   Widget build(BuildContext context) {
@@ -1047,22 +1331,58 @@ class _GroupedBooks extends StatelessWidget {
         final content = viewMode == LibraryViewMode.grid
             ? _BookGrid(
                 books: section.value,
+                roughness: roughness,
                 onOpen: onOpen,
                 onLongPress: onLongPress,
               )
             : _BookList(
                 books: section.value,
+                roughness: roughness,
                 onOpen: onOpen,
                 onLongPress: onLongPress,
               );
         if (groupBy == LibraryGroupBy.none) return content;
-        return ExpansionTile(
-          key: PageStorageKey('${groupBy.name}:${section.key}'),
-          initiallyExpanded: true,
-          title: Text('${section.key} (${section.value.length})'),
-          children: [content],
+        return _SketchGroup(
+          title: '${section.key} (${section.value.length})',
+          roughness: roughness,
+          children: content,
         );
       }).toList(),
+    );
+  }
+}
+
+/// A collapsible group heading with the app's spacing and type, replacing the
+/// Material expansion tile's filled header.
+class _SketchGroup extends StatelessWidget {
+  const _SketchGroup({
+    required this.title,
+    required this.children,
+    required this.roughness,
+  });
+
+  final String title;
+  final Widget children;
+  final double roughness;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        initiallyExpanded: true,
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: const EdgeInsets.only(bottom: kSpace3),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: kInk,
+          ),
+        ),
+        children: <Widget>[children],
+      ),
     );
   }
 }
@@ -1072,36 +1392,72 @@ class _BookList extends StatelessWidget {
     required this.books,
     required this.onOpen,
     required this.onLongPress,
+    required this.roughness,
   });
 
   final List<Book> books;
   final ValueChanged<Book> onOpen;
   final ValueChanged<Book> onLongPress;
+  final double roughness;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: books
           .map(
-            (Book book) => Card(
-              child: ListTile(
-                leading: _cover(book),
-                title: Text(book.title),
-                subtitle: Text(_subtitle(book)),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
+            (Book book) => Padding(
+              padding: const EdgeInsets.only(bottom: kSpace2),
+              child: SketchSurface(
+                seedKey: 'book-${book.id.value}',
+                roughness: roughness,
+                padding: const EdgeInsets.all(kSpace2),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    if (book.progressPercentage != null)
-                      Text('${(book.progressPercentage! * 100).round()}%'),
-                    IconButton(
-                      icon: const Icon(Icons.more_vert),
+                    _cover(book),
+                    const SizedBox(width: kSpace3),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            book.title,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: kInk,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _subtitle(book),
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: kInkMuted,
+                            ),
+                          ),
+                          if (book.progressPercentage != null) ...<Widget>[
+                            const SizedBox(height: kSpace1),
+                            Text(
+                              '${(book.progressPercentage! * 100).round()}% read',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: kAccent,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SketchIconButton(
+                      icon: Icons.more_vert,
                       tooltip: 'Book actions',
                       onPressed: () => onLongPress(book),
                     ),
                   ],
                 ),
-                onTap: () => onOpen(book),
-                onLongPress: () => onLongPress(book),
               ),
             ),
           )
@@ -1115,11 +1471,13 @@ class _BookGrid extends StatelessWidget {
     required this.books,
     required this.onOpen,
     required this.onLongPress,
+    required this.roughness,
   });
 
   final List<Book> books;
   final ValueChanged<Book> onOpen;
   final ValueChanged<Book> onLongPress;
+  final double roughness;
 
   @override
   Widget build(BuildContext context) {
@@ -1130,50 +1488,43 @@ class _BookGrid extends StatelessWidget {
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columns,
         childAspectRatio: 0.62,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        crossAxisSpacing: kSpace2,
+        mainAxisSpacing: kSpace2,
       ),
       itemCount: books.length,
       itemBuilder: (BuildContext ctx, int i) {
         final Book book = books[i];
-        return Card(
-          clipBehavior: Clip.antiAlias,
+        return SketchSurface(
+          seedKey: 'book-grid-${book.id.value}',
+          roughness: roughness,
+          padding: const EdgeInsets.all(kSpace2),
           child: InkWell(
             onTap: () => onOpen(book),
+            onLongPress: () => onLongPress(book),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Expanded(child: _cover(book, fill: true)),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        book.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        book.authors.isEmpty
-                            ? 'Unknown author'
-                            : book.authors.join(', '),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                          icon: const Icon(Icons.more_vert, size: 18),
-                          tooltip: 'Book actions',
-                          onPressed: () => onLongPress(book),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: kSpace2),
+                Text(
+                  book.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    color: kInk,
                   ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  book.authors.isEmpty
+                      ? 'Unknown author'
+                      : book.authors.join(', '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12, color: kInkMuted),
                 ),
               ],
             ),
@@ -1186,20 +1537,20 @@ class _BookGrid extends StatelessWidget {
 
 Widget _cover(Book book, {bool fill = false}) {
   final String? cover = book.coverPath;
-  if (cover == null) {
-    final Widget icon = Icon(Icons.menu_book_outlined, size: fill ? 48 : null);
-    return fill ? Center(child: icon) : icon;
-  }
+  final Widget placeholder = Icon(
+    Icons.menu_book_outlined,
+    size: fill ? 40 : 28,
+    color: kInkMuted,
+  );
+  if (cover == null) return fill ? Center(child: placeholder) : placeholder;
   final File file = File(cover);
   if (!file.existsSync()) {
-    final Widget icon = Icon(Icons.menu_book_outlined, size: fill ? 48 : null);
-    return fill ? Center(child: icon) : icon;
+    return fill ? Center(child: placeholder) : placeholder;
   }
   return Image.file(
     file,
     fit: BoxFit.cover,
-    errorBuilder: (_, _, _) =>
-        Icon(Icons.menu_book_outlined, size: fill ? 48 : null),
+    errorBuilder: (_, _, _) => placeholder,
   );
 }
 

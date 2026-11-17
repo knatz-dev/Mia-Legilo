@@ -3,14 +3,24 @@ import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../core/design/fields.dart';
+import '../../core/design/tokens.dart';
+import '../../core/design/widgets.dart';
 import '../../domain/annotation.dart';
 import '../../domain/ids.dart';
 import '../../domain/locator.dart';
 import '../../domain/status.dart';
 import '../../library/library_service.dart';
 import '../../reader_engines/foliate/foliate_engine.dart';
+import '../settings/settings_model.dart';
+import '../settings/settings_pages.dart';
+import '../settings/settings_service.dart';
 import 'reader_settings.dart';
 
+/// The reader. Layout, typography and theme are read from the persisted
+/// reader defaults (edited in Settings → Reader); the only temporary control
+/// here is the scrolled/paginated view toggle, whose saved default also lives
+/// in Settings → Reader.
 class ReaderPage extends StatefulWidget {
   const ReaderPage({
     super.key,
@@ -75,10 +85,17 @@ class _ReaderPageState extends State<ReaderPage> {
       await _engine.initialize();
       final LibraryService? library = widget.library;
       if (library != null) {
-        final String? raw = await library.store.readSetting('reader.settings');
-        if (raw != null && raw.isNotEmpty) {
-          _settings = ReaderSettings.fromJsonString(raw);
-        }
+        final ReaderDefaults defaults = await SettingsService(library)
+            .readerDefaults();
+        _settings = ReaderSettings(
+          fontSize: defaults.fontSize,
+          lineHeight: defaults.lineHeight,
+          margin: defaults.margin,
+          theme: defaults.theme,
+          layout: defaults.layout,
+          highContrast: defaults.theme == 'high-contrast',
+          reducedMotion: defaults.reducedMotion,
+        );
       }
       await _engine.load(source);
       await _engine.bookOpened;
@@ -92,7 +109,6 @@ class _ReaderPageState extends State<ReaderPage> {
       _locationSub = _engine.onLocationChanged.listen(_onLocation);
       _errorSub = _engine.onError.listen((String e) async {
         if (!mounted) return;
-        // Attempt bounded crash recovery.
         final bool recovered = await _engine.recover();
         if (recovered) {
           if (!mounted) return;
@@ -169,19 +185,21 @@ class _ReaderPageState extends State<ReaderPage> {
     if (!mounted) return;
     final bool? mark = await showDialog<bool>(
       context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Finished reading?'),
+      builder: (BuildContext ctx) => SketchDialog(
+        title: 'Finished reading?',
+        seedKey: 'finished-reading',
         content: const Text(
           'You reached the end of this book. Mark it as completed?',
+          style: TextStyle(fontSize: 14, height: 1.5, color: kInk),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Not yet'),
           ),
-          TextButton(
+          SketchButton(
+            label: 'Mark completed',
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Mark completed'),
           ),
         ],
       ),
@@ -202,148 +220,34 @@ class _ReaderPageState extends State<ReaderPage> {
     await _engine.setTheme(_settings.theme);
   }
 
-  Future<void> _saveSettings() async {
+  Future<void> _toggleLayout() async {
+    final String layout = _paginated ? 'scrolled' : 'paginated';
+    setState(() {
+      _paginated = !_paginated;
+      _settings = _settings.copyWith(layout: layout);
+    });
+    await _engine.setLayout(layout);
     final LibraryService? library = widget.library;
-    if (library == null) return;
-    await library.store.writeSetting(
-      'reader.settings',
-      _settings.toJsonString(),
-    );
+    if (library != null) {
+      // The saved default follows the reader, so a fresh book opens the way
+      // this one was last read.
+      final ReaderDefaults defaults = await SettingsService(library)
+          .readerDefaults();
+      await SettingsService(library)
+          .saveReaderDefaults(defaults.copyWith(layout: layout));
+    }
   }
 
-  Future<void> _showSettings() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext ctx) {
-        double fontSize = _settings.fontSize;
-        double lineHeight = _settings.lineHeight;
-        double margin = _settings.margin;
-        String theme = _settings.theme;
-        String layout = _settings.layout;
-        bool reducedMotion = _settings.reducedMotion;
-        return StatefulBuilder(
-          builder: (BuildContext ctx, StateSetter setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Typography',
-                    style: Theme.of(ctx).textTheme.titleMedium,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      const Text('Font size'),
-                      Expanded(
-                        child: Slider(
-                          value: fontSize,
-                          min: 12,
-                          max: 28,
-                          divisions: 16,
-                          label: fontSize.round().toString(),
-                          onChanged: (double v) =>
-                              setModalState(() => fontSize = v),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      const Text('Line height'),
-                      Expanded(
-                        child: Slider(
-                          value: lineHeight,
-                          min: 1.2,
-                          max: 2.2,
-                          divisions: 10,
-                          label: lineHeight.toStringAsFixed(1),
-                          onChanged: (double v) =>
-                              setModalState(() => lineHeight = v),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      const Text('Margin'),
-                      Expanded(
-                        child: Slider(
-                          value: margin,
-                          min: 8,
-                          max: 40,
-                          divisions: 8,
-                          label: margin.round().toString(),
-                          onChanged: (double v) =>
-                              setModalState(() => margin = v),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Theme', style: Theme.of(ctx).textTheme.titleMedium),
-                  Wrap(
-                    spacing: 8,
-                    children: <String>['light', 'dark', 'sepia', 'high-contrast']
-                        .map(
-                          (String t) => ChoiceChip(
-                            label: Text(t),
-                            selected: theme == t,
-                            onSelected: (_) => setModalState(() => theme = t),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('Layout', style: Theme.of(ctx).textTheme.titleMedium),
-                  Wrap(
-                    spacing: 8,
-                    children: <String>['scrolled', 'paginated']
-                        .map(
-                          (String l) => ChoiceChip(
-                            label: Text(l),
-                            selected: layout == l,
-                            onSelected: (_) => setModalState(() => layout = l),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  SwitchListTile(
-                    title: const Text('Reduced motion'),
-                    subtitle: const Text('Disable animations for e-ink / accessibility'),
-                    value: reducedMotion,
-                    onChanged: (bool v) =>
-                        setModalState(() => reducedMotion = v),
-                  ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final ReaderSettings next = _settings.copyWith(
-                          fontSize: fontSize,
-                          lineHeight: lineHeight,
-                          margin: margin,
-                          theme: theme,
-                          layout: layout,
-                          reducedMotion: reducedMotion,
-                        );
-                        setState(() => _settings = next);
-                        _paginated = next.layout == 'paginated';
-                        await _applySettings();
-                        await _saveSettings();
-                        if (ctx.mounted) Navigator.pop(ctx);
-                      },
-                      child: const Text('Apply'),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+  void _openReaderSettings() {
+    final LibraryService? library = widget.library;
+    if (library == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SettingsHost(
+          service: SettingsService(library),
+          child: ReaderSettingsPage(settings: SettingsService(library)),
+        ),
+      ),
     );
   }
 
@@ -379,16 +283,15 @@ class _ReaderPageState extends State<ReaderPage> {
     if (widget.library == null || widget.bookId == null) {
       await showDialog<void>(
         context: context,
-        builder: (BuildContext ctx) => AlertDialog(
-          title: const Text('Bookmarks'),
+        builder: (BuildContext ctx) => SketchDialog(
+          title: 'Bookmarks',
+          seedKey: 'bookmarks-unavailable',
           content: const Text(
             'Open this book from your library to manage bookmarks.',
+            style: TextStyle(fontSize: 14, height: 1.5, color: kInk),
           ),
           actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('OK'),
-            ),
+            SketchButton(label: 'OK', onPressed: () => Navigator.pop(ctx)),
           ],
         ),
       );
@@ -400,26 +303,33 @@ class _ReaderPageState extends State<ReaderPage> {
     if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
-      builder: (BuildContext ctx) => SafeArea(
+      builder: (BuildContext ctx) => SketchSheet(
+        title: 'Bookmarks',
+        seedKey: 'bookmarks-sheet',
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
         child: list.isEmpty
             ? const Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('No bookmarks yet.'),
+                padding: EdgeInsets.symmetric(vertical: kSpace4),
+                child: Text(
+                  'No bookmarks yet. Use the bookmark icon while reading.',
+                  style: TextStyle(fontSize: 14, color: kInkMuted),
+                ),
               )
-            : ListView(
-                shrinkWrap: true,
+            : Column(
+                mainAxisSize: MainAxisSize.min,
                 children: list
                     .map(
-                      (Bookmark bm) => ListTile(
-                        title: Text(bm.label ?? 'Bookmark'),
-                        subtitle: Text(bm.locator.cfi ?? ''),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () async {
-                            await widget.library!.deleteBookmark(bm.id);
-                            if (ctx.mounted) Navigator.pop(ctx);
-                          },
-                        ),
+                      (Bookmark bm) => SketchNavRow(
+                        label: bm.label ?? 'Bookmark',
+                        value: bm.locator.cfi ?? '',
+                        icon: bm.locator.cfi == null
+                            ? Icons.bookmark_outline
+                            : null,
                         onTap: () {
                           Navigator.pop(ctx);
                           _engine.goTo(bm.locator);
@@ -435,23 +345,26 @@ class _ReaderPageState extends State<ReaderPage> {
   Future<void> _showSearch() async {
     await showDialog<void>(
       context: context,
-      builder: (BuildContext ctx) => AlertDialog(
-        title: const Text('Search in book'),
-        content: TextField(
+      builder: (BuildContext ctx) => SketchDialog(
+        title: 'Search in book',
+        seedKey: 'search-in-book',
+        content: SketchTextField(
+          label: 'Query',
           controller: _searchController,
-          decoration: const InputDecoration(hintText: 'Query'),
+          autofocus: true,
+          seedKey: 'search-in-book-field',
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          SketchButton(
+            label: 'Search',
             onPressed: () {
               _engine.search(_searchController.text);
               Navigator.pop(ctx);
             },
-            child: const Text('Search'),
           ),
         ],
       ),
@@ -466,69 +379,41 @@ class _ReaderPageState extends State<ReaderPage> {
       appBar: AppBar(
         title: Text(widget.title ?? 'Reader', overflow: TextOverflow.ellipsis),
         actions: <Widget>[
-          Semantics(
-            label: 'Table of contents',
-            child: IconButton(
-              icon: const Icon(Icons.toc),
-              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-              tooltip: 'Contents',
-            ),
+          SketchIconButton(
+            icon: Icons.toc,
+            tooltip: 'Contents',
+            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
-          Semantics(
-            label: _paginated
-                ? 'Switch to vertical scrolling'
-                : 'Switch to paginated layout',
-            child: IconButton(
-              icon: Icon(
-                _paginated ? Icons.swap_vert : Icons.auto_stories_outlined,
-              ),
-              onPressed: () async {
-                setState(() => _paginated = !_paginated);
-                final String layout = _paginated ? 'paginated' : 'scrolled';
-                _settings = _settings.copyWith(layout: layout);
-                await _engine.setLayout(layout);
-                await _saveSettings();
-              },
-              tooltip: _paginated ? 'Vertical scroll' : 'Paginated',
-            ),
+          SketchIconButton(
+            icon: _paginated ? Icons.swap_vert : Icons.auto_stories_outlined,
+            tooltip: _paginated ? 'Vertical scroll' : 'Paginated',
+            onPressed: _toggleLayout,
           ),
-          Semantics(
-            label: 'Bookmarks',
-            child: IconButton(
-              icon: const Icon(Icons.bookmarks),
-              onPressed: _showBookmarks,
-              tooltip: 'Bookmarks',
-            ),
+          SketchIconButton(
+            icon: Icons.bookmarks_outlined,
+            tooltip: 'Bookmarks',
+            onPressed: _showBookmarks,
           ),
-          Semantics(
-            label: 'Typography and theme',
-            child: IconButton(
-              icon: const Icon(Icons.text_fields),
-              onPressed: _showSettings,
-              tooltip: 'Typography and theme',
-            ),
+          SketchIconButton(
+            icon: Icons.text_fields,
+            tooltip: 'Reader settings',
+            onPressed: _openReaderSettings,
           ),
-          Semantics(
-            label: 'Search in book',
-            child: IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: _showSearch,
-              tooltip: 'Search',
-            ),
+          SketchIconButton(
+            icon: Icons.search,
+            tooltip: 'Search in book',
+            onPressed: _showSearch,
           ),
-          Semantics(
-            label: 'Add bookmark',
-            child: IconButton(
-              icon: const Icon(Icons.bookmark_add),
-              onPressed: () async {
-                await _engine.addBookmark();
-                final ReadingLocator? loc = _lastLocator;
-                if (loc != null) {
-                  await widget.onAddBookmark?.call(loc);
-                }
-              },
-              tooltip: 'Bookmark',
-            ),
+          SketchIconButton(
+            icon: Icons.bookmark_add_outlined,
+            tooltip: 'Add bookmark',
+            onPressed: () async {
+              await _engine.addBookmark();
+              final ReadingLocator? loc = _lastLocator;
+              if (loc != null) {
+                await widget.onAddBookmark?.call(loc);
+              }
+            },
           ),
         ],
       ),
@@ -537,29 +422,46 @@ class _ReaderPageState extends State<ReaderPage> {
           WebViewWidget(controller: _engine.controller),
           if (_loading)
             const ColoredBox(
-              color: Color(0xFFFDFBF7),
+              color: kPaper,
               child: Center(child: CircularProgressIndicator()),
             ),
           if (_loadError != null)
             ColoredBox(
-              color: const Color(0xFFFDFBF7),
+              color: kPaper,
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(kSpace5),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      const Icon(Icons.error_outline, size: 40),
-                      const SizedBox(height: 12),
-                      const Text('Could not open this book'),
-                      const SizedBox(height: 8),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 40,
+                        color: kInkMuted,
+                      ),
+                      const SizedBox(height: kSpace3),
+                      const Text(
+                        'Could not open this book',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: kInk,
+                        ),
+                      ),
+                      const SizedBox(height: kSpace2),
                       Text(
                         _loadError!,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          height: 1.45,
+                          color: kInkMuted,
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      FilledButton(
+                      const SizedBox(height: kSpace4),
+                      SketchButton(
+                        label: 'Retry',
+                        icon: Icons.refresh,
                         onPressed: () {
                           setState(() {
                             _loading = true;
@@ -567,7 +469,6 @@ class _ReaderPageState extends State<ReaderPage> {
                           });
                           _openBook();
                         },
-                        child: const Text('Retry'),
                       ),
                     ],
                   ),
@@ -580,22 +481,24 @@ class _ReaderPageState extends State<ReaderPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            if (_progress != null) Text('${(_progress! * 100).round()}%'),
-            Semantics(
-              label: 'Previous page',
-              child: IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: _engine.goPrev,
-                tooltip: 'Previous',
+            if (_progress != null)
+              Text(
+                '${(_progress! * 100).round()}%',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: kAccent,
+                ),
               ),
+            SketchIconButton(
+              icon: Icons.chevron_left,
+              tooltip: 'Previous page',
+              onPressed: _engine.goPrev,
             ),
-            Semantics(
-              label: 'Next page',
-              child: IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: _engine.goNext,
-                tooltip: 'Next',
-              ),
+            SketchIconButton(
+              icon: Icons.chevron_right,
+              tooltip: 'Next page',
+              onPressed: _engine.goNext,
             ),
           ],
         ),
