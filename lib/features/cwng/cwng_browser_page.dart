@@ -148,7 +148,27 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
       );
       return;
     }
-    final String? profileId = await _profileIdFor(baseUrl);
+    final String? existingProfileId = await _profileIdFor(baseUrl);
+    String profileId;
+    if (existingProfileId != null) {
+      profileId = existingProfileId;
+    } else {
+      // Create a new profile.
+      profileId = 'cwng-${DateTime.now().millisecondsSinceEpoch}';
+      final ConnectionProfile profile = ConnectionProfile(
+        id: profileId,
+        serverUrl: baseUrl,
+        username: username,
+        label: uri.host,
+        lastConnectedAt: DateTime.now(),
+      );
+      final SettingsService? settings = widget.settings;
+      if (settings != null) {
+        final List<ConnectionProfile> profiles = await settings.connections();
+        profiles.add(profile);
+        await settings.saveConnections(profiles);
+      }
+    }
     await _connectWith(
       baseUrl: baseUrl,
       username: username,
@@ -226,6 +246,24 @@ class _CwngBrowserPageState extends State<CwngBrowserPage> {
         _activeProfileId = profileId;
         _message = 'Connected to $baseUrl';
       });
+      // Update lastConnectedAt.
+      final SettingsService? settings = widget.settings;
+      if (settings != null && profileId != null) {
+        final List<ConnectionProfile> profiles = await settings.connections();
+        final int idx = profiles.indexWhere(
+          (ConnectionProfile p) => p.id == profileId,
+        );
+        if (idx >= 0) {
+          profiles[idx] = ConnectionProfile(
+            id: profiles[idx].id,
+            serverUrl: profiles[idx].serverUrl,
+            username: profiles[idx].username,
+            label: profiles[idx].label,
+            lastConnectedAt: DateTime.now(),
+          );
+          await settings.saveConnections(profiles);
+        }
+      }
       await _loadFeed('/opds');
     } catch (e) {
       if (!restoring) setState(() => _error = 'Connection failed: $e');
